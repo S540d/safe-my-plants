@@ -27,21 +27,21 @@ export default function RootLayout() {
           name="index"
           options={{
             title: 'Pflanzen',
-            tabBarIcon: ({ color }) => <TabIcon emoji="🪴" color={color} />,
+            tabBarIcon: () => <TabIcon emoji="🪴" />,
           }}
         />
         <Tabs.Screen
           name="admin"
           options={{
             title: 'Admin',
-            tabBarIcon: ({ color }) => <TabIcon emoji="⚙️" color={color} />,
+            tabBarIcon: () => <TabIcon emoji="⚙️" />,
           }}
         />
         <Tabs.Screen
           name="settings"
           options={{
             title: 'Einstellungen',
-            tabBarIcon: ({ color }) => <TabIcon emoji="🔧" color={color} />,
+            tabBarIcon: () => <TabIcon emoji="🔧" />,
           }}
         />
         <Tabs.Screen
@@ -55,7 +55,7 @@ export default function RootLayout() {
   )
 }
 
-function TabIcon({ emoji, color }: { emoji: string; color: string }) {
+function TabIcon({ emoji }: { emoji: string; color?: unknown }) {
   const { Text } = require('react-native')
   return <Text style={{ fontSize: 20 }}>{emoji}</Text>
 }
