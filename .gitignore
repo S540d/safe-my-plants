@@ -43,3 +43,5 @@ yarn-error.*
 # Android signing
 local.properties
 keystore.properties
+!.claude/commands/
+!.claude/commands/**
