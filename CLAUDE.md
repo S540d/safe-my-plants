@@ -4,6 +4,19 @@
 
 Topfpflanzen-Companion-App für Android. Zeigt Pflegehinweise, Ampel-Status für Gieß-/Düngeintervalle, Krankheitsbilder und Fotos. Inhalte werden manuell als Admin eingepflegt (kein Backend, kein Cloud-Build).
 
+## Workflow-Regeln (verbindlich)
+
+- **PRs immer gegen `testing`**, niemals direkt gegen `main`
+- **Kein Merge nach `main`** ohne explizite schriftliche Erlaubnis des Nutzers
+- Vor jedem PR: `git fetch origin testing` – prüfen ob Basis aktuell ist, ggf. rebasen
+- CI-Checks und Copilot-Review abwarten; Suggestions prüfen und sinnvolle umsetzen
+- Nach jedem Merge: `.claude/memory.md` mit relevanten Änderungen aktualisieren
+- Für den vollständigen automatisierten Workflow: `/pr` verwenden
+
+## Öffentliches Repository – Datenschutz
+
+Das Repository ist öffentlich. Keine vollständigen Implementierungsdetails (Schemata, Algorithmen, interne Architekturentscheidungen) in README oder öffentliche Docs – diese gehören in CLAUDE.md oder `.claude/memory.md`.
+
 ## Tech Stack
 
 - React Native + Expo 56 (TypeScript)
@@ -72,12 +85,10 @@ APK-Output: `android/app/build/outputs/apk/`
 ## Branch-Strategie
 
 ```
-main      – Produktions-Stand
-testing   – Staging / QA
-feature/* – Kurzlebige Feature-Branches → Merge in testing → Merge in main
+main      – Produktions-Stand (kein Force-Push, kein direkter Merge ohne Erlaubnis)
+testing   – Staging / QA  ← Standard-Ziel für alle PRs
+feature/* – Kurzlebige Feature-Branches → testing → main
 ```
-
-Kein Force-Push auf `main`.
 
 ## Datenmodell (Überblick)
 
