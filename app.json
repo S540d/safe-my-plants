@@ -1,25 +1,45 @@
 {
   "expo": {
-    "name": "safe_my_plants_init",
-    "slug": "safe_my_plants_init",
+    "name": "Safe My Plants",
+    "slug": "safe-my-plants",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "io.github.s540d.safemyplants"
     },
     "android": {
+      "package": "io.github.s540d.safemyplants",
+      "versionCode": 1,
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#2D6A4F",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Safe My Plants möchte auf deine Fotos zugreifen, um Pflanzenbilder hinzuzufügen.",
+          "cameraPermission": "Safe My Plants möchte deine Kamera nutzen, um Pflanzenfotos aufzunehmen."
+        }
+      ]
+    ],
+    "scheme": "safemyplants"
   }
 }
