@@ -16,11 +16,10 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
 
 ## Entscheidungen & Einschränkungen
 
-- **Kein Backend** – alle Daten in AsyncStorage, Plant-IDs sind UUIDs
+- **Kein Backend** – alle Daten in AsyncStorage; Plant-IDs sind strings (`default-*` für Musterpflanzen, `plant-<timestamp>-<random>` für neue)
 - **Kein EAS** – APK-Build lokal mit `./gradlew assembleRelease`
 - **Kein Force-Push auf main**
-- Keystore-Pfad lokal: `~/Documents/Programmierung/Projects/Keystore/`
-- `keystore.properties` und `local.properties` niemals einchecken
+- Keystore liegt lokal (außerhalb des Repos), Pfad via `keystore.properties` – niemals einchecken
 
 ## Branch-Strategie
 
@@ -37,7 +36,7 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
 ## Künftige Zusammenführung mit Pflanzkalender
 
 - Gleiche `PlantLocation`-Typen verwenden
-- UUID-basierte Plant-IDs bleiben kompatibel
+- Plant-IDs auf UUID-Format umstellen (TODO: vor Zusammenführung)
 - JSON-Export-Struktur kompatibel halten
 
 ## Aktuelle Abhängigkeiten (Stand 2026-05)
