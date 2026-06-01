@@ -24,7 +24,7 @@ export function DashboardSummary({ plants, lang, activeFilter, onFilterChange }:
     return plants.reduce(
       (acc, plant) => {
         const { overall } = getCareStatus(plant)
-        if (overall === 'overdue' || overall === 'never') acc.overdue++
+        if (overall === 'overdue') acc.overdue++
         else if (overall === 'soon') acc.soon++
         else acc.ok++
         return acc

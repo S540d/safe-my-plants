@@ -9,6 +9,7 @@ import {
   savePlants,
   saveSchemaVersion,
 } from '../services/storage'
+import { notifyCareLogUpdate } from '../hooks/useCareLog'
 import { CareAction } from '../types/careLog'
 import { Plant } from '../types/plant'
 
@@ -111,6 +112,7 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
         type: 'water',
         timestamp: now,
       })
+      notifyCareLogUpdate()
     },
     [plants, persist]
   )
@@ -127,6 +129,7 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
         type: 'fertilize',
         timestamp: now,
       })
+      notifyCareLogUpdate()
     },
     [plants, persist]
   )

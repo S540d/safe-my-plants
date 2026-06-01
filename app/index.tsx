@@ -28,7 +28,7 @@ export default function HomeScreen() {
     if (!activeFilter) return plants
     return plants.filter((p) => {
       const { overall } = getCareStatus(p)
-      if (activeFilter === 'overdue') return overall === 'overdue' || overall === 'never'
+      if (activeFilter === 'overdue') return overall === 'overdue'
       return overall === activeFilter
     })
   }, [plants, activeFilter])
