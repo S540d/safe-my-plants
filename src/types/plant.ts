@@ -1,6 +1,6 @@
 export type PlantLocation = 'sun' | 'partial-shade' | 'shade' | 'indoor'
 export type HumidityLevel = 'low' | 'medium' | 'high'
-export type CareStatus = 'ok' | 'soon' | 'overdue' | 'never'
+export type CareStatus = 'ok' | 'soon' | 'overdue'
 
 export interface CareInfo {
   wateringFrequencyDays: number
