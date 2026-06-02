@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { CareAction } from '../types/careLog'
 import { Plant } from '../types/plant'
 
 const KEYS = {
@@ -6,6 +7,8 @@ const KEYS = {
   adminPinSet: 'smp-admin-pin',
   language: 'smp-language',
   theme: 'smp-theme',
+  careLog: 'smp-carelog',
+  schemaVersion: 'smp-schema-version',
 }
 
 async function get<T>(key: string): Promise<T | null> {
@@ -51,4 +54,25 @@ export async function getTheme(): Promise<'light' | 'dark' | 'system' | null> {
 
 export async function saveTheme(theme: 'light' | 'dark' | 'system'): Promise<void> {
   await set(KEYS.theme, theme)
+}
+
+export async function getCareLog(): Promise<CareAction[]> {
+  return (await get<CareAction[]>(KEYS.careLog)) ?? []
+}
+
+export async function saveCareLog(actions: CareAction[]): Promise<void> {
+  await set(KEYS.careLog, actions)
+}
+
+export async function addCareAction(action: CareAction): Promise<void> {
+  const existing = await getCareLog()
+  await set(KEYS.careLog, [action, ...existing])
+}
+
+export async function getSchemaVersion(): Promise<number> {
+  return (await get<number>(KEYS.schemaVersion)) ?? 1
+}
+
+export async function saveSchemaVersion(version: number): Promise<void> {
+  await set(KEYS.schemaVersion, version)
 }

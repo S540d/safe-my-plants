@@ -1,6 +1,16 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { DEFAULT_PLANTS } from '../constants/defaultPlants'
-import { getPlants, savePlants } from '../services/storage'
+import {
+  addCareAction,
+  getCareLog,
+  getPlants,
+  getSchemaVersion,
+  saveCareLog,
+  savePlants,
+  saveSchemaVersion,
+} from '../services/storage'
+import { notifyCareLogUpdate } from '../hooks/useCareLog'
+import { CareAction } from '../types/careLog'
 import { Plant } from '../types/plant'
 
 interface PlantContextValue {
@@ -15,6 +25,35 @@ interface PlantContextValue {
 
 const PlantContext = createContext<PlantContextValue | null>(null)
 
+async function runMigrations(plants: Plant[]): Promise<void> {
+  const version = await getSchemaVersion()
+  if (version >= 2) return
+
+  const existing = await getCareLog()
+  const existingIds = new Set(existing.map((a) => a.id))
+  const entries: CareAction[] = []
+
+  for (const plant of plants) {
+    if (plant.lastWatered) {
+      const id = `migration-water-${plant.id}`
+      if (!existingIds.has(id)) {
+        entries.push({ id, plantId: plant.id, type: 'water', timestamp: plant.lastWatered })
+      }
+    }
+    if (plant.lastFertilized) {
+      const id = `migration-fertilize-${plant.id}`
+      if (!existingIds.has(id)) {
+        entries.push({ id, plantId: plant.id, type: 'fertilize', timestamp: plant.lastFertilized })
+      }
+    }
+  }
+
+  if (entries.length > 0) {
+    await saveCareLog([...entries, ...existing])
+  }
+  await saveSchemaVersion(2)
+}
+
 export function PlantProvider({ children }: { children: React.ReactNode }) {
   const [plants, setPlants] = useState<Plant[]>([])
   const [isLoaded, setIsLoaded] = useState(false)
@@ -25,8 +64,10 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
       if (stored.length === 0) {
         await savePlants(DEFAULT_PLANTS)
         setPlants(DEFAULT_PLANTS)
+        await runMigrations(DEFAULT_PLANTS)
       } else {
         setPlants(stored)
+        await runMigrations(stored)
       }
       setIsLoaded(true)
     }
@@ -61,22 +102,34 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
 
   const markWatered = useCallback(
     async (id: string) => {
+      const now = new Date().toISOString()
       await persist(
-        plants.map((p) =>
-          p.id === id ? { ...p, lastWatered: new Date().toISOString(), updatedAt: new Date().toISOString() } : p
-        )
+        plants.map((p) => (p.id === id ? { ...p, lastWatered: now, updatedAt: now } : p))
       )
+      await addCareAction({
+        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        plantId: id,
+        type: 'water',
+        timestamp: now,
+      })
+      notifyCareLogUpdate()
     },
     [plants, persist]
   )
 
   const markFertilized = useCallback(
     async (id: string) => {
+      const now = new Date().toISOString()
       await persist(
-        plants.map((p) =>
-          p.id === id ? { ...p, lastFertilized: new Date().toISOString(), updatedAt: new Date().toISOString() } : p
-        )
+        plants.map((p) => (p.id === id ? { ...p, lastFertilized: now, updatedAt: now } : p))
       )
+      await addCareAction({
+        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        plantId: id,
+        type: 'fertilize',
+        timestamp: now,
+      })
+      notifyCareLogUpdate()
     },
     [plants, persist]
   )

@@ -8,11 +8,15 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
 ## Wichtige Dateipfade
 
 - `app/` – Expo Router Screens (Tabs: index, admin, settings; Dynamic: plant/[id])
-- `src/contexts/PlantContext.tsx` – zentraler State + AsyncStorage-Persistenz
+- `src/contexts/PlantContext.tsx` – zentraler State + AsyncStorage-Persistenz + CareLog-Writes
 - `src/hooks/useCareStatus.ts` – Ampel-Berechnung (ok / soon / overdue)
+- `src/hooks/useCareLog.ts` – CareLog CRUD (addAction, getActionsForPlant, getRecentActions)
 - `src/types/plant.ts` – vollständiges Datenmodell (Plant, CareInfo, Disease)
+- `src/types/careLog.ts` – CareAction, CareActionType (Schema v2)
 - `src/constants/defaultPlants.ts` – 3 vorinstallierte Musterpflanzen
 - `src/i18n/translations.ts` – DE/EN-Strings
+- `src/components/DashboardSummary.tsx` – 3 Filter-Karten (overdue/soon/ok) + Counts
+- `src/components/HeroPlantCard.tsx` – Hero-Tile für dringendste Pflanze
 
 ## Entscheidungen & Einschränkungen
 
@@ -20,6 +24,20 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
 - **Kein EAS** – APK-Build lokal mit `./gradlew assembleRelease`
 - **Kein Force-Push auf main**
 - Keystore liegt lokal (außerhalb des Repos), Pfad via `keystore.properties` – niemals einchecken
+- **CareLog** (`smp-carelog`): additiver Store, `lastWatered`/`lastFertilized` bleiben als Schnellzugriff erhalten
+- **Schema-Version** (`smp-schema-version`): aktuell 2; idempotente Migration in `PlantContext` beim Start
+- **useCareLog Subscriber-Pattern**: module-level Subscribers, `notifyCareLogUpdate()` nach externen Writes aufrufen
+
+## AsyncStorage-Keys
+
+| Key | Inhalt |
+|-----|--------|
+| `smp-plants` | `Plant[]` |
+| `smp-admin-pin` | PIN-String |
+| `smp-language` | `'de' \| 'en'` |
+| `smp-theme` | `'light' \| 'dark' \| 'system'` |
+| `smp-carelog` | `CareAction[]` |
+| `smp-schema-version` | `number` (aktuell: 2) |
 
 ## Branch-Strategie
 

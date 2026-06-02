@@ -91,6 +91,23 @@ const translations = {
     settings_about: 'Über die App',
     settings_version: 'Version',
 
+    // Dashboard
+    dashboard_due_today: 'Heute fällig',
+    dashboard_this_week: 'Bald fällig',
+    dashboard_all_good: 'Alles ok',
+
+    // Hero Card
+    hero_featured: 'Braucht Aufmerksamkeit',
+    hero_water: 'Gegossen',
+    hero_fertilize: 'Gedüngt',
+
+    // CareAction Types
+    care_action_water: 'Gegossen',
+    care_action_fertilize: 'Gedüngt',
+    care_action_repot: 'Umgetopft',
+    care_action_prune: 'Geschnitten',
+    care_action_note: 'Notiz',
+
     // Common
     ok: 'OK',
     cancel: 'Abbrechen',
@@ -194,6 +211,23 @@ const translations = {
     settings_admin_change_pin: 'Change PIN',
     settings_about: 'About',
     settings_version: 'Version',
+
+    // Dashboard
+    dashboard_due_today: 'Due today',
+    dashboard_this_week: 'Due soon',
+    dashboard_all_good: 'All good',
+
+    // Hero Card
+    hero_featured: 'Needs attention',
+    hero_water: 'Watered',
+    hero_fertilize: 'Fertilized',
+
+    // CareAction Types
+    care_action_water: 'Watered',
+    care_action_fertilize: 'Fertilized',
+    care_action_repot: 'Repotted',
+    care_action_prune: 'Pruned',
+    care_action_note: 'Note',
 
     // Common
     ok: 'OK',

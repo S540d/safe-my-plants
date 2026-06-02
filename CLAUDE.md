@@ -30,12 +30,12 @@ Das Repository ist öffentlich. Keine vollständigen Implementierungsdetails (Sc
 ```
 app/               – Expo Router Screens (Tabs: index, admin, settings; Dynamic: plant/[id])
 src/
-  components/      – TrafficLight, PlantCard, DiseaseCard
-  contexts/        – PlantContext (CRUD + Persistenz)
-  hooks/           – useCareStatus, usePreferences
-  types/           – plant.ts (Plant, CareInfo, Disease, CareStatus)
+  components/      – TrafficLight, PlantCard, DiseaseCard, DashboardSummary, HeroPlantCard
+  contexts/        – PlantContext (CRUD + Persistenz + CareLog-Writes)
+  hooks/           – useCareStatus, usePreferences, useCareLog
+  types/           – plant.ts, careLog.ts (CareAction, CareActionType)
   constants/       – defaultPlants.ts (3 Musterpflanzen)
-  services/        – storage.ts (AsyncStorage-Wrapper)
+  services/        – storage.ts (AsyncStorage-Wrapper inkl. CareLog + Schema-Version)
   i18n/            – translations.ts (DE/EN)
 ```
 
@@ -105,16 +105,50 @@ Plant {
     humidity: 'low' | 'medium' | 'high'
   }
   diseases: Disease[]        // { id, name, symptoms, treatment, imageUri? }
-  lastWatered?, lastFertilized?   // ISO date strings
+  lastWatered?, lastFertilized?   // ISO date strings (bleiben als Schnellzugriff)
   createdAt, updatedAt
 }
+
+// Neu (Schema v2):
+CareAction {
+  id: string
+  plantId: string
+  type: 'water' | 'fertilize' | 'repot' | 'prune' | 'note'
+  timestamp: string          // ISO-8601
+  note?: string
+}
 ```
+
+## AsyncStorage-Keys
+
+| Key | Inhalt |
+|-----|--------|
+| `smp-plants` | `Plant[]` |
+| `smp-admin-pin` | PIN-String |
+| `smp-language` | `'de' \| 'en'` |
+| `smp-theme` | `'light' \| 'dark' \| 'system'` |
+| `smp-carelog` | `CareAction[]` (neu, Schema v2) |
+| `smp-schema-version` | `number` (aktuell: 2) |
+
+## Schema-Migration
+
+`PlantContext` führt beim App-Start eine idempotente Migration durch:
+- v1 → v2: bestehende `lastWatered`/`lastFertilized` werden als initiale CareLog-Einträge übernommen (IDs: `migration-water-{plantId}`, `migration-fertilize-{plantId}`)
+- `smp-schema-version` wird auf `2` gesetzt
+
+## CareLog-Architektur
+
+- `src/services/storage.ts` → `addCareAction`, `getCareLog`, `saveCareLog`
+- `src/hooks/useCareLog.ts` → React-Hook mit **module-level Subscriber-Pattern**: alle Instanzen bleiben via `notifyCareLogUpdate()` synchron
+- `PlantContext.markWatered/markFertilized` rufen `addCareAction` + `notifyCareLogUpdate()` auf
+- Neue externe Writes immer über `notifyCareLogUpdate()` abschließen
 
 ## Ampel-Logik
 
 - **Grün (ok):** > 20% des Intervalls verbleibend
 - **Gelb (soon):** 0–20% verbleibend
 - **Rot (overdue):** Datum überschritten oder noch nie gegossen/gedüngt
+- `'never'` als CareStatus existiert im Typ, wird aber von `computeStatus` nie zurückgegeben (gibt `'overdue'` bei fehlendem Datum zurück)
 
 Berechnung in `src/hooks/useCareStatus.ts`.
 
@@ -123,8 +157,39 @@ Berechnung in `src/hooks/useCareStatus.ts`.
 PIN-geschützt (4-stellig, in AsyncStorage). Beim ersten Start wird die PIN gesetzt.
 Admin kann: Pflanzen anlegen/bearbeiten/löschen, Fotos hinzufügen, Krankheiten verwalten.
 
+## Feature-Roadmap (GitHub Issues: s540d/safe-my-plants)
+
+Vollständige Planung: Issue #16 (Tracking-Issue)
+
+### Phase 1 – MVP ✅/🔄
+| Issue | Feature | Status |
+|-------|---------|--------|
+| #2 | CareLog-Datenmodell + History-Hook | ✅ merged (PR #17) |
+| #3 | Dashboard-Karten + Hero-Tile am Index | ✅ merged (PR #17) |
+| #4 | Suchleiste + Filter-Chips + Sortierung | 🔜 |
+| #5 | In-App-Reminder-Banner + Tab-Badge | 🔜 |
+| #6 | Plant-Detail: History-Liste + Quick-Actions | 🔜 (benötigt #2) |
+
+### Phase 2 – Polish
+| Issue | Feature | Status |
+|-------|---------|--------|
+| #7 | Foto-Galerie + Schema-Migration (photos: PlantPhoto[]) | 🔜 |
+| #8 | Theme-Tokens + Empty-States + Dark-Mode-Audit | 🔜 |
+| #9 | Animationen (Reanimated) + Haptik | 🔜 |
+| #10 | Notizen pro Pflanze | 🔜 |
+| #11 | First-Run-Onboarding (3 Slides) | 🔜 |
+| #12 | Statistik-Screen: Streak, Counts | 🔜 |
+| #13 | Pflanzen-Templates | 🔜 |
+
+### Phase 3 – Stretch
+| Issue | Feature | Status |
+|-------|---------|--------|
+| #14 | Push-Notifications (expo-notifications) | 🔜 |
+| #15 | JSON-Export / Import (expo-sharing) | 🔜 |
+
 ## Spätere Zusammenführung mit Pflanzkalender
 
 - Gleiche `PlantLocation`-Typen
 - Plant-IDs als UUIDs (universal)
 - JSON-Export-Struktur kompatibel haltbar
+- CareLog-Einträge enthalten `plantId` als UUID → direkt portierbar

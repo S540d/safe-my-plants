@@ -6,7 +6,6 @@ const STATUS_COLORS: Record<CareStatus, string> = {
   ok: '#52B788',
   soon: '#F4A261',
   overdue: '#E63946',
-  never: '#E63946',
 }
 
 interface TrafficLightProps {

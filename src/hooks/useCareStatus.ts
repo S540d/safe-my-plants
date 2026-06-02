@@ -14,7 +14,7 @@ function computeStatus(lastDate: string | undefined, intervalDays: number): Care
 }
 
 function worstStatus(a: CareStatus, b: CareStatus): CareStatus {
-  const order: CareStatus[] = ['overdue', 'soon', 'ok', 'never']
+  const order: CareStatus[] = ['overdue', 'soon', 'ok']
   return order.indexOf(a) <= order.indexOf(b) ? a : b
 }
 
