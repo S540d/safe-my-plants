@@ -3,12 +3,19 @@ import { useRouter } from 'expo-router'
 import React, { useMemo, useState } from 'react'
 import { FlatList, SafeAreaView, StyleSheet, Text, View } from 'react-native'
 import { DashboardFilter, DashboardSummary } from '../src/components/DashboardSummary'
+import { FilterChips } from '../src/components/FilterChips'
 import { HeroPlantCard } from '../src/components/HeroPlantCard'
 import { PlantCard } from '../src/components/PlantCard'
+import { ReminderBanner } from '../src/components/ReminderBanner'
+import { SearchBar } from '../src/components/SearchBar'
+import { SortMenu } from '../src/components/SortMenu'
 import { usePlants } from '../src/contexts/PlantContext'
 import { getCareStatus } from '../src/hooks/useCareStatus'
+import { useOverdueCount } from '../src/hooks/useOverdueCount'
 import { usePreferences } from '../src/hooks/usePreferences'
-import { Plant } from '../src/types/plant'
+import { t } from '../src/i18n/translations'
+import { CareStatus, Plant, PlantLocation } from '../src/types/plant'
+import { filterAndSortPlants, SortOption } from '../src/utils/plantFilter'
 
 function pickHeroPlant(plants: Plant[]): Plant | null {
   if (plants.length === 0) return null
@@ -22,16 +29,36 @@ export default function HomeScreen() {
   const { plants, isLoaded, markWatered, markFertilized } = usePlants()
   const { language } = usePreferences()
   const router = useRouter()
-  const [activeFilter, setActiveFilter] = useState<DashboardFilter>(null)
+  const { overdue: overdueCount } = useOverdueCount()
 
-  const filteredPlants = useMemo(() => {
-    if (!activeFilter) return plants
-    return plants.filter((p) => {
-      const { overall } = getCareStatus(p)
-      if (activeFilter === 'overdue') return overall === 'overdue'
-      return overall === activeFilter
-    })
-  }, [plants, activeFilter])
+  const [query, setQuery] = useState('')
+  const [selectedLocations, setSelectedLocations] = useState<PlantLocation[]>([])
+  const [selectedStatuses, setSelectedStatuses] = useState<CareStatus[]>([])
+  const [sort, setSort] = useState<SortOption>('recent')
+
+  const activeDashboardFilter: DashboardFilter =
+    selectedStatuses.length === 1 ? (selectedStatuses[0] as DashboardFilter) : null
+
+  function handleDashboardFilter(filter: DashboardFilter) {
+    if (!filter || selectedStatuses.includes(filter)) {
+      setSelectedStatuses([])
+    } else {
+      setSelectedStatuses([filter])
+    }
+  }
+
+  function toggleLocation(loc: PlantLocation) {
+    setSelectedLocations((prev) => (prev.includes(loc) ? prev.filter((l) => l !== loc) : [...prev, loc]))
+  }
+
+  function toggleStatus(status: CareStatus) {
+    setSelectedStatuses((prev) => (prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]))
+  }
+
+  const filteredPlants = useMemo(
+    () => filterAndSortPlants(plants, { query, locations: selectedLocations, statuses: selectedStatuses, sort }),
+    [plants, query, selectedLocations, selectedStatuses, sort],
+  )
 
   const heroPlant = useMemo(() => pickHeroPlant(plants), [plants])
 
@@ -40,6 +67,8 @@ export default function HomeScreen() {
     language === 'de'
       ? 'Noch keine Pflanzen vorhanden.\nFüge deine erste Pflanze im Admin-Bereich hinzu.'
       : 'No plants yet.\nAdd your first plant in the Admin area.'
+  const searchPlaceholder = t(language, 'search_placeholder')
+  const noResultsText = t(language, 'filter_no_results')
 
   if (!isLoaded) return null
 
@@ -54,12 +83,26 @@ export default function HomeScreen() {
           onFertilize={() => markFertilized(heroPlant.id)}
         />
       )}
+      <ReminderBanner
+        count={overdueCount}
+        lang={language}
+        onPress={() => handleDashboardFilter('overdue')}
+      />
       <DashboardSummary
         plants={plants}
         lang={language}
-        activeFilter={activeFilter}
-        onFilterChange={setActiveFilter}
+        activeFilter={activeDashboardFilter}
+        onFilterChange={handleDashboardFilter}
       />
+      <SearchBar value={query} onChangeText={setQuery} placeholder={searchPlaceholder} />
+      <FilterChips
+        selectedLocations={selectedLocations}
+        selectedStatuses={selectedStatuses}
+        onLocationToggle={toggleLocation}
+        onStatusToggle={toggleStatus}
+        lang={language}
+      />
+      <SortMenu value={sort} onChange={setSort} lang={language} />
     </>
   )
 
@@ -92,14 +135,10 @@ export default function HomeScreen() {
           )}
           ListHeaderComponent={ListHeader}
           ListEmptyComponent={
-            activeFilter ? (
-              <View style={styles.emptyContainer}>
-                <Text style={styles.emptyEmoji}>✅</Text>
-                <Text style={styles.emptyText}>
-                  {language === 'de' ? 'Keine Pflanzen in dieser Kategorie.' : 'No plants in this category.'}
-                </Text>
-              </View>
-            ) : null
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyEmoji}>🔍</Text>
+              <Text style={styles.emptyText}>{noResultsText}</Text>
+            </View>
           }
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}

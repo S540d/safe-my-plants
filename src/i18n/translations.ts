@@ -108,6 +108,19 @@ const translations = {
     care_action_prune: 'Geschnitten',
     care_action_note: 'Notiz',
 
+    // Search & Filter
+    search_placeholder: 'Pflanze suchen …',
+    filter_all: 'Alle',
+    sort_name: 'Name A–Z',
+    sort_next_care: 'Nächste Pflege',
+    sort_recent: 'Zuletzt hinzugefügt',
+    filter_no_results: 'Keine Pflanzen für diese Filter.',
+
+    // Reminder Banner
+    reminder_singular: '1 Pflanze braucht jetzt Wasser',
+    reminder_plural: '{{n}} Pflanzen brauchen jetzt Wasser',
+    reminder_tap: 'Tippen zum Anzeigen',
+
     // Common
     ok: 'OK',
     cancel: 'Abbrechen',
@@ -228,6 +241,19 @@ const translations = {
     care_action_repot: 'Repotted',
     care_action_prune: 'Pruned',
     care_action_note: 'Note',
+
+    // Search & Filter
+    search_placeholder: 'Search plants …',
+    filter_all: 'All',
+    sort_name: 'Name A–Z',
+    sort_next_care: 'Next care',
+    sort_recent: 'Recently added',
+    filter_no_results: 'No plants match these filters.',
+
+    // Reminder Banner
+    reminder_singular: '1 plant needs water now',
+    reminder_plural: '{{n}} plants need water now',
+    reminder_tap: 'Tap to view',
 
     // Common
     ok: 'OK',
