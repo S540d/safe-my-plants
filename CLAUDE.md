@@ -147,8 +147,7 @@ CareAction {
 
 - **Grün (ok):** > 20% des Intervalls verbleibend
 - **Gelb (soon):** 0–20% verbleibend
-- **Rot (overdue):** Datum überschritten oder noch nie gegossen/gedüngt
-- `'never'` als CareStatus existiert im Typ, wird aber von `computeStatus` nie zurückgegeben (gibt `'overdue'` bei fehlendem Datum zurück)
+- **Rot (overdue):** Datum überschritten oder noch nie gegossen/gedüngt (`lastWatered`/`lastFertilized` fehlt → direkt `overdue`)
 
 Berechnung in `src/hooks/useCareStatus.ts`.
 
