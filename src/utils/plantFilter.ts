@@ -13,11 +13,12 @@ export interface FilterState {
 function daysUntilNextCare(plant: Plant, now: number): number {
   const waterDays = plant.lastWatered
     ? plant.careInfo.wateringFrequencyDays - (now - new Date(plant.lastWatered).getTime()) / 86400000
-    : -Infinity
+    : Number.NEGATIVE_INFINITY
   const fertDays = plant.lastFertilized
     ? plant.careInfo.fertilizingFrequencyDays - (now - new Date(plant.lastFertilized).getTime()) / 86400000
-    : -Infinity
-  return Math.min(waterDays, fertDays)
+    : Number.NEGATIVE_INFINITY
+  const min = Math.min(waterDays, fertDays)
+  return isFinite(min) ? min : Number.NEGATIVE_INFINITY
 }
 
 export function filterAndSortPlants(plants: Plant[], { query, locations, statuses, sort }: FilterState): Plant[] {
@@ -41,9 +42,12 @@ export function filterAndSortPlants(plants: Plant[], { query, locations, statuse
   }
 
   const now = Date.now()
+  if (sort === 'nextCare') {
+    const scores = new Map(result.map((p) => [p.id, daysUntilNextCare(p, now)]))
+    return [...result].sort((a, b) => (scores.get(a.id) ?? 0) - (scores.get(b.id) ?? 0))
+  }
   return [...result].sort((a, b) => {
     if (sort === 'name') return a.name.localeCompare(b.name)
-    if (sort === 'nextCare') return daysUntilNextCare(a, now) - daysUntilNextCare(b, now)
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   })
 }

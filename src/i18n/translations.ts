@@ -92,7 +92,7 @@ const translations = {
     settings_version: 'Version',
 
     // Dashboard
-    dashboard_due_today: 'Heute fällig',
+    dashboard_due_today: 'Überfällig',
     dashboard_this_week: 'Bald fällig',
     dashboard_all_good: 'Alles ok',
 
@@ -117,8 +117,8 @@ const translations = {
     filter_no_results: 'Keine Pflanzen für diese Filter.',
 
     // Reminder Banner
-    reminder_singular: '1 Pflanze braucht jetzt Wasser',
-    reminder_plural: '{{n}} Pflanzen brauchen jetzt Wasser',
+    reminder_singular: '1 Pflanze braucht Pflege',
+    reminder_plural: '{{n}} Pflanzen brauchen Pflege',
     reminder_tap: 'Tippen zum Anzeigen',
 
     // Common
@@ -226,7 +226,7 @@ const translations = {
     settings_version: 'Version',
 
     // Dashboard
-    dashboard_due_today: 'Due today',
+    dashboard_due_today: 'Overdue',
     dashboard_this_week: 'Due soon',
     dashboard_all_good: 'All good',
 
@@ -251,8 +251,8 @@ const translations = {
     filter_no_results: 'No plants match these filters.',
 
     // Reminder Banner
-    reminder_singular: '1 plant needs water now',
-    reminder_plural: '{{n}} plants need water now',
+    reminder_singular: '1 plant needs care',
+    reminder_plural: '{{n}} plants need care',
     reminder_tap: 'Tap to view',
 
     // Common
