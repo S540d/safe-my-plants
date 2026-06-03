@@ -1,17 +1,11 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { LOCATION_ICONS } from '../constants/locationIcons'
 import { getCareStatus } from '../hooks/useCareStatus'
 import { Language } from '../i18n/translations'
 import { Plant } from '../types/plant'
 import { TrafficLight } from './TrafficLight'
-
-const LOCATION_ICONS: Record<string, string> = {
-  sun: '☀️',
-  'partial-shade': '⛅',
-  shade: '🌥️',
-  indoor: '🏠',
-}
 
 interface PlantCardProps {
   plant: Plant

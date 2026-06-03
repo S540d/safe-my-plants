@@ -1,5 +1,6 @@
 import React from 'react'
 import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { LOCATION_ICONS } from '../constants/locationIcons'
 import { Language } from '../i18n/translations'
 import { CareStatus, PlantLocation } from '../types/plant'
 
@@ -11,11 +12,11 @@ interface Props {
   lang: Language
 }
 
-const LOCATION_CHIPS: { value: PlantLocation; emoji: string; label: Record<Language, string> }[] = [
-  { value: 'sun', emoji: '☀️', label: { de: 'Sonne', en: 'Sun' } },
-  { value: 'partial-shade', emoji: '🌤', label: { de: 'Halbschatten', en: 'Part shade' } },
-  { value: 'shade', emoji: '🌿', label: { de: 'Schatten', en: 'Shade' } },
-  { value: 'indoor', emoji: '🏠', label: { de: 'Innen', en: 'Indoor' } },
+const LOCATION_CHIPS: { value: PlantLocation; label: Record<Language, string> }[] = [
+  { value: 'sun', label: { de: 'Sonne', en: 'Sun' } },
+  { value: 'partial-shade', label: { de: 'Halbschatten', en: 'Part shade' } },
+  { value: 'shade', label: { de: 'Schatten', en: 'Shade' } },
+  { value: 'indoor', label: { de: 'Innen', en: 'Indoor' } },
 ]
 
 const STATUS_CHIPS: { value: CareStatus; emoji: string; color: string }[] = [
@@ -32,7 +33,7 @@ export function FilterChips({ selectedLocations, selectedStatuses, onLocationTog
       style={styles.scroll}
       contentContainerStyle={styles.content}
     >
-      {LOCATION_CHIPS.map(({ value, emoji, label }) => {
+      {LOCATION_CHIPS.map(({ value, label }) => {
         const active = selectedLocations.includes(value)
         return (
           <TouchableOpacity
@@ -41,7 +42,7 @@ export function FilterChips({ selectedLocations, selectedStatuses, onLocationTog
             onPress={() => onLocationToggle(value)}
           >
             <Text style={[styles.chipText, active && styles.chipTextActive]}>
-              {emoji} {label[lang]}
+              {LOCATION_ICONS[value]} {label[lang]}
             </Text>
           </TouchableOpacity>
         )

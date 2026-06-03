@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity } from 'react-native'
-import { Language } from '../i18n/translations'
+import { Language, t } from '../i18n/translations'
 
 interface Props {
   count: number
@@ -13,14 +13,10 @@ export function ReminderBanner({ count, lang, onPress }: Props) {
 
   const text =
     count === 1
-      ? lang === 'de'
-        ? '1 Pflanze braucht jetzt Wasser'
-        : '1 plant needs water now'
-      : lang === 'de'
-        ? `${count} Pflanzen brauchen jetzt Wasser`
-        : `${count} plants need water now`
+      ? t(lang, 'reminder_singular')
+      : t(lang, 'reminder_plural', { n: count })
 
-  const cta = lang === 'de' ? 'Tippen zum Anzeigen' : 'Tap to view'
+  const cta = t(lang, 'reminder_tap')
 
   return (
     <TouchableOpacity style={styles.banner} onPress={onPress} activeOpacity={0.85}>

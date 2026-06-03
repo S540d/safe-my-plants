@@ -10,8 +10,7 @@ export interface FilterState {
   sort: SortOption
 }
 
-function daysUntilNextCare(plant: Plant): number {
-  const now = Date.now()
+function daysUntilNextCare(plant: Plant, now: number): number {
   const waterDays = plant.lastWatered
     ? plant.careInfo.wateringFrequencyDays - (now - new Date(plant.lastWatered).getTime()) / 86400000
     : -Infinity
@@ -41,9 +40,10 @@ export function filterAndSortPlants(plants: Plant[], { query, locations, statuse
     result = result.filter((p) => statuses.includes(getCareStatus(p).overall))
   }
 
+  const now = Date.now()
   return [...result].sort((a, b) => {
     if (sort === 'name') return a.name.localeCompare(b.name)
-    if (sort === 'nextCare') return daysUntilNextCare(a) - daysUntilNextCare(b)
+    if (sort === 'nextCare') return daysUntilNextCare(a, now) - daysUntilNextCare(b, now)
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   })
 }

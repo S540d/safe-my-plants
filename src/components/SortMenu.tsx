@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Modal, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
-import { Language } from '../i18n/translations'
+import { Language, t, TranslationKey } from '../i18n/translations'
 import { SortOption } from '../utils/plantFilter'
 
 interface Props {
@@ -9,10 +9,10 @@ interface Props {
   lang: Language
 }
 
-const OPTIONS: { value: SortOption; label: Record<Language, string> }[] = [
-  { value: 'name', label: { de: 'Name A–Z', en: 'Name A–Z' } },
-  { value: 'nextCare', label: { de: 'Nächste Pflege', en: 'Next care' } },
-  { value: 'recent', label: { de: 'Zuletzt hinzugefügt', en: 'Recently added' } },
+const OPTIONS: { value: SortOption; labelKey: TranslationKey }[] = [
+  { value: 'name', labelKey: 'sort_name' },
+  { value: 'nextCare', labelKey: 'sort_next_care' },
+  { value: 'recent', labelKey: 'sort_recent' },
 ]
 
 export function SortMenu({ value, onChange, lang }: Props) {
@@ -22,7 +22,7 @@ export function SortMenu({ value, onChange, lang }: Props) {
   return (
     <>
       <TouchableOpacity style={styles.trigger} onPress={() => setOpen(true)}>
-        <Text style={styles.triggerText}>↕ {current.label[lang]}</Text>
+        <Text style={styles.triggerText}>↕ {t(lang, current.labelKey)}</Text>
       </TouchableOpacity>
       <Modal transparent visible={open} animationType="fade" onRequestClose={() => setOpen(false)}>
         <TouchableWithoutFeedback onPress={() => setOpen(false)}>
@@ -40,7 +40,7 @@ export function SortMenu({ value, onChange, lang }: Props) {
             >
               <Text style={[styles.optionText, opt.value === value && styles.optionTextActive]}>
                 {opt.value === value ? '✓  ' : '    '}
-                {opt.label[lang]}
+                {t(lang, opt.labelKey)}
               </Text>
             </TouchableOpacity>
           ))}
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
   },
   triggerText: { fontSize: 13, color: '#2D6A4F', fontWeight: '600' },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.3)' },
+  backdrop: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.3)' },
   sheet: {
     position: 'absolute',
     right: 16,

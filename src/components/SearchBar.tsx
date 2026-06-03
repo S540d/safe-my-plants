@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 
 interface Props {
@@ -8,20 +8,54 @@ interface Props {
 }
 
 export function SearchBar({ value, onChangeText, placeholder }: Props) {
+  const [local, setLocal] = useState(value)
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastSent = useRef(value)
+
+  useEffect(() => {
+    if (value !== lastSent.current) {
+      lastSent.current = value
+      setLocal(value)
+    }
+  }, [value])
+
+  useEffect(
+    () => () => {
+      if (timer.current) clearTimeout(timer.current)
+    },
+    [],
+  )
+
+  function handleChange(text: string) {
+    setLocal(text)
+    if (timer.current) clearTimeout(timer.current)
+    timer.current = setTimeout(() => {
+      lastSent.current = text
+      onChangeText(text)
+    }, 150)
+  }
+
+  function handleClear() {
+    setLocal('')
+    if (timer.current) clearTimeout(timer.current)
+    lastSent.current = ''
+    onChangeText('')
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.icon}>🔍</Text>
       <TextInput
         style={styles.input}
-        value={value}
-        onChangeText={onChangeText}
+        value={local}
+        onChangeText={handleChange}
         placeholder={placeholder}
         placeholderTextColor="#74C69D"
         returnKeyType="search"
         clearButtonMode="never"
       />
-      {value.length > 0 && (
-        <TouchableOpacity onPress={() => onChangeText('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+      {local.length > 0 && (
+        <TouchableOpacity onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
           <Text style={styles.clear}>✕</Text>
         </TouchableOpacity>
       )}

@@ -13,6 +13,7 @@ import { usePlants } from '../src/contexts/PlantContext'
 import { getCareStatus } from '../src/hooks/useCareStatus'
 import { useOverdueCount } from '../src/hooks/useOverdueCount'
 import { usePreferences } from '../src/hooks/usePreferences'
+import { t } from '../src/i18n/translations'
 import { CareStatus, Plant, PlantLocation } from '../src/types/plant'
 import { filterAndSortPlants, SortOption } from '../src/utils/plantFilter'
 
@@ -66,9 +67,8 @@ export default function HomeScreen() {
     language === 'de'
       ? 'Noch keine Pflanzen vorhanden.\nFüge deine erste Pflanze im Admin-Bereich hinzu.'
       : 'No plants yet.\nAdd your first plant in the Admin area.'
-  const searchPlaceholder = language === 'de' ? 'Pflanze suchen …' : 'Search plants …'
-  const noResultsText =
-    language === 'de' ? 'Keine Pflanzen für diese Filter.' : 'No plants match these filters.'
+  const searchPlaceholder = t(language, 'search_placeholder')
+  const noResultsText = t(language, 'filter_no_results')
 
   if (!isLoaded) return null
 
