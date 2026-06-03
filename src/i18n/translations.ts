@@ -91,6 +91,36 @@ const translations = {
     settings_about: 'Über die App',
     settings_version: 'Version',
 
+    // Dashboard
+    dashboard_due_today: 'Überfällig',
+    dashboard_this_week: 'Bald fällig',
+    dashboard_all_good: 'Alles ok',
+
+    // Hero Card
+    hero_featured: 'Braucht Aufmerksamkeit',
+    hero_water: 'Gegossen',
+    hero_fertilize: 'Gedüngt',
+
+    // CareAction Types
+    care_action_water: 'Gegossen',
+    care_action_fertilize: 'Gedüngt',
+    care_action_repot: 'Umgetopft',
+    care_action_prune: 'Geschnitten',
+    care_action_note: 'Notiz',
+
+    // Search & Filter
+    search_placeholder: 'Pflanze suchen …',
+    filter_all: 'Alle',
+    sort_name: 'Name A–Z',
+    sort_next_care: 'Nächste Pflege',
+    sort_recent: 'Zuletzt hinzugefügt',
+    filter_no_results: 'Keine Pflanzen für diese Filter.',
+
+    // Reminder Banner
+    reminder_singular: '1 Pflanze braucht Pflege',
+    reminder_plural: '{{n}} Pflanzen brauchen Pflege',
+    reminder_tap: 'Tippen zum Anzeigen',
+
     // Common
     ok: 'OK',
     cancel: 'Abbrechen',
@@ -194,6 +224,36 @@ const translations = {
     settings_admin_change_pin: 'Change PIN',
     settings_about: 'About',
     settings_version: 'Version',
+
+    // Dashboard
+    dashboard_due_today: 'Overdue',
+    dashboard_this_week: 'Due soon',
+    dashboard_all_good: 'All good',
+
+    // Hero Card
+    hero_featured: 'Needs attention',
+    hero_water: 'Watered',
+    hero_fertilize: 'Fertilized',
+
+    // CareAction Types
+    care_action_water: 'Watered',
+    care_action_fertilize: 'Fertilized',
+    care_action_repot: 'Repotted',
+    care_action_prune: 'Pruned',
+    care_action_note: 'Note',
+
+    // Search & Filter
+    search_placeholder: 'Search plants …',
+    filter_all: 'All',
+    sort_name: 'Name A–Z',
+    sort_next_care: 'Next care',
+    sort_recent: 'Recently added',
+    filter_no_results: 'No plants match these filters.',
+
+    // Reminder Banner
+    reminder_singular: '1 plant needs care',
+    reminder_plural: '{{n}} plants need care',
+    reminder_tap: 'Tap to view',
 
     // Common
     ok: 'OK',
