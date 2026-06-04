@@ -127,6 +127,8 @@ const translations = {
     notes_placeholder: 'Was hast du beobachtet?',
     notes_empty: 'Noch keine Notizen zu dieser Pflanze.',
     notes_save: 'Speichern',
+    notes_show_more: 'Mehr anzeigen',
+    notes_show_less: 'Weniger anzeigen',
 
     // Common
     ok: 'OK',
@@ -268,6 +270,8 @@ const translations = {
     notes_placeholder: 'What did you observe?',
     notes_empty: 'No notes for this plant yet.',
     notes_save: 'Save',
+    notes_show_more: 'Show more',
+    notes_show_less: 'Show less',
 
     // Common
     ok: 'OK',

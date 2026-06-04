@@ -34,9 +34,14 @@ function formatNoteDate(iso: string, lang: Language): string {
 function NoteItem({ text, date, lang }: { text: string; date: string; lang: Language }) {
   const [expanded, setExpanded] = useState(false)
   const lines = text.split('\n')
-  const isLong = lines.length > 3 || text.length > 180
+  // isLong: either too many chars OR too many lines
+  const isLong = text.length > 180 || lines.length > 3
 
-  const displayed = !isLong || expanded ? text : text.slice(0, 180).trimEnd() + '…'
+  const displayed = !isLong || expanded
+    ? text
+    : lines.length > 3
+      ? lines.slice(0, 3).join('\n').trimEnd() + '…'
+      : text.slice(0, 180).trimEnd() + '…'
 
   return (
     <View style={styles.noteItem}>
@@ -45,9 +50,7 @@ function NoteItem({ text, date, lang }: { text: string; date: string; lang: Lang
       {isLong && (
         <TouchableOpacity onPress={() => setExpanded((v) => !v)}>
           <Text style={styles.expandLink}>
-            {expanded
-              ? (lang === 'de' ? 'Weniger anzeigen' : 'Show less')
-              : (lang === 'de' ? 'Mehr anzeigen' : 'Show more')}
+            {expanded ? t(lang, 'notes_show_less') : t(lang, 'notes_show_more')}
           </Text>
         </TouchableOpacity>
       )}
@@ -56,11 +59,15 @@ function NoteItem({ text, date, lang }: { text: string; date: string; lang: Lang
 }
 
 export function NotesSection({ plantId, lang }: Props) {
-  const { addAction, getActionsForPlant } = useCareLog()
+  const { addAction, actions } = useCareLog()
   const [modalVisible, setModalVisible] = useState(false)
   const [draft, setDraft] = useState('')
 
-  const notes = getActionsForPlant(plantId, 50).filter((a) => a.type === 'note').slice(0, 10)
+  // Filter notes from the full actions list to avoid the slice-before-filter bug
+  const notes = actions
+    .filter((a) => a.plantId === plantId && a.type === 'note')
+    .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
+    .slice(0, 10)
 
   const handleSave = async () => {
     const text = draft.trim()
@@ -70,11 +77,20 @@ export function NotesSection({ plantId, lang }: Props) {
     setModalVisible(false)
   }
 
+  const handleClose = () => {
+    setDraft('')
+    setModalVisible(false)
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>{t(lang, 'notes_title')}</Text>
-        <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
+        <TouchableOpacity
+          style={styles.addBtn}
+          onPress={() => setModalVisible(true)}
+          accessibilityLabel={t(lang, 'notes_add')}
+        >
           <Text style={styles.addBtnText}>+</Text>
         </TouchableOpacity>
       </View>
@@ -87,7 +103,12 @@ export function NotesSection({ plantId, lang }: Props) {
         ))
       )}
 
-      <Modal visible={modalVisible} transparent animationType="slide">
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={handleClose}
+      >
         <View style={styles.backdrop}>
           <View style={styles.sheet}>
             <Text style={styles.sheetTitle}>{t(lang, 'notes_add')}</Text>
@@ -105,7 +126,7 @@ export function NotesSection({ plantId, lang }: Props) {
             <View style={styles.row}>
               <TouchableOpacity
                 style={[styles.btn, styles.btnSecondary]}
-                onPress={() => { setDraft(''); setModalVisible(false) }}
+                onPress={handleClose}
               >
                 <Text style={styles.btnSecondaryText}>{t(lang, 'cancel')}</Text>
               </TouchableOpacity>
