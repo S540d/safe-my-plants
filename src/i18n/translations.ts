@@ -121,6 +121,19 @@ const translations = {
     reminder_plural: '{{n}} Pflanzen brauchen Pflege',
     reminder_tap: 'Tippen zum Anzeigen',
 
+    // Stats Screen
+    stats_title: 'Statistiken',
+    stats_streak_current: 'Tage in Folge',
+    stats_streak_longest: 'Rekord',
+    stats_streak_days: 'Tage',
+    stats_this_month: 'Dieser Monat',
+    stats_actions_water: 'Gegossen',
+    stats_actions_fertilize: 'Gedüngt',
+    stats_actions_other: 'Sonstiges',
+    stats_highlights: 'Highlights',
+    stats_thirstiest: 'Durstigste Pflanze',
+    stats_most_active: 'Fleißigste Pflanze',
+
     // Common
     ok: 'OK',
     cancel: 'Abbrechen',
@@ -254,6 +267,19 @@ const translations = {
     reminder_singular: '1 plant needs care',
     reminder_plural: '{{n}} plants need care',
     reminder_tap: 'Tap to view',
+
+    // Stats Screen
+    stats_title: 'Statistics',
+    stats_streak_current: 'days in a row',
+    stats_streak_longest: 'Record',
+    stats_streak_days: 'days',
+    stats_this_month: 'This month',
+    stats_actions_water: 'Watered',
+    stats_actions_fertilize: 'Fertilized',
+    stats_actions_other: 'Other',
+    stats_highlights: 'Highlights',
+    stats_thirstiest: 'Thirstiest plant',
+    stats_most_active: 'Most active plant',
 
     // Common
     ok: 'OK',

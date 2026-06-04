@@ -48,6 +48,13 @@ function AppTabs() {
         }}
       />
       <Tabs.Screen
+        name="stats"
+        options={{
+          title: 'Statistiken',
+          tabBarIcon: () => <TabIcon emoji="📊" />,
+        }}
+      />
+      <Tabs.Screen
         name="plant/[id]"
         options={{
           href: null,
