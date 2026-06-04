@@ -20,7 +20,7 @@ export function PlantCard({ plant, lang, onPress }: PlantCardProps) {
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
       {hasPhoto ? (
-        <Image source={{ uri: plant.photos[0] }} style={styles.photo} />
+        <Image source={{ uri: plant.photos[0].uri }} style={styles.photo} />
       ) : (
         <LinearGradient colors={['#2D6A4F', '#52B788']} style={styles.photoPlaceholder}>
           <Text style={styles.plantEmoji}>🪴</Text>
