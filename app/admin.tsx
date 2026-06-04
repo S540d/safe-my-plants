@@ -17,7 +17,7 @@ import {
 } from 'react-native'
 import { usePlants } from '../src/contexts/PlantContext'
 import { usePreferences } from '../src/hooks/usePreferences'
-import { Disease, Plant, PlantLocation } from '../src/types/plant'
+import { Disease, Plant, PlantLocation, PlantPhoto } from '../src/types/plant'
 
 function generateId() {
   return `plant-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
@@ -141,11 +141,12 @@ function PlantForm({ lang, initial, onSave, onCancel }: PlantFormProps) {
       quality: 0.8,
     })
     if (!result.canceled && result.assets[0]) {
-      set({ photos: [...plant.photos, result.assets[0].uri] })
+      const photo: PlantPhoto = { uri: result.assets[0].uri, takenAt: new Date().toISOString() }
+      set({ photos: [...plant.photos, photo] })
     }
   }
 
-  const removePhoto = (uri: string) => set({ photos: plant.photos.filter((p) => p !== uri) })
+  const removePhoto = (uri: string) => set({ photos: plant.photos.filter((p) => p.uri !== uri) })
 
   const saveDisease = () => {
     if (!newDisease || !newDisease.name.trim()) return
@@ -224,10 +225,10 @@ function PlantForm({ lang, initial, onSave, onCancel }: PlantFormProps) {
 
         <SectionLabel text={L('Fotos', 'Photos')} />
         <View style={formStyles.photoGrid}>
-          {plant.photos.map((uri) => (
-            <View key={uri} style={formStyles.photoWrapper}>
-              <Image source={{ uri }} style={formStyles.photo} />
-              <TouchableOpacity style={formStyles.removePhoto} onPress={() => removePhoto(uri)}>
+          {plant.photos.map((photo) => (
+            <View key={photo.uri} style={formStyles.photoWrapper}>
+              <Image source={{ uri: photo.uri }} style={formStyles.photo} />
+              <TouchableOpacity style={formStyles.removePhoto} onPress={() => removePhoto(photo.uri)}>
                 <Text style={formStyles.removePhotoText}>✕</Text>
               </TouchableOpacity>
             </View>

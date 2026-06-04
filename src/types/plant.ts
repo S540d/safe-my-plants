@@ -2,6 +2,11 @@ export type PlantLocation = 'sun' | 'partial-shade' | 'shade' | 'indoor'
 export type HumidityLevel = 'low' | 'medium' | 'high'
 export type CareStatus = 'ok' | 'soon' | 'overdue'
 
+export interface PlantPhoto {
+  uri: string
+  takenAt: string // ISO-8601
+}
+
 export interface CareInfo {
   wateringFrequencyDays: number
   wateringTips: string
@@ -25,7 +30,7 @@ export interface Plant {
   name: string
   scientificName?: string
   description: string
-  photos: string[]
+  photos: PlantPhoto[]
   location: PlantLocation
   careInfo: CareInfo
   diseases: Disease[]
