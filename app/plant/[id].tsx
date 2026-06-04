@@ -11,6 +11,7 @@ import {
   View,
 } from 'react-native'
 import { DiseaseCard } from '../../src/components/DiseaseCard'
+import { NotesSection } from '../../src/components/NotesSection'
 import { TrafficLight } from '../../src/components/TrafficLight'
 import { usePlants } from '../../src/contexts/PlantContext'
 import { formatLastDate, formatNextDate, useCareStatus } from '../../src/hooks/useCareStatus'
@@ -166,6 +167,9 @@ export default function PlantDetailScreen() {
               ))}
             </>
           )}
+
+          {/* Notes */}
+          <NotesSection plantId={plant.id} lang={lang} />
 
           <View style={styles.bottomSpacer} />
         </View>
