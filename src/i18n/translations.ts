@@ -127,6 +127,8 @@ const translations = {
     settings_notifications_time: 'Uhrzeit',
     settings_notifications_permission_denied: 'Berechtigung verweigert. Bitte in den Systemeinstellungen aktivieren.',
     settings_notifications_saved: 'Erinnerung gespeichert',
+    notification_channel_name: 'Pflege-Erinnerungen',
+    notification_body: 'Schau nach deinen Pflanzen – vielleicht braucht eine heute Pflege!',
 
     // Common
     ok: 'OK',
@@ -268,6 +270,8 @@ const translations = {
     settings_notifications_time: 'Time',
     settings_notifications_permission_denied: 'Permission denied. Please enable in system settings.',
     settings_notifications_saved: 'Reminder saved',
+    notification_channel_name: 'Care Reminders',
+    notification_body: 'Check on your plants – one might need care today!',
 
     // Common
     ok: 'OK',

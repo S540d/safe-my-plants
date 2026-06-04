@@ -45,7 +45,7 @@ export default function SettingsScreen() {
     await saveReminderSettings(updated)
     if (updated.enabled) {
       const [h, m] = updated.time.split(':').map(Number)
-      await scheduleDaily(h, m)
+      await scheduleDaily(h, m, lang)
     } else {
       await cancelAll()
     }
@@ -63,16 +63,18 @@ export default function SettingsScreen() {
     if (value) Alert.alert('', t(lang, 'settings_notifications_saved'))
   }
 
-  const adjustTime = (deltaHour: number, deltaMinute: number) => {
+  const adjustTime = async (deltaHour: number, deltaMinute: number) => {
     const [h, m] = reminder.time.split(':').map(Number)
-    let newH = (h + deltaHour + 24) % 24
-    let newM = (m + deltaMinute + 60) % 60
+    const totalMinutes = h * 60 + m + deltaHour * 60 + deltaMinute
+    const wrapped = ((totalMinutes % 1440) + 1440) % 1440
+    const newH = Math.floor(wrapped / 60)
+    const newM = wrapped % 60
     const newTime = `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`
     const updated = { ...reminder, time: newTime }
     setReminder(updated)
-    saveReminderSettings(updated)
+    await saveReminderSettings(updated)
     if (reminder.enabled) {
-      scheduleDaily(newH, newM)
+      await scheduleDaily(newH, newM, lang)
     }
   }
 
