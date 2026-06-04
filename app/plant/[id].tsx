@@ -1,7 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useState } from 'react'
 import {
-  Alert,
   Image,
   SafeAreaView,
   ScrollView,
@@ -10,11 +9,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { CareHistoryList } from '../../src/components/CareHistoryList'
 import { DiseaseCard } from '../../src/components/DiseaseCard'
+import { QuickActionBar } from '../../src/components/QuickActionBar'
 import { TrafficLight } from '../../src/components/TrafficLight'
 import { usePlants } from '../../src/contexts/PlantContext'
 import { formatLastDate, formatNextDate, useCareStatus } from '../../src/hooks/useCareStatus'
 import { usePreferences } from '../../src/hooks/usePreferences'
+import { t } from '../../src/i18n/translations'
 
 const LOCATION_LABELS: Record<string, Record<string, string>> = {
   de: { sun: 'Sonne', 'partial-shade': 'Halbschatten', shade: 'Schatten', indoor: 'Innenraum' },
@@ -28,7 +30,7 @@ const HUMIDITY_LABELS: Record<string, Record<string, string>> = {
 
 export default function PlantDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
-  const { plants, markWatered, markFertilized } = usePlants()
+  const { plants } = usePlants()
   const { language } = usePreferences()
   const router = useRouter()
   const [photoIndex, setPhotoIndex] = useState(0)
@@ -45,22 +47,6 @@ export default function PlantDetailScreen() {
 
   const careStatus = useCareStatus(plant)
   const lang = language
-
-  const handleMarkWatered = () => {
-    const msg = lang === 'de' ? 'Als gegossen markieren?' : 'Mark as watered?'
-    Alert.alert('', msg, [
-      { text: lang === 'de' ? 'Abbrechen' : 'Cancel', style: 'cancel' },
-      { text: 'OK', onPress: () => markWatered(plant.id) },
-    ])
-  }
-
-  const handleMarkFertilized = () => {
-    const msg = lang === 'de' ? 'Als gedüngt markieren?' : 'Mark as fertilized?'
-    Alert.alert('', msg, [
-      { text: lang === 'de' ? 'Abbrechen' : 'Cancel', style: 'cancel' },
-      { text: 'OK', onPress: () => markFertilized(plant.id) },
-    ])
-  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -99,42 +85,45 @@ export default function PlantDetailScreen() {
 
           <Text style={styles.description}>{plant.description}</Text>
 
-          {/* Care action buttons */}
-          <View style={styles.actionRow}>
-            <TouchableOpacity
-              style={[styles.actionBtn, careStatus.watering === 'ok' ? styles.actionBtnOk : styles.actionBtnAlert]}
-              onPress={handleMarkWatered}
-            >
-              <Text style={styles.actionIcon}>💧</Text>
-              <View>
-                <Text style={styles.actionLabel}>{lang === 'de' ? 'Gießen' : 'Water'}</Text>
-                <Text style={styles.actionSub}>{formatNextDate(plant.lastWatered, plant.careInfo.wateringFrequencyDays, lang)}</Text>
-              </View>
-              <TrafficLight status={careStatus.watering} size={10} />
-            </TouchableOpacity>
+          {/* Quick action bar (replaces individual water/fertilize buttons) */}
+          <Text style={styles.sectionTitle}>{t(lang, 'detail_quick_actions')}</Text>
+          <QuickActionBar plantId={plant.id} />
 
-            <TouchableOpacity
-              style={[styles.actionBtn, careStatus.fertilizing === 'ok' ? styles.actionBtnOk : styles.actionBtnAlert]}
-              onPress={handleMarkFertilized}
-            >
-              <Text style={styles.actionIcon}>🌿</Text>
-              <View>
-                <Text style={styles.actionLabel}>{lang === 'de' ? 'Düngen' : 'Fertilize'}</Text>
-                <Text style={styles.actionSub}>{formatNextDate(plant.lastFertilized, plant.careInfo.fertilizingFrequencyDays, lang)}</Text>
-              </View>
-              <TrafficLight status={careStatus.fertilizing} size={10} />
-            </TouchableOpacity>
+          {/* Next care dates */}
+          <View style={styles.nextCareRow}>
+            <View style={styles.nextCareItem}>
+              <Text style={styles.nextCareLabel}>💧 {t(lang, 'detail_watering')}</Text>
+              <Text style={styles.nextCareValue}>
+                {formatNextDate(plant.lastWatered, plant.careInfo.wateringFrequencyDays, lang)}
+              </Text>
+              <TrafficLight status={careStatus.watering} size={8} />
+            </View>
+            <View style={styles.nextCareItem}>
+              <Text style={styles.nextCareLabel}>🌿 {t(lang, 'detail_fertilizing')}</Text>
+              <Text style={styles.nextCareValue}>
+                {formatNextDate(plant.lastFertilized, plant.careInfo.fertilizingFrequencyDays, lang)}
+              </Text>
+              <TrafficLight status={careStatus.fertilizing} size={8} />
+            </View>
           </View>
 
           {/* Care info */}
-          <Text style={styles.sectionTitle}>{lang === 'de' ? 'Pflegehinweise' : 'Care Instructions'}</Text>
+          <Text style={styles.sectionTitle}>{t(lang, 'detail_care_info')}</Text>
 
           <View style={styles.infoGrid}>
-            <InfoRow icon="📍" label={lang === 'de' ? 'Standort' : 'Location'} value={LOCATION_LABELS[lang][plant.location]} />
-            <InfoRow icon="🌡️" label={lang === 'de' ? 'Temperatur' : 'Temperature'} value={`${plant.careInfo.temperature.min}–${plant.careInfo.temperature.max} °C`} />
-            <InfoRow icon="💦" label={lang === 'de' ? 'Luftfeuchtigkeit' : 'Humidity'} value={HUMIDITY_LABELS[lang][plant.careInfo.humidity]} />
-            <InfoRow icon="💧" label={lang === 'de' ? 'Gießintervall' : 'Watering interval'} value={`${plant.careInfo.wateringFrequencyDays} ${lang === 'de' ? 'Tage' : 'days'}`} />
-            <InfoRow icon="🌿" label={lang === 'de' ? 'Düngintervall' : 'Fertilizing interval'} value={`${plant.careInfo.fertilizingFrequencyDays} ${lang === 'de' ? 'Tage' : 'days'}`} />
+            <InfoRow icon="📍" label={t(lang, 'detail_location')} value={LOCATION_LABELS[lang][plant.location]} />
+            <InfoRow icon="🌡️" label={t(lang, 'detail_temperature')} value={`${plant.careInfo.temperature.min}–${plant.careInfo.temperature.max} °C`} />
+            <InfoRow icon="💦" label={t(lang, 'detail_humidity')} value={HUMIDITY_LABELS[lang][plant.careInfo.humidity]} />
+            <InfoRow
+              icon="💧"
+              label={lang === 'de' ? 'Gießintervall' : 'Watering interval'}
+              value={`${plant.careInfo.wateringFrequencyDays} ${t(lang, 'days')}`}
+            />
+            <InfoRow
+              icon="🌿"
+              label={lang === 'de' ? 'Düngintervall' : 'Fertilizing interval'}
+              value={`${plant.careInfo.fertilizingFrequencyDays} ${t(lang, 'days')}`}
+            />
           </View>
 
           {plant.careInfo.locationTips ? (
@@ -150,22 +139,25 @@ export default function PlantDetailScreen() {
           {/* Last care dates */}
           <View style={styles.lastDatesRow}>
             <Text style={styles.lastDate}>
-              {lang === 'de' ? 'Gegossen' : 'Watered'}: {formatLastDate(plant.lastWatered, lang)}
+              {t(lang, 'detail_last_watered')}: {formatLastDate(plant.lastWatered, lang)}
             </Text>
             <Text style={styles.lastDate}>
-              {lang === 'de' ? 'Gedüngt' : 'Fertilized'}: {formatLastDate(plant.lastFertilized, lang)}
+              {t(lang, 'detail_last_fertilized')}: {formatLastDate(plant.lastFertilized, lang)}
             </Text>
           </View>
 
           {/* Diseases */}
           {plant.diseases.length > 0 && (
             <>
-              <Text style={styles.sectionTitle}>{lang === 'de' ? 'Krankheiten & Schädlinge' : 'Diseases & Pests'}</Text>
+              <Text style={styles.sectionTitle}>{t(lang, 'detail_diseases')}</Text>
               {plant.diseases.map((d) => (
                 <DiseaseCard key={d.id} disease={d} lang={lang} />
               ))}
             </>
           )}
+
+          {/* Care History */}
+          <CareHistoryList plantId={plant.id} />
 
           <View style={styles.bottomSpacer} />
         </View>
@@ -222,16 +214,24 @@ const styles = StyleSheet.create({
   name: { fontSize: 26, fontWeight: '700', color: '#1B4332' },
   scientificName: { fontSize: 14, color: '#74C69D', fontStyle: 'italic', marginTop: 2 },
   description: { fontSize: 15, color: '#444', lineHeight: 22, marginBottom: 16 },
-  actionRow: { flexDirection: 'row', gap: 10, marginBottom: 20 },
-  actionBtn: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8,
-    padding: 12, borderRadius: 12,
+  nextCareRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 12,
+    marginBottom: 20,
   },
-  actionBtnOk: { backgroundColor: '#D8F3DC' },
-  actionBtnAlert: { backgroundColor: '#FFE8D6' },
-  actionIcon: { fontSize: 22 },
-  actionLabel: { fontSize: 13, fontWeight: '600', color: '#1B4332' },
-  actionSub: { fontSize: 11, color: '#52B788', marginTop: 1 },
+  nextCareItem: {
+    flex: 1,
+    backgroundColor: '#D8F3DC',
+    borderRadius: 12,
+    padding: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexWrap: 'wrap',
+  },
+  nextCareLabel: { fontSize: 12, color: '#1B4332', fontWeight: '600' },
+  nextCareValue: { fontSize: 11, color: '#2D6A4F', flex: 1 },
   sectionTitle: {
     fontSize: 18, fontWeight: '700', color: '#1B4332',
     marginTop: 4, marginBottom: 10,
