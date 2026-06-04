@@ -53,8 +53,8 @@ export default function PlantDetailScreen() {
     Alert.alert('', msg, [
       { text: lang === 'de' ? 'Abbrechen' : 'Cancel', style: 'cancel' },
       {
-        text: 'OK', onPress: () => {
-          markWatered(plant.id)
+        text: 'OK', onPress: async () => {
+          await markWatered(plant.id)
           setShowWaterDrop(true)
         }
       },

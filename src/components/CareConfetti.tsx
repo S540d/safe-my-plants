@@ -66,7 +66,7 @@ function Piece({ color, startX, startY, delay, visible }: {
 export function CareConfetti({ visible, onFinish }: Props) {
   useEffect(() => {
     if (visible && onFinish) {
-      const timer = setTimeout(onFinish, 1000)
+      const timer = setTimeout(onFinish, 1400)
       return () => clearTimeout(timer)
     }
   }, [visible, onFinish])
