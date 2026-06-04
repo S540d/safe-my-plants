@@ -121,6 +121,13 @@ const translations = {
     reminder_plural: '{{n}} Pflanzen brauchen Pflege',
     reminder_tap: 'Tippen zum Anzeigen',
 
+    // Notifications
+    settings_notifications: 'Erinnerungen',
+    settings_notifications_enable: 'Tägliche Erinnerung',
+    settings_notifications_time: 'Uhrzeit',
+    settings_notifications_permission_denied: 'Berechtigung verweigert. Bitte in den Systemeinstellungen aktivieren.',
+    settings_notifications_saved: 'Erinnerung gespeichert',
+
     // Common
     ok: 'OK',
     cancel: 'Abbrechen',
@@ -254,6 +261,13 @@ const translations = {
     reminder_singular: '1 plant needs care',
     reminder_plural: '{{n}} plants need care',
     reminder_tap: 'Tap to view',
+
+    // Notifications
+    settings_notifications: 'Reminders',
+    settings_notifications_enable: 'Daily reminder',
+    settings_notifications_time: 'Time',
+    settings_notifications_permission_denied: 'Permission denied. Please enable in system settings.',
+    settings_notifications_saved: 'Reminder saved',
 
     // Common
     ok: 'OK',
