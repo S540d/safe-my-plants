@@ -48,7 +48,9 @@ keystore.properties
 .claude/
 
 # Security – Pflicht-Einträge (Issue #7 / reusable-gitignore-audit)
+.env
 .env.local
 credentials.json
 *.keystore
 docs/private/
+

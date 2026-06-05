@@ -1,0 +1,49 @@
+#!/bin/sh
+
+# ── gitignore-Audit ────────────────────────────────────────────────────────
+# Stellt sicher, dass sicherheitskritische Einträge im .gitignore vorhanden sind.
+
+REQUIRED_ENTRIES=".env *.jks *.keystore local.properties keystore.properties credentials.json .env.local docs/private/"
+FAIL=0
+
+for entry in $REQUIRED_ENTRIES; do
+  if ! grep -qF "$entry" .gitignore 2>/dev/null; then
+    echo "❌  .gitignore fehlt: $entry"
+    FAIL=1
+  fi
+done
+
+if [ "$FAIL" -eq 1 ]; then
+  echo ""
+  echo "Commit abgebrochen – fehlende .gitignore-Einträge zuerst ergänzen."
+  exit 1
+fi
+
+# ── Security-Scan (staged Dateien – aus dem Index lesen) ──────────────────
+# Sucht nach möglichen Secrets / Signing-Fingerprints in staged Dateien.
+
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null)
+
+if [ -n "$STAGED_FILES" ]; then
+  # .husky/ selbst ist kein Kandidat für Secrets
+  SCAN_FILES=$(echo "$STAGED_FILES" | grep -v '^\.husky/' || true)
+  # \s ist in POSIX ERE nicht portabel → [[:space:]] verwenden
+  SECRETS_PATTERN='(-----BEGIN (RSA|EC|OPENSSH) PRIVATE KEY|api_key[[:space:]]*=|apiKey[[:space:]]*=|client_secret[[:space:]]*=|password[[:space:]]*=|passwd[[:space:]]*=|Authorization:[[:space:]]*Bearer |firebase_api_key|google_api_key)'
+  MATCHES=""
+  for f in $SCAN_FILES; do
+    # Aus dem Index lesen (nicht Working Tree) – erfasst genau den staged Inhalt
+    if git show ":$f" 2>/dev/null | grep -qE "$SECRETS_PATTERN"; then
+      MATCHES="$MATCHES $f"
+    fi
+  done
+  if [ -n "$MATCHES" ]; then
+    echo ""
+    echo "⚠️  Mögliche Secrets in folgenden staged Dateien gefunden:"
+    echo "$MATCHES"
+    echo ""
+    echo "Bitte prüfen. Zum Überspringen: git commit --no-verify"
+    exit 1
+  fi
+fi
+
+echo "✅  pre-commit OK"
