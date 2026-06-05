@@ -19,7 +19,7 @@ if [ "$FAIL" -eq 1 ]; then
   exit 1
 fi
 
-# ── Security-Scan (staged Dateien) ────────────────────────────────────────
+# ── Security-Scan (staged Dateien – aus dem Index lesen) ──────────────────
 # Sucht nach möglichen Secrets / Signing-Fingerprints in staged Dateien.
 
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null)
@@ -27,8 +27,15 @@ STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM 2>/dev/null)
 if [ -n "$STAGED_FILES" ]; then
   # .husky/ selbst ist kein Kandidat für Secrets
   SCAN_FILES=$(echo "$STAGED_FILES" | grep -v '^\.husky/' || true)
-  SECRETS_PATTERN='(-----BEGIN (RSA|EC|OPENSSH) PRIVATE KEY|api_key\s*=|apiKey\s*=|client_secret\s*=|password\s*=|passwd\s*=|Authorization:\s*Bearer |firebase_api_key|google_api_key)'
-  MATCHES=$(echo "$SCAN_FILES" | tr '\n' '\0' | xargs -0 grep -lE "$SECRETS_PATTERN" 2>/dev/null || true)
+  # \s ist in POSIX ERE nicht portabel → [[:space:]] verwenden
+  SECRETS_PATTERN='(-----BEGIN (RSA|EC|OPENSSH) PRIVATE KEY|api_key[[:space:]]*=|apiKey[[:space:]]*=|client_secret[[:space:]]*=|password[[:space:]]*=|passwd[[:space:]]*=|Authorization:[[:space:]]*Bearer |firebase_api_key|google_api_key)'
+  MATCHES=""
+  for f in $SCAN_FILES; do
+    # Aus dem Index lesen (nicht Working Tree) – erfasst genau den staged Inhalt
+    if git show ":$f" 2>/dev/null | grep -qE "$SECRETS_PATTERN"; then
+      MATCHES="$MATCHES $f"
+    fi
+  done
   if [ -n "$MATCHES" ]; then
     echo ""
     echo "⚠️  Mögliche Secrets in folgenden staged Dateien gefunden:"
