@@ -1,4 +1,7 @@
-import { Plant } from '../types/plant'
+import { Plant, PlantPhoto } from '../types/plant'
+
+// Photos field uses PlantPhoto[] – empty by default for new installations.
+const NO_PHOTOS: PlantPhoto[] = []
 
 export const DEFAULT_PLANTS: Plant[] = [
   {
@@ -7,7 +10,7 @@ export const DEFAULT_PLANTS: Plant[] = [
     scientificName: 'Monstera deliciosa',
     description:
       'Die Fensterblatt-Pflanze ist eine beliebte Zimmerpflanze mit charakteristischen gelochten Blättern. Sie ist pflegeleicht und wächst schnell.',
-    photos: [],
+    photos: NO_PHOTOS,
     location: 'partial-shade',
     careInfo: {
       wateringFrequencyDays: 7,
@@ -46,7 +49,7 @@ export const DEFAULT_PLANTS: Plant[] = [
     scientificName: 'Epipremnum aureum',
     description:
       'Die Efeutute ist eine der robustesten Zimmerpflanzen überhaupt. Sie verzeiht Pflanzenfehler und gedeiht auch in weniger idealem Licht.',
-    photos: [],
+    photos: NO_PHOTOS,
     location: 'shade',
     careInfo: {
       wateringFrequencyDays: 10,
@@ -79,7 +82,7 @@ export const DEFAULT_PLANTS: Plant[] = [
     scientificName: 'Ficus elastica',
     description:
       'Der Gummibaum mit seinen glänzend dunkelgrünen Blättern ist ein klassischer Zimmerbaum. Er kann über Jahre sehr groß werden.',
-    photos: [],
+    photos: NO_PHOTOS,
     location: 'sun',
     careInfo: {
       wateringFrequencyDays: 10,
