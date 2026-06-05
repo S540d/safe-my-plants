@@ -121,6 +121,15 @@ const translations = {
     reminder_plural: '{{n}} Pflanzen brauchen Pflege',
     reminder_tap: 'Tippen zum Anzeigen',
 
+    // Notes
+    notes_title: 'Notizen',
+    notes_add: 'Notiz hinzufügen',
+    notes_placeholder: 'Was hast du beobachtet?',
+    notes_empty: 'Noch keine Notizen zu dieser Pflanze.',
+    notes_save: 'Speichern',
+    notes_show_more: 'Mehr anzeigen',
+    notes_show_less: 'Weniger anzeigen',
+
     // Common
     ok: 'OK',
     cancel: 'Abbrechen',
@@ -254,6 +263,15 @@ const translations = {
     reminder_singular: '1 plant needs care',
     reminder_plural: '{{n}} plants need care',
     reminder_tap: 'Tap to view',
+
+    // Notes
+    notes_title: 'Notes',
+    notes_add: 'Add note',
+    notes_placeholder: 'What did you observe?',
+    notes_empty: 'No notes for this plant yet.',
+    notes_save: 'Save',
+    notes_show_more: 'Show more',
+    notes_show_less: 'Show less',
 
     // Common
     ok: 'OK',
