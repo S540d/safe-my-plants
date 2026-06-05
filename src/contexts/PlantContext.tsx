@@ -1,3 +1,4 @@
+import * as Haptics from 'expo-haptics'
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { DEFAULT_PLANTS } from '../constants/defaultPlants'
 import {
@@ -113,6 +114,7 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
         timestamp: now,
       })
       notifyCareLogUpdate()
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {})
     },
     [plants, persist]
   )
@@ -130,6 +132,7 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
         timestamp: now,
       })
       notifyCareLogUpdate()
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {})
     },
     [plants, persist]
   )

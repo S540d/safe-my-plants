@@ -85,10 +85,13 @@ APK-Output: `android/app/build/outputs/apk/`
 ## Branch-Strategie
 
 ```
-main      – Produktions-Stand (kein Force-Push, kein direkter Merge ohne Erlaubnis)
-testing   – Staging / QA  ← Standard-Ziel für alle PRs
-feature/* – Kurzlebige Feature-Branches → testing → main
+main (production) ← testing ← feature/issue-XXX
 ```
+
+- `testing` ist Standard-Ziel für alle PRs — nie direkt auf `main`
+- `gh pr merge <nr> --squash --delete-branch` für Feature→testing
+- `gh pr merge <nr> --squash` für testing→main (kein `--delete-branch`!)
+- **Vor Push:** lokale Tests (`npm test`); kein Merge bei CI-Fail
 
 ## Datenmodell (Überblick)
 
