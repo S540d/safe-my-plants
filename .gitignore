@@ -43,8 +43,9 @@ yarn-error.*
 # Android signing
 local.properties
 keystore.properties
-!.claude/commands/
-!.claude/commands/**
+
+# Claude Code local files (commands, settings – never commit)
+.claude/
 
 # Security – Pflicht-Einträge (Issue #7 / reusable-gitignore-audit)
 .env
