@@ -25,6 +25,7 @@ const translations = {
     detail_humidity: 'Luftfeuchtigkeit',
     detail_diseases: 'Krankheiten & Schädlinge',
     detail_photos: 'Fotos',
+    detail_quick_actions: 'Schnellaktionen',
     detail_last_watered: 'Zuletzt gegossen',
     detail_last_fertilized: 'Zuletzt gedüngt',
     detail_mark_watered: 'Jetzt gegossen',
@@ -121,6 +122,21 @@ const translations = {
     reminder_plural: '{{n}} Pflanzen brauchen Pflege',
     reminder_tap: 'Tippen zum Anzeigen',
 
+    // Quick Actions
+    action_water: 'Gießen',
+    action_fertilize: 'Düngen',
+    action_repot: 'Umtopfen',
+    action_prune: 'Schneiden',
+    action_note: 'Notiz',
+
+    // Note Modal
+    note_modal_title: 'Notiz hinzufügen',
+    note_modal_placeholder: 'Was hast du beobachtet?',
+
+    // History
+    history_title: 'Pflegehistorie',
+    history_empty: 'Noch keine Pflegeeinträge für diese Pflanze.',
+
     // Empty States
     empty_plants_title: 'Keine Pflanzen',
     empty_plants_body: 'Füge deine erste Pflanze im Admin-Bereich hinzu.',
@@ -186,6 +202,7 @@ const translations = {
     detail_humidity: 'Humidity',
     detail_diseases: 'Diseases & Pests',
     detail_photos: 'Photos',
+    detail_quick_actions: 'Quick actions',
     detail_last_watered: 'Last watered',
     detail_last_fertilized: 'Last fertilized',
     detail_mark_watered: 'Watered now',
@@ -281,6 +298,21 @@ const translations = {
     reminder_singular: '1 plant needs care',
     reminder_plural: '{{n}} plants need care',
     reminder_tap: 'Tap to view',
+
+    // Quick Actions
+    action_water: 'Water',
+    action_fertilize: 'Fertilize',
+    action_repot: 'Repot',
+    action_prune: 'Prune',
+    action_note: 'Note',
+
+    // Note Modal
+    note_modal_title: 'Add note',
+    note_modal_placeholder: 'What did you observe?',
+
+    // History
+    history_title: 'Care history',
+    history_empty: 'No care entries for this plant yet.',
 
     // Empty States
     empty_plants_title: 'No Plants',
