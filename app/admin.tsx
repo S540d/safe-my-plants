@@ -4,8 +4,10 @@ import { useRouter } from 'expo-router'
 import React, { useState } from 'react'
 import {
   Alert,
+  FlatList,
   Image,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -15,6 +17,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { PLANT_TEMPLATES, PlantTemplate } from '../src/constants/plantTemplates'
 import { usePlants } from '../src/contexts/PlantContext'
 import { usePreferences } from '../src/hooks/usePreferences'
 import { Disease, Plant, PlantLocation } from '../src/types/plant'
@@ -291,6 +294,90 @@ function SectionLabel({ text }: { text: string }) {
   return <Text style={formStyles.sectionLabel}>{text}</Text>
 }
 
+// ─── Templates Modal ─────────────────────────────────────────────────────────
+
+interface TemplatesModalProps {
+  lang: 'de' | 'en'
+  visible: boolean
+  onSelect: (template: PlantTemplate) => void
+  onClose: () => void
+}
+
+function TemplatesModal({ lang, visible, onSelect, onClose }: TemplatesModalProps) {
+  const [query, setQuery] = useState('')
+  const filtered = PLANT_TEMPLATES.filter((t) =>
+    t.name.toLowerCase().includes(query.toLowerCase()) ||
+    (t.scientificName ?? '').toLowerCase().includes(query.toLowerCase())
+  )
+
+  return (
+    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
+      <SafeAreaView style={tmStyles.container}>
+        <View style={tmStyles.header}>
+          <Text style={tmStyles.title}>{lang === 'de' ? 'Vorlage wählen' : 'Choose template'}</Text>
+          <TouchableOpacity onPress={onClose} style={tmStyles.closeBtn}>
+            <Text style={tmStyles.closeBtnText}>✕</Text>
+          </TouchableOpacity>
+        </View>
+        <TextInput
+          style={tmStyles.searchInput}
+          placeholder={lang === 'de' ? 'Vorlage suchen …' : 'Search templates …'}
+          placeholderTextColor="#9CA3AF"
+          value={query}
+          onChangeText={setQuery}
+        />
+        <FlatList
+          data={filtered}
+          keyExtractor={(item) => item.name}
+          contentContainerStyle={tmStyles.list}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={tmStyles.row} onPress={() => onSelect(item)}>
+              <View style={tmStyles.rowContent}>
+                <Text style={tmStyles.rowName}>{item.name}</Text>
+                {item.scientificName ? (
+                  <Text style={tmStyles.rowScientific}>{item.scientificName}</Text>
+                ) : null}
+                <Text style={tmStyles.rowMeta}>
+                  💧 {item.careInfo.wateringFrequencyDays}d · 🌿 {item.careInfo.fertilizingFrequencyDays}d
+                </Text>
+              </View>
+              <Text style={tmStyles.rowArrow}>→</Text>
+            </TouchableOpacity>
+          )}
+        />
+      </SafeAreaView>
+    </Modal>
+  )
+}
+
+const tmStyles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#F0FFF4' },
+  header: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    padding: 16, borderBottomWidth: 1, borderBottomColor: '#D8F3DC',
+  },
+  title: { fontSize: 20, fontWeight: '700', color: '#1B4332' },
+  closeBtn: { padding: 6 },
+  closeBtnText: { fontSize: 20, color: '#74C69D' },
+  searchInput: {
+    margin: 12, borderWidth: 1.5, borderColor: '#B7E4C7',
+    borderRadius: 10, padding: 10, fontSize: 15,
+    backgroundColor: '#fff', color: '#1A1A1A',
+  },
+  list: { padding: 12, gap: 8 },
+  row: {
+    backgroundColor: '#fff', borderRadius: 12, padding: 14,
+    flexDirection: 'row', alignItems: 'center',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+  },
+  rowContent: { flex: 1 },
+  rowName: { fontSize: 16, fontWeight: '600', color: '#1B4332' },
+  rowScientific: { fontSize: 12, color: '#74C69D', fontStyle: 'italic', marginTop: 1 },
+  rowMeta: { fontSize: 12, color: '#6B7280', marginTop: 4 },
+  rowArrow: { fontSize: 18, color: '#52B788', marginLeft: 8 },
+})
+
 // ─── Main Admin Screen ────────────────────────────────────────────────────────
 
 export default function AdminScreen() {
@@ -299,7 +386,23 @@ export default function AdminScreen() {
   const [unlocked, setUnlocked] = useState(false)
   const [editing, setEditing] = useState<Plant | null>(null)
   const [creating, setCreating] = useState(false)
+  const [showTemplates, setShowTemplates] = useState(false)
   const lang = language
+
+  const handleSelectTemplate = (template: PlantTemplate) => {
+    setShowTemplates(false)
+    const now = new Date().toISOString()
+    const prefilled: Plant = {
+      ...template,
+      id: `plant-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      photos: [],
+      lastWatered: undefined,
+      lastFertilized: undefined,
+      createdAt: now,
+      updatedAt: now,
+    }
+    setEditing(prefilled)
+  }
 
   if (!unlocked) {
     return (
@@ -360,9 +463,18 @@ export default function AdminScreen() {
         <Text style={styles.headerTitle}>{lang === 'de' ? 'Admin' : 'Admin'}</Text>
         <Text style={styles.headerSub}>{lang === 'de' ? 'Pflanzenverwaltung' : 'Plant Management'}</Text>
       </LinearGradient>
+      <TemplatesModal
+        lang={lang}
+        visible={showTemplates}
+        onSelect={handleSelectTemplate}
+        onClose={() => setShowTemplates(false)}
+      />
       <ScrollView contentContainerStyle={styles.scroll}>
         <TouchableOpacity style={styles.addBtn} onPress={() => setCreating(true)}>
           <Text style={styles.addBtnText}>+ {lang === 'de' ? 'Neue Pflanze' : 'New Plant'}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.templateBtn} onPress={() => setShowTemplates(true)}>
+          <Text style={styles.templateBtnText}>📋 {lang === 'de' ? 'Aus Vorlage hinzufügen' : 'Add from template'}</Text>
         </TouchableOpacity>
         {plants.map((plant) => (
           <View key={plant.id} style={styles.plantRow}>
@@ -394,9 +506,15 @@ const styles = StyleSheet.create({
   scroll: { padding: 16 },
   addBtn: {
     backgroundColor: '#2D6A4F', borderRadius: 12,
-    padding: 14, alignItems: 'center', marginBottom: 16,
+    padding: 14, alignItems: 'center', marginBottom: 8,
   },
   addBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  templateBtn: {
+    backgroundColor: '#D8F3DC', borderRadius: 12,
+    padding: 14, alignItems: 'center', marginBottom: 16,
+    borderWidth: 1.5, borderColor: '#52B788',
+  },
+  templateBtnText: { color: '#1B4332', fontSize: 15, fontWeight: '600' },
   plantRow: {
     backgroundColor: '#fff', borderRadius: 12, padding: 14,
     flexDirection: 'row', alignItems: 'center',
