@@ -1,11 +1,23 @@
-import { Tabs } from 'expo-router'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Tabs, useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { PlantProvider } from '../src/contexts/PlantContext'
 import { useOverdueCount } from '../src/hooks/useOverdueCount'
 
+const ONBOARDED_KEY = 'smp-onboarded'
+
 function AppTabs() {
   const { overdue } = useOverdueCount()
+  const router = useRouter()
+
+  useEffect(() => {
+    AsyncStorage.getItem(ONBOARDED_KEY).then((value) => {
+      if (!value) {
+        router.replace('/onboarding')
+      }
+    })
+  }, [router])
 
   return (
     <Tabs
@@ -56,6 +68,12 @@ function AppTabs() {
       />
       <Tabs.Screen
         name="plant/[id]"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="onboarding"
         options={{
           href: null,
         }}
