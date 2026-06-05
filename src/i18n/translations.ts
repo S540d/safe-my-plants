@@ -131,6 +131,15 @@ const translations = {
     settings_import_confirm: 'Bestehende Daten werden ergänzt, nicht ersetzt.',
     settings_import_error: 'Ungültige Backup-Datei.',
 
+    // Notes
+    notes_title: 'Notizen',
+    notes_add: 'Notiz hinzufügen',
+    notes_placeholder: 'Was hast du beobachtet?',
+    notes_empty: 'Noch keine Notizen zu dieser Pflanze.',
+    notes_save: 'Speichern',
+    notes_show_more: 'Mehr anzeigen',
+    notes_show_less: 'Weniger anzeigen',
+
     // Common
     ok: 'OK',
     cancel: 'Abbrechen',
@@ -274,6 +283,15 @@ const translations = {
     settings_import_skipped: '{{n}} already present (skipped)',
     settings_import_confirm: 'Existing data will be supplemented, not replaced.',
     settings_import_error: 'Invalid backup file.',
+
+    // Notes
+    notes_title: 'Notes',
+    notes_add: 'Add note',
+    notes_placeholder: 'What did you observe?',
+    notes_empty: 'No notes for this plant yet.',
+    notes_save: 'Save',
+    notes_show_more: 'Show more',
+    notes_show_less: 'Show less',
 
     // Common
     ok: 'OK',
