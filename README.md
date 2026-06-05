@@ -1,31 +1,57 @@
 # Safe My Plants 🌿
 
-Eine Topfpflanzen-Companion-App für Android. Pflegehinweise, Gieß- und Düngeampel, Krankheitsbilder und Fotos – alles offline, kein Backend.
+An Android companion app for houseplants. Care tips, watering and fertilizing indicators, disease images, and photos — all offline, no backend required.
+
+## Live
+
+[![Play Store](https://img.shields.io/badge/Google_Play-Download-green?logo=google-play)](https://play.google.com/store/apps/details?id=io.github.s540d.safemyplants)
 
 ## Features
 
-- **Pflanzenübersicht** – alle Pflanzen auf einen Blick mit Ampel-Status
-- **Ampel-System** – zeigt an, wann Gießen oder Düngen fällig ist
-- **Detailansicht** – Pflegetipps, Fotos, Standort- und Klimabedarf
-- **Krankheitsbilder** – Symptome und Behandlungshinweise je Pflanze
-- **Admin-Bereich** – PIN-geschützt; Pflanzen anlegen, bearbeiten, löschen
-- **Mehrsprachig** – Deutsch und Englisch
-- **Offline-first** – alle Daten lokal gespeichert, kein Account nötig
+- **Plant overview** – all plants at a glance with status indicators
+- **Traffic light system** – shows when watering or fertilizing is due
+- **Detail view** – care tips, photos, location and climate requirements
+- **Disease images** – symptoms and treatment notes per plant
+- **Admin area** – PIN-protected; create, edit, delete plants
+- **Multilingual** – German and English
+- **Offline-first** – all data stored locally, no account required
 
 ## Tech Stack
 
-| Technologie | Version |
+| Technology | Version |
 |---|---|
 | React Native + Expo | 56 |
 | Expo Router | ~56.2 |
 | TypeScript | ~6.0 |
 | AsyncStorage | 2.2 |
 
-## Projektstruktur
+## Setup
+
+**Prerequisites:** Node.js ≥ 18, npm, Expo Go app or Android emulator
+
+```bash
+git clone https://github.com/s540d/safe-my-plants.git
+cd safe-my-plants
+npm install
+npx expo start
+```
+
+Scan the QR code with Expo Go or press `a` for Android emulator.
+
+## Android Build (local)
+
+```bash
+npx expo prebuild --platform android
+cd android
+./gradlew assembleDebug     # Debug APK
+./gradlew assembleRelease   # Release APK
+```
+
+## Project Structure
 
 ```
 safe-my-plants/
-├── app/          # Expo Router Screens (Tabs + Detailansicht)
+├── app/          # Expo Router screens (tabs + detail view)
 ├── src/
 │   ├── components/
 │   ├── contexts/
@@ -37,28 +63,6 @@ safe-my-plants/
 └── assets/
 ```
 
-## Entwicklung starten
+## License
 
-**Voraussetzungen:** Node.js ≥ 18, npm, Expo Go App oder Android-Emulator
-
-```bash
-git clone https://github.com/s540d/safe-my-plants.git
-cd safe-my-plants
-npm install
-npx expo start
-```
-
-QR-Code mit Expo Go scannen oder `a` für Android-Emulator.
-
-## Android-Build (lokal)
-
-```bash
-npx expo prebuild --platform android
-cd android
-./gradlew assembleDebug     # Debug APK
-./gradlew assembleRelease   # Release APK
-```
-
-## Lizenz
-
-Siehe [LICENSE](LICENSE).
+See [LICENSE](LICENSE).
