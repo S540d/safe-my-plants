@@ -132,6 +132,19 @@ const translations = {
     settings_import_confirm: 'Bestehende Daten werden ergänzt, nicht ersetzt.',
     settings_import_error: 'Ungültige Backup-Datei.',
 
+    // Stats Screen
+    stats_title: 'Statistiken',
+    stats_streak_current: 'Tage in Folge',
+    stats_streak_longest: 'Rekord',
+    stats_streak_days: 'Tage',
+    stats_this_month: 'Dieser Monat',
+    stats_actions_water: 'Gegossen',
+    stats_actions_fertilize: 'Gedüngt',
+    stats_actions_other: 'Sonstiges',
+    stats_highlights: 'Highlights',
+    stats_thirstiest: 'Durstigste Pflanze',
+    stats_most_active: 'Fleißigste Pflanze',
+
     // Quick Actions
     action_water: 'Gießen',
     action_fertilize: 'Düngen',
@@ -318,6 +331,19 @@ const translations = {
     settings_import_skipped: '{{n}} already present (skipped)',
     settings_import_confirm: 'Existing data will be supplemented, not replaced.',
     settings_import_error: 'Invalid backup file.',
+
+    // Stats Screen
+    stats_title: 'Statistics',
+    stats_streak_current: 'days in a row',
+    stats_streak_longest: 'Record',
+    stats_streak_days: 'days',
+    stats_this_month: 'This month',
+    stats_actions_water: 'Watered',
+    stats_actions_fertilize: 'Fertilized',
+    stats_actions_other: 'Other',
+    stats_highlights: 'Highlights',
+    stats_thirstiest: 'Thirstiest plant',
+    stats_most_active: 'Most active plant',
 
     // Quick Actions
     action_water: 'Water',
