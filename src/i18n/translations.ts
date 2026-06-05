@@ -121,6 +121,24 @@ const translations = {
     reminder_plural: '{{n}} Pflanzen brauchen Pflege',
     reminder_tap: 'Tippen zum Anzeigen',
 
+    // Empty States
+    empty_plants_title: 'Keine Pflanzen',
+    empty_plants_body: 'Füge deine erste Pflanze im Admin-Bereich hinzu.',
+    empty_plants_cta: 'Zum Admin-Bereich',
+    empty_history_title: 'Noch keine Einträge',
+    empty_diseases_title: 'Keine Krankheiten bekannt',
+
+    // Onboarding
+    onboarding_skip: 'Überspringen',
+    onboarding_next: 'Weiter',
+    onboarding_finish: 'Fertig',
+    onboarding_slide1_title: 'Willkommen bei Safe My Plants',
+    onboarding_slide1_body: 'Alle deine Pflanzen im Blick – smarte Pflegeerinnerung.',
+    onboarding_slide2_title: 'Das Ampel-System',
+    onboarding_slide2_body: 'Grün: alles gut. Gelb: bald fällig. Rot: jetzt handeln!',
+    onboarding_slide3_title: 'Schnell pflegen',
+    onboarding_slide3_body: 'Tippe auf eine Pflanze und protokolliere Gießen, Düngen und mehr.',
+
     // Notes
     notes_title: 'Notizen',
     notes_add: 'Notiz hinzufügen',
@@ -263,6 +281,24 @@ const translations = {
     reminder_singular: '1 plant needs care',
     reminder_plural: '{{n}} plants need care',
     reminder_tap: 'Tap to view',
+
+    // Empty States
+    empty_plants_title: 'No Plants',
+    empty_plants_body: 'Add your first plant in the Admin area.',
+    empty_plants_cta: 'Go to Admin',
+    empty_history_title: 'No entries yet',
+    empty_diseases_title: 'No diseases known',
+
+    // Onboarding
+    onboarding_skip: 'Skip',
+    onboarding_next: 'Next',
+    onboarding_finish: 'Get started',
+    onboarding_slide1_title: 'Welcome to Safe My Plants',
+    onboarding_slide1_body: 'All your plants at a glance – smart care reminders.',
+    onboarding_slide2_title: 'The Traffic Light System',
+    onboarding_slide2_body: 'Green: all good. Yellow: due soon. Red: act now!',
+    onboarding_slide3_title: 'Quick care',
+    onboarding_slide3_body: 'Tap a plant and log watering, fertilizing and more.',
 
     // Notes
     notes_title: 'Notes',

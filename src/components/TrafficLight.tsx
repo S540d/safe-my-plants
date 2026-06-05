@@ -1,11 +1,12 @@
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
+import { Colors } from '../constants/theme'
 import { CareStatus } from '../types/plant'
 
 const STATUS_COLORS: Record<CareStatus, string> = {
-  ok: '#52B788',
-  soon: '#F4A261',
-  overdue: '#E63946',
+  ok: Colors.light.statusOk,
+  soon: Colors.light.statusSoon,
+  overdue: Colors.light.statusOverdue,
 }
 
 interface TrafficLightProps {

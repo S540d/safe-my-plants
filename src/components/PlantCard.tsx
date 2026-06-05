@@ -3,6 +3,7 @@ import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { LOCATION_ICONS } from '../constants/locationIcons'
 import { getCareStatus } from '../hooks/useCareStatus'
+import { useThemeColors } from '../hooks/useThemeColors'
 import { Language } from '../i18n/translations'
 import { Plant } from '../types/plant'
 import { TrafficLight } from './TrafficLight'
@@ -16,25 +17,30 @@ interface PlantCardProps {
 export function PlantCard({ plant, lang, onPress }: PlantCardProps) {
   const status = getCareStatus(plant)
   const hasPhoto = plant.photos.length > 0
+  const colors = useThemeColors()
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.85}>
+    <TouchableOpacity
+      style={[styles.card, { backgroundColor: colors.surface }]}
+      onPress={onPress}
+      activeOpacity={0.85}
+    >
       {hasPhoto ? (
         <Image source={{ uri: plant.photos[0].uri }} style={styles.photo} />
       ) : (
-        <LinearGradient colors={['#2D6A4F', '#52B788']} style={styles.photoPlaceholder}>
+        <LinearGradient colors={[colors.primaryMid, colors.primaryLight]} style={styles.photoPlaceholder}>
           <Text style={styles.plantEmoji}>🪴</Text>
         </LinearGradient>
       )}
       <View style={styles.content}>
         <View style={styles.header}>
-          <Text style={styles.name} numberOfLines={1}>
+          <Text style={[styles.name, { color: colors.primary }]} numberOfLines={1}>
             {plant.name}
           </Text>
           <TrafficLight status={status.overall} size={14} />
         </View>
         {plant.scientificName ? (
-          <Text style={styles.scientificName} numberOfLines={1}>
+          <Text style={[styles.scientificName, { color: colors.accent }]} numberOfLines={1}>
             {plant.scientificName}
           </Text>
         ) : null}
@@ -57,7 +63,6 @@ export function PlantCard({ plant, lang, onPress }: PlantCardProps) {
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
     borderRadius: 12,
     marginHorizontal: 16,
     marginVertical: 6,
@@ -94,13 +99,11 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1B4332',
     flex: 1,
     marginRight: 8,
   },
   scientificName: {
     fontSize: 12,
-    color: '#74C69D',
     fontStyle: 'italic',
     marginTop: 2,
   },
