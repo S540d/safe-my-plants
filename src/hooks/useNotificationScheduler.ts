@@ -1,44 +1,12 @@
 import * as Notifications from 'expo-notifications'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Platform } from 'react-native'
 import { Language, t } from '../i18n/translations'
+import { ReminderSettings, getReminderSettings, saveReminderSettings } from '../services/storage'
 
-const REMINDER_KEY = 'smp-reminders'
+export type { ReminderSettings }
+export { getReminderSettings, saveReminderSettings }
+
 const NOTIFICATION_CHANNEL_ID = 'safe-my-plants-care'
-
-export interface ReminderSettings {
-  enabled: boolean
-  time: string // 'HH:mm'
-}
-
-const DEFAULT_SETTINGS: ReminderSettings = { enabled: false, time: '09:00' }
-
-function isValidSettings(obj: unknown): obj is ReminderSettings {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    typeof (obj as ReminderSettings).enabled === 'boolean' &&
-    typeof (obj as ReminderSettings).time === 'string' &&
-    /^\d{2}:\d{2}$/.test((obj as ReminderSettings).time)
-  )
-}
-
-export async function getReminderSettings(): Promise<ReminderSettings> {
-  try {
-    const raw = await AsyncStorage.getItem(REMINDER_KEY)
-    if (raw) {
-      const parsed: unknown = JSON.parse(raw)
-      if (isValidSettings(parsed)) return parsed
-    }
-    return DEFAULT_SETTINGS
-  } catch {
-    return DEFAULT_SETTINGS
-  }
-}
-
-export async function saveReminderSettings(settings: ReminderSettings): Promise<void> {
-  await AsyncStorage.setItem(REMINDER_KEY, JSON.stringify(settings))
-}
 
 async function ensureChannel(lang: Language): Promise<void> {
   if (Platform.OS !== 'android') return
