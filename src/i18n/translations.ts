@@ -321,7 +321,6 @@ const translations = {
     reminder_plural: '{{n}} plants need care',
     reminder_tap: 'Tap to view',
 
-<<<<<<< HEAD
     // Notifications
     settings_notifications: 'Reminders',
     settings_notifications_enable: 'Daily reminder',
