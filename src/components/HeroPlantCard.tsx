@@ -18,7 +18,7 @@ export function HeroPlantCard({ plant, lang, onPress, onWater, onFertilize }: Pr
   return (
     <TouchableOpacity style={styles.hero} onPress={onPress} activeOpacity={0.92}>
       {hasPhoto ? (
-        <Image source={{ uri: plant.photos[0] }} style={styles.image} resizeMode="cover" />
+        <Image source={{ uri: plant.photos[0].uri }} style={styles.image} resizeMode="cover" />
       ) : (
         <LinearGradient colors={['#2D6A4F', '#52B788']} style={styles.image}>
           <Text style={styles.placeholder}>🪴</Text>

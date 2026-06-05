@@ -12,7 +12,7 @@ import {
 } from '../services/storage'
 import { notifyCareLogUpdate } from '../hooks/useCareLog'
 import { CareAction } from '../types/careLog'
-import { Plant } from '../types/plant'
+import { Plant, PlantPhoto } from '../types/plant'
 
 interface PlantContextValue {
   plants: Plant[]
@@ -28,31 +28,47 @@ const PlantContext = createContext<PlantContextValue | null>(null)
 
 async function runMigrations(plants: Plant[]): Promise<void> {
   const version = await getSchemaVersion()
-  if (version >= 2) return
 
-  const existing = await getCareLog()
-  const existingIds = new Set(existing.map((a) => a.id))
-  const entries: CareAction[] = []
+  // v1 → v2: migrate lastWatered/lastFertilized to CareLog entries
+  if (version < 2) {
+    const existing = await getCareLog()
+    const existingIds = new Set(existing.map((a) => a.id))
+    const entries: CareAction[] = []
 
-  for (const plant of plants) {
-    if (plant.lastWatered) {
-      const id = `migration-water-${plant.id}`
-      if (!existingIds.has(id)) {
-        entries.push({ id, plantId: plant.id, type: 'water', timestamp: plant.lastWatered })
+    for (const plant of plants) {
+      if (plant.lastWatered) {
+        const id = `migration-water-${plant.id}`
+        if (!existingIds.has(id)) {
+          entries.push({ id, plantId: plant.id, type: 'water', timestamp: plant.lastWatered })
+        }
+      }
+      if (plant.lastFertilized) {
+        const id = `migration-fertilize-${plant.id}`
+        if (!existingIds.has(id)) {
+          entries.push({ id, plantId: plant.id, type: 'fertilize', timestamp: plant.lastFertilized })
+        }
       }
     }
-    if (plant.lastFertilized) {
-      const id = `migration-fertilize-${plant.id}`
-      if (!existingIds.has(id)) {
-        entries.push({ id, plantId: plant.id, type: 'fertilize', timestamp: plant.lastFertilized })
-      }
+
+    if (entries.length > 0) {
+      await saveCareLog([...entries, ...existing])
     }
+    await saveSchemaVersion(2)
   }
 
-  if (entries.length > 0) {
-    await saveCareLog([...entries, ...existing])
+  // v2 → v3: migrate photos: string[] to photos: PlantPhoto[]
+  if (version < 3) {
+    const migrated = plants.map((plant) => {
+      const rawPhotos = plant.photos as unknown as (string | PlantPhoto)[]
+      const converted: PlantPhoto[] = rawPhotos.map((p) =>
+        typeof p === 'string' ? { uri: p, takenAt: plant.createdAt } : p
+      )
+      return { ...plant, photos: converted }
+    })
+    await savePlants(migrated)
+    await saveSchemaVersion(3)
+    return
   }
-  await saveSchemaVersion(2)
 }
 
 export function PlantProvider({ children }: { children: React.ReactNode }) {

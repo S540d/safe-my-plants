@@ -9,6 +9,7 @@ const KEYS = {
   theme: 'smp-theme',
   careLog: 'smp-carelog',
   schemaVersion: 'smp-schema-version',
+  reminders: 'smp-reminders',
 }
 
 async function get<T>(key: string): Promise<T | null> {
@@ -75,4 +76,31 @@ export async function getSchemaVersion(): Promise<number> {
 
 export async function saveSchemaVersion(version: number): Promise<void> {
   await set(KEYS.schemaVersion, version)
+}
+
+export interface ReminderSettings {
+  enabled: boolean
+  time: string // 'HH:mm'
+}
+
+const DEFAULT_REMINDER_SETTINGS: ReminderSettings = { enabled: false, time: '09:00' }
+
+function isValidReminderSettings(obj: unknown): obj is ReminderSettings {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    typeof (obj as ReminderSettings).enabled === 'boolean' &&
+    typeof (obj as ReminderSettings).time === 'string' &&
+    /^\d{2}:\d{2}$/.test((obj as ReminderSettings).time)
+  )
+}
+
+export async function getReminderSettings(): Promise<ReminderSettings> {
+  const parsed = await get<unknown>(KEYS.reminders)
+  if (isValidReminderSettings(parsed)) return parsed
+  return DEFAULT_REMINDER_SETTINGS
+}
+
+export async function saveReminderSettings(settings: ReminderSettings): Promise<void> {
+  await set(KEYS.reminders, settings)
 }

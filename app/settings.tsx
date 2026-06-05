@@ -1,17 +1,28 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Alert,
   SafeAreaView,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native'
 import { usePreferences } from '../src/hooks/usePreferences'
+import {
+  cancelAll,
+  getReminderSettings,
+  requestNotificationPermission,
+  ReminderSettings,
+  saveReminderSettings,
+  scheduleDaily,
+} from '../src/hooks/useNotificationScheduler'
+import { exportData, importData } from '../src/services/exportImport'
+import { t } from '../src/i18n/translations'
 
 type ThemeMode = 'light' | 'dark' | 'system'
 
@@ -23,6 +34,86 @@ export default function SettingsScreen() {
   const [confirmPin, setConfirmPin] = useState('')
 
   const lang = language
+
+  const [reminder, setReminder] = useState<ReminderSettings>({ enabled: false, time: '09:00' })
+
+  useEffect(() => {
+    getReminderSettings().then(setReminder)
+  }, [])
+
+  const applyReminder = async (updated: ReminderSettings) => {
+    setReminder(updated)
+    await saveReminderSettings(updated)
+    if (updated.enabled) {
+      const [h, m] = updated.time.split(':').map(Number)
+      await scheduleDaily(h, m, lang)
+    } else {
+      await cancelAll()
+    }
+  }
+
+  const handleToggleReminder = async (value: boolean) => {
+    if (value) {
+      const granted = await requestNotificationPermission()
+      if (!granted) {
+        Alert.alert('', t(lang, 'settings_notifications_permission_denied'))
+        return
+      }
+    }
+    await applyReminder({ ...reminder, enabled: value })
+    if (value) Alert.alert('', t(lang, 'settings_notifications_saved'))
+  }
+
+  const adjustTime = async (deltaHour: number, deltaMinute: number) => {
+    const [h, m] = reminder.time.split(':').map(Number)
+    const totalMinutes = h * 60 + m + deltaHour * 60 + deltaMinute
+    const wrapped = ((totalMinutes % 1440) + 1440) % 1440
+    const newH = Math.floor(wrapped / 60)
+    const newM = wrapped % 60
+    const newTime = `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`
+    const updated = { ...reminder, time: newTime }
+    setReminder(updated)
+    await saveReminderSettings(updated)
+    if (reminder.enabled) {
+      await scheduleDaily(newH, newM, lang)
+    }
+  }
+
+  const handleExport = async () => {
+    try {
+      await exportData()
+    } catch (e) {
+      if ((e as Error).message !== 'cancelled') {
+        Alert.alert('', lang === 'de' ? 'Export fehlgeschlagen.' : 'Export failed.')
+      }
+    }
+  }
+
+  const handleImport = () => {
+    Alert.alert(
+      lang === 'de' ? 'Daten importieren' : 'Import data',
+      t(lang, 'settings_import_confirm'),
+      [
+        { text: t(lang, 'cancel'), style: 'cancel' },
+        {
+          text: lang === 'de' ? 'Importieren' : 'Import',
+          onPress: async () => {
+            try {
+              const { imported, skipped } = await importData()
+              const lines = [t(lang, 'settings_import_success', { n: imported })]
+              if (skipped > 0) lines.push(t(lang, 'settings_import_skipped', { n: skipped }))
+              Alert.alert('', lines.join('\n'))
+            } catch (e) {
+              const msg = (e as Error).message
+              if (msg !== 'cancelled') {
+                Alert.alert('', t(lang, 'settings_import_error'))
+              }
+            }
+          },
+        },
+      ]
+    )
+  }
 
   const handleSavePin = async () => {
     if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
@@ -95,6 +186,53 @@ export default function SettingsScreen() {
           </View>
         )}
 
+        {/* Notifications */}
+        <Text style={styles.sectionLabel}>{t(lang, 'settings_notifications')}</Text>
+        <View style={styles.notifCard}>
+          <View style={styles.notifRow}>
+            <Text style={styles.notifLabel}>{t(lang, 'settings_notifications_enable')}</Text>
+            <Switch
+              value={reminder.enabled}
+              onValueChange={handleToggleReminder}
+              trackColor={{ true: '#2D6A4F', false: '#B7E4C7' }}
+              thumbColor="#fff"
+            />
+          </View>
+          {reminder.enabled && (
+            <View style={[styles.notifRow, { marginTop: 12 }]}>
+              <Text style={styles.notifLabel}>{t(lang, 'settings_notifications_time')}</Text>
+              <View style={styles.timePicker}>
+                <TouchableOpacity style={styles.timeBtn} onPress={() => adjustTime(-1, 0)}>
+                  <Text style={styles.timeBtnText}>−</Text>
+                </TouchableOpacity>
+                <Text style={styles.timeDisplay}>{reminder.time.split(':')[0]}</Text>
+                <TouchableOpacity style={styles.timeBtn} onPress={() => adjustTime(1, 0)}>
+                  <Text style={styles.timeBtnText}>+</Text>
+                </TouchableOpacity>
+                <Text style={styles.timeSep}>:</Text>
+                <TouchableOpacity style={styles.timeBtn} onPress={() => adjustTime(0, -15)}>
+                  <Text style={styles.timeBtnText}>−</Text>
+                </TouchableOpacity>
+                <Text style={styles.timeDisplay}>{reminder.time.split(':')[1]}</Text>
+                <TouchableOpacity style={styles.timeBtn} onPress={() => adjustTime(0, 15)}>
+                  <Text style={styles.timeBtnText}>+</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        </View>
+
+        {/* Data */}
+        <Text style={styles.sectionLabel}>{t(lang, 'settings_data')}</Text>
+        <View style={styles.dataRow}>
+          <TouchableOpacity style={[styles.dataBtn, styles.dataBtnExport]} onPress={handleExport}>
+            <Text style={[styles.dataBtnText, { color: '#fff' }]}>📤 {t(lang, 'settings_export')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.dataBtn, styles.dataBtnImport]} onPress={handleImport}>
+            <Text style={[styles.dataBtnText, { color: '#2D6A4F' }]}>📥 {t(lang, 'settings_import')}</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* About */}
         <Text style={styles.sectionLabel}>{lang === 'de' ? 'Über die App' : 'About'}</Text>
         <View style={styles.aboutCard}>
@@ -163,6 +301,30 @@ const styles = StyleSheet.create({
     padding: 12, alignItems: 'center',
   },
   saveBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  notifCard: {
+    backgroundColor: '#fff', borderRadius: 12, padding: 14,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+  },
+  notifRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  notifLabel: { fontSize: 15, color: '#1B4332', flex: 1 },
+  timePicker: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  timeBtn: {
+    width: 28, height: 28, borderRadius: 14,
+    backgroundColor: '#D8F3DC', alignItems: 'center', justifyContent: 'center',
+  },
+  timeBtnText: { fontSize: 16, color: '#2D6A4F', fontWeight: '700', lineHeight: 20 },
+  timeDisplay: { fontSize: 18, fontWeight: '700', color: '#1B4332', minWidth: 28, textAlign: 'center' },
+  timeSep: { fontSize: 18, fontWeight: '700', color: '#1B4332', marginHorizontal: 2 },
+  dataRow: { flexDirection: 'row', gap: 10 },
+  dataBtn: {
+    flex: 1, padding: 14, borderRadius: 12, alignItems: 'center',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+  },
+  dataBtnExport: { backgroundColor: '#2D6A4F' },
+  dataBtnImport: { backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#B7E4C7' },
+  dataBtnText: { fontSize: 13, fontWeight: '600', color: '#fff' },
   aboutCard: {
     backgroundColor: '#fff', borderRadius: 12, padding: 16,
     shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
