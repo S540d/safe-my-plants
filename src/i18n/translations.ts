@@ -122,6 +122,16 @@ const translations = {
     reminder_plural: '{{n}} Pflanzen brauchen Pflege',
     reminder_tap: 'Tippen zum Anzeigen',
 
+    // Data / Export-Import
+    settings_data: 'Daten',
+    settings_export: 'Daten exportieren',
+    settings_import: 'Daten importieren',
+    settings_export_success: 'Backup gespeichert',
+    settings_import_success: '{{n}} Pflanze(n) importiert',
+    settings_import_skipped: '{{n}} bereits vorhanden (übersprungen)',
+    settings_import_confirm: 'Bestehende Daten werden ergänzt, nicht ersetzt.',
+    settings_import_error: 'Ungültige Backup-Datei.',
+
     // Stats Screen
     stats_title: 'Statistiken',
     stats_streak_current: 'Tage in Folge',
@@ -311,6 +321,16 @@ const translations = {
     reminder_singular: '1 plant needs care',
     reminder_plural: '{{n}} plants need care',
     reminder_tap: 'Tap to view',
+
+    // Data / Export-Import
+    settings_data: 'Data',
+    settings_export: 'Export data',
+    settings_import: 'Import data',
+    settings_export_success: 'Backup saved',
+    settings_import_success: '{{n}} plant(s) imported',
+    settings_import_skipped: '{{n}} already present (skipped)',
+    settings_import_confirm: 'Existing data will be supplemented, not replaced.',
+    settings_import_error: 'Invalid backup file.',
 
     // Stats Screen
     stats_title: 'Statistics',
