@@ -4,6 +4,8 @@ An Android companion app for houseplants. Care tips, watering and fertilizing in
 
 ## Live
 
+**[Try the app →](https://s540d.github.io/safe-my-plants)**
+
 [![Play Store](https://img.shields.io/badge/Google_Play-Download-green?logo=google-play)](https://play.google.com/store/apps/details?id=io.github.s540d.safemyplants)
 
 ## Features
