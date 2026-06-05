@@ -12,6 +12,7 @@ import {
 import { CareHistoryList } from '../../src/components/CareHistoryList'
 import { DiseaseCard } from '../../src/components/DiseaseCard'
 import { NotesSection } from '../../src/components/NotesSection'
+import { PhotoGalleryModal } from '../../src/components/PhotoGalleryModal'
 import { QuickActionBar } from '../../src/components/QuickActionBar'
 import { TrafficLight } from '../../src/components/TrafficLight'
 import { WaterDropAnimation } from '../../src/components/WaterDropAnimation'
@@ -36,6 +37,8 @@ export default function PlantDetailScreen() {
   const { language } = usePreferences()
   const router = useRouter()
   const [photoIndex, setPhotoIndex] = useState(0)
+  const [galleryVisible, setGalleryVisible] = useState(false)
+  const [galleryInitialIndex, setGalleryInitialIndex] = useState(0)
   const [showWaterDrop, setShowWaterDrop] = useState(false)
 
   const plant = plants.find((p) => p.id === id)
@@ -56,8 +59,8 @@ export default function PlantDetailScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header photo */}
         {plant.photos.length > 0 ? (
-          <TouchableOpacity onPress={() => setPhotoIndex((i) => (i + 1) % plant.photos.length)}>
-            <Image source={{ uri: plant.photos[photoIndex] }} style={styles.heroPhoto} />
+          <TouchableOpacity onPress={() => { setGalleryInitialIndex(photoIndex); setGalleryVisible(true) }}>
+            <Image source={{ uri: plant.photos[photoIndex].uri }} style={styles.heroPhoto} />
             {plant.photos.length > 1 && (
               <View style={styles.photoBadge}>
                 <Text style={styles.photoBadgeText}>
@@ -168,6 +171,15 @@ export default function PlantDetailScreen() {
           <View style={styles.bottomSpacer} />
         </View>
       </ScrollView>
+      {plant.photos.length > 0 && (
+        <PhotoGalleryModal
+          photos={plant.photos}
+          initialIndex={galleryInitialIndex}
+          visible={galleryVisible}
+          onClose={() => setGalleryVisible(false)}
+          lang={lang}
+        />
+      )}
       <WaterDropAnimation visible={showWaterDrop} onFinish={() => setShowWaterDrop(false)} />
     </SafeAreaView>
   )
