@@ -21,6 +21,7 @@ import {
   saveReminderSettings,
   scheduleDaily,
 } from '../src/hooks/useNotificationScheduler'
+import { exportData, importData } from '../src/services/exportImport'
 import { t } from '../src/i18n/translations'
 
 type ThemeMode = 'light' | 'dark' | 'system'
@@ -76,6 +77,42 @@ export default function SettingsScreen() {
     if (reminder.enabled) {
       await scheduleDaily(newH, newM, lang)
     }
+  }
+
+  const handleExport = async () => {
+    try {
+      await exportData()
+    } catch (e) {
+      if ((e as Error).message !== 'cancelled') {
+        Alert.alert('', lang === 'de' ? 'Export fehlgeschlagen.' : 'Export failed.')
+      }
+    }
+  }
+
+  const handleImport = () => {
+    Alert.alert(
+      lang === 'de' ? 'Daten importieren' : 'Import data',
+      t(lang, 'settings_import_confirm'),
+      [
+        { text: t(lang, 'cancel'), style: 'cancel' },
+        {
+          text: lang === 'de' ? 'Importieren' : 'Import',
+          onPress: async () => {
+            try {
+              const { imported, skipped } = await importData()
+              const lines = [t(lang, 'settings_import_success', { n: imported })]
+              if (skipped > 0) lines.push(t(lang, 'settings_import_skipped', { n: skipped }))
+              Alert.alert('', lines.join('\n'))
+            } catch (e) {
+              const msg = (e as Error).message
+              if (msg !== 'cancelled') {
+                Alert.alert('', t(lang, 'settings_import_error'))
+              }
+            }
+          },
+        },
+      ]
+    )
   }
 
   const handleSavePin = async () => {
@@ -185,6 +222,17 @@ export default function SettingsScreen() {
           )}
         </View>
 
+        {/* Data */}
+        <Text style={styles.sectionLabel}>{t(lang, 'settings_data')}</Text>
+        <View style={styles.dataRow}>
+          <TouchableOpacity style={[styles.dataBtn, styles.dataBtnExport]} onPress={handleExport}>
+            <Text style={[styles.dataBtnText, { color: '#fff' }]}>📤 {t(lang, 'settings_export')}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.dataBtn, styles.dataBtnImport]} onPress={handleImport}>
+            <Text style={[styles.dataBtnText, { color: '#2D6A4F' }]}>📥 {t(lang, 'settings_import')}</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* About */}
         <Text style={styles.sectionLabel}>{lang === 'de' ? 'Über die App' : 'About'}</Text>
         <View style={styles.aboutCard}>
@@ -268,6 +316,15 @@ const styles = StyleSheet.create({
   timeBtnText: { fontSize: 16, color: '#2D6A4F', fontWeight: '700', lineHeight: 20 },
   timeDisplay: { fontSize: 18, fontWeight: '700', color: '#1B4332', minWidth: 28, textAlign: 'center' },
   timeSep: { fontSize: 18, fontWeight: '700', color: '#1B4332', marginHorizontal: 2 },
+  dataRow: { flexDirection: 'row', gap: 10 },
+  dataBtn: {
+    flex: 1, padding: 14, borderRadius: 12, alignItems: 'center',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+  },
+  dataBtnExport: { backgroundColor: '#2D6A4F' },
+  dataBtnImport: { backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#B7E4C7' },
+  dataBtnText: { fontSize: 13, fontWeight: '600', color: '#fff' },
   aboutCard: {
     backgroundColor: '#fff', borderRadius: 12, padding: 16,
     shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
