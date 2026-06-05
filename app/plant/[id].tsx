@@ -11,7 +11,9 @@ import {
   View,
 } from 'react-native'
 import { DiseaseCard } from '../../src/components/DiseaseCard'
+import { NotesSection } from '../../src/components/NotesSection'
 import { TrafficLight } from '../../src/components/TrafficLight'
+import { WaterDropAnimation } from '../../src/components/WaterDropAnimation'
 import { usePlants } from '../../src/contexts/PlantContext'
 import { formatLastDate, formatNextDate, useCareStatus } from '../../src/hooks/useCareStatus'
 import { usePreferences } from '../../src/hooks/usePreferences'
@@ -32,6 +34,7 @@ export default function PlantDetailScreen() {
   const { language } = usePreferences()
   const router = useRouter()
   const [photoIndex, setPhotoIndex] = useState(0)
+  const [showWaterDrop, setShowWaterDrop] = useState(false)
 
   const plant = plants.find((p) => p.id === id)
 
@@ -50,7 +53,12 @@ export default function PlantDetailScreen() {
     const msg = lang === 'de' ? 'Als gegossen markieren?' : 'Mark as watered?'
     Alert.alert('', msg, [
       { text: lang === 'de' ? 'Abbrechen' : 'Cancel', style: 'cancel' },
-      { text: 'OK', onPress: () => markWatered(plant.id) },
+      {
+        text: 'OK', onPress: async () => {
+          await markWatered(plant.id)
+          setShowWaterDrop(true)
+        }
+      },
     ])
   }
 
@@ -167,9 +175,13 @@ export default function PlantDetailScreen() {
             </>
           )}
 
+          {/* Notes */}
+          <NotesSection plantId={plant.id} lang={lang} />
+
           <View style={styles.bottomSpacer} />
         </View>
       </ScrollView>
+      <WaterDropAnimation visible={showWaterDrop} onFinish={() => setShowWaterDrop(false)} />
     </SafeAreaView>
   )
 }

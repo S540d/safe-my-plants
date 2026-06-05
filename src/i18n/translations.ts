@@ -130,6 +130,15 @@ const translations = {
     notification_channel_name: 'Pflege-Erinnerungen',
     notification_body: 'Schau nach deinen Pflanzen – vielleicht braucht eine heute Pflege!',
 
+    // Notes
+    notes_title: 'Notizen',
+    notes_add: 'Notiz hinzufügen',
+    notes_placeholder: 'Was hast du beobachtet?',
+    notes_empty: 'Noch keine Notizen zu dieser Pflanze.',
+    notes_save: 'Speichern',
+    notes_show_more: 'Mehr anzeigen',
+    notes_show_less: 'Weniger anzeigen',
+
     // Common
     ok: 'OK',
     cancel: 'Abbrechen',
@@ -272,6 +281,15 @@ const translations = {
     settings_notifications_saved: 'Reminder saved',
     notification_channel_name: 'Care Reminders',
     notification_body: 'Check on your plants – one might need care today!',
+
+    // Notes
+    notes_title: 'Notes',
+    notes_add: 'Add note',
+    notes_placeholder: 'What did you observe?',
+    notes_empty: 'No notes for this plant yet.',
+    notes_save: 'Save',
+    notes_show_more: 'Show more',
+    notes_show_less: 'Show less',
 
     // Common
     ok: 'OK',
