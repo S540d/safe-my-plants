@@ -197,7 +197,7 @@ export const DEFAULT_PLANTS: Plant[] = [
     name: 'Bogenhanf',
     scientificName: 'Sansevieria trifasciata',
     description:
-      'Der Bogenhanf ist eine äußerst robuste Sukkulente mit aufrechten, bandartigen Blättern. Er gilt als einer der härtesten Zimmerpflanzen und reinigt zudem die Raumluft.',
+      'Der Bogenhanf ist eine äußerst robuste Sukkulente mit aufrechten, bandartigen Blättern. Er gilt als eine der härtesten Zimmerpflanzen und reinigt zudem die Raumluft.',
     photos: [],
     location: 'indoor',
     careInfo: {
