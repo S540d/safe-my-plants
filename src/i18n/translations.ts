@@ -309,7 +309,6 @@ const translations = {
     reminder_plural: '{{n}} plants need care',
     reminder_tap: 'Tap to view',
 
-<<<<<<< HEAD
     // Data / Export-Import
     settings_data: 'Data',
     settings_export: 'Export data',
