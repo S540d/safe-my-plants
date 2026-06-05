@@ -11,8 +11,10 @@ import {
 } from 'react-native'
 import { CareHistoryList } from '../../src/components/CareHistoryList'
 import { DiseaseCard } from '../../src/components/DiseaseCard'
+import { NotesSection } from '../../src/components/NotesSection'
 import { QuickActionBar } from '../../src/components/QuickActionBar'
 import { TrafficLight } from '../../src/components/TrafficLight'
+import { WaterDropAnimation } from '../../src/components/WaterDropAnimation'
 import { usePlants } from '../../src/contexts/PlantContext'
 import { formatLastDate, formatNextDate, useCareStatus } from '../../src/hooks/useCareStatus'
 import { usePreferences } from '../../src/hooks/usePreferences'
@@ -34,6 +36,7 @@ export default function PlantDetailScreen() {
   const { language } = usePreferences()
   const router = useRouter()
   const [photoIndex, setPhotoIndex] = useState(0)
+  const [showWaterDrop, setShowWaterDrop] = useState(false)
 
   const plant = plants.find((p) => p.id === id)
 
@@ -159,9 +162,13 @@ export default function PlantDetailScreen() {
           {/* Care History */}
           <CareHistoryList plantId={plant.id} />
 
+          {/* Notes */}
+          <NotesSection plantId={plant.id} lang={lang} />
+
           <View style={styles.bottomSpacer} />
         </View>
       </ScrollView>
+      <WaterDropAnimation visible={showWaterDrop} onFinish={() => setShowWaterDrop(false)} />
     </SafeAreaView>
   )
 }
