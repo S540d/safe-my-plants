@@ -26,6 +26,11 @@ jobs:
           cache: 'npm'
       - run: npm ci --legacy-peer-deps
       - run: npx expo export -p web
+      - name: Fix asset paths for GitHub Pages sub-path deployment
+        run: |
+          find dist -name "*.html" | xargs sed -i \
+            -e 's|src="/_expo/|src="/safe-my-plants/_expo/|g' \
+            -e 's|href="/favicon.ico"|href="/safe-my-plants/favicon.ico"|g'
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
