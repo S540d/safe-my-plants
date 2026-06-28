@@ -1,11 +1,18 @@
 import { Plant } from '../types/plant'
 
-export type PlantTemplate = Omit<Plant, 'id' | 'photos' | 'lastWatered' | 'lastFertilized' | 'createdAt' | 'updatedAt'>
+export type PlantTemplate = Omit<
+  Plant,
+  'id' | 'photos' | 'lastWatered' | 'lastFertilized' | 'createdAt' | 'updatedAt'
+> & {
+  /** Weitere gebräuchliche Namen/Synonyme für die Suche (z. B. "Friedenslilie" für das Einblatt). */
+  aliases?: string[]
+}
 
 export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Monstera',
     scientificName: 'Monstera deliciosa',
+    aliases: ['Fensterblatt', 'Köstliches Fensterblatt'],
     description: 'Das Fensterblatt mit charakteristischen gelochten Blättern. Pflegeleicht und wächst schnell.',
     location: 'partial-shade',
     careInfo: {
@@ -22,6 +29,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Efeutute',
     scientificName: 'Epipremnum aureum',
+    aliases: ['Pothos', 'Goldene Efeutute', 'Skindapsus'],
     description: 'Extrem robuste Hängepflanze. Verträgt wenig Licht und unregelmäßiges Gießen.',
     location: 'shade',
     careInfo: {
@@ -38,6 +46,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Gummibaum',
     scientificName: 'Ficus elastica',
+    aliases: ['Birkenfeige', 'Ficus'],
     description: 'Klassischer Zimmerbaum mit glänzend dunkelgrünen Blättern.',
     location: 'sun',
     careInfo: {
@@ -54,6 +63,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Aloe Vera',
     scientificName: 'Aloe vera',
+    aliases: ['Echte Aloe', 'Wüstenlilie'],
     description: 'Sukkulente mit heilenden Eigenschaften. Braucht viel Sonne und wenig Wasser.',
     location: 'sun',
     careInfo: {
@@ -70,6 +80,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Zamioculcas',
     scientificName: 'Zamioculcas zamiifolia',
+    aliases: ['Glücksfeder', 'ZZ-Pflanze', 'Kartonpapierpflanze'],
     description: 'Glücksfeder – extrem genügsam, verträgt Trockenheit und wenig Licht.',
     location: 'shade',
     careInfo: {
@@ -86,6 +97,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Bogenhanf',
     scientificName: 'Sansevieria trifasciata',
+    aliases: ['Sansevieria', 'Schwiegermutterzunge', 'Schlangenpflanze'],
     description: 'Schwertförmige Blätter, nahezu unzerstörbar. Ideal für Anfänger.',
     location: 'indoor',
     careInfo: {
@@ -102,6 +114,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Orchidee',
     scientificName: 'Phalaenopsis',
+    aliases: ['Phalaenopsis', 'Schmetterlingsorchidee', 'Falterorchidee'],
     description: 'Elegante Blütenpracht. Braucht hellen Standort ohne direkte Sonne und hohe Luftfeuchtigkeit.',
     location: 'partial-shade',
     careInfo: {
@@ -134,6 +147,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Drachenbaum',
     scientificName: 'Dracaena marginata',
+    aliases: ['Dracaena', 'Madagaskar-Drachenbaum'],
     description: 'Schlanker Baum mit schmalen Blättern, luftreinigend. Robust und pflegeleicht.',
     location: 'partial-shade',
     careInfo: {
@@ -166,6 +180,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Sukkulente',
     scientificName: 'Echeveria',
+    aliases: ['Echeverie', 'Dickblatt'],
     description: 'Rosettenförmige Sukkulente mit fleischigen Blättern. Ideal für sonnige Fensterbänke.',
     location: 'sun',
     careInfo: {
@@ -182,6 +197,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Friedenslilie',
     scientificName: 'Spathiphyllum',
+    aliases: ['Einblatt', 'Blattfahne', 'Scheidenblatt'],
     description: 'Elegante Schattenpflanze mit weißen Blüten. Zeigt durch hängende Blätter Durst an.',
     location: 'shade',
     careInfo: {
@@ -198,6 +214,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Yucca-Palme',
     scientificName: 'Yucca elephantipes',
+    aliases: ['Yucca', 'Palmlilie', 'Riesen-Palmlilie'],
     description: 'Markante Zimmerpflanze mit schwertförmigen Blättern auf einem dicken Stamm.',
     location: 'sun',
     careInfo: {
@@ -214,6 +231,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Grünlilie',
     scientificName: 'Chlorophytum comosum',
+    aliases: ['Chlorophytum', 'Graslilie', 'Spinnenpflanze'],
     description: 'Unverwüstliche Hängepflanze mit grün-weiß gestreiften Blättern. Ideal für Anfänger.',
     location: 'partial-shade',
     careInfo: {
@@ -262,6 +280,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Calathea',
     scientificName: 'Calathea orbifolia',
+    aliases: ['Korbmarante', 'Pfauenpflanze', 'Schattenblume'],
     description: 'Kunstvoll gemusterte Blätter. Anspruchsvoll, aber ein echter Blickfang.',
     location: 'shade',
     careInfo: {
@@ -278,6 +297,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Geldbaum',
     scientificName: 'Crassula ovata',
+    aliases: ['Pfennigbaum', 'Glücksbaum', 'Dickblatt', 'Crassula'],
     description: 'Sukkulente mit dicken, glänzenden Blättern. Gilt als Glücksbringer und wird sehr alt.',
     location: 'sun',
     careInfo: {
@@ -294,6 +314,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Schwertfarn',
     scientificName: 'Nephrolepis exaltata',
+    aliases: ['Nephrolepis', 'Zimmerfarn', 'Boston-Farn'],
     description: 'Klassische Hängepflanze mit langen, herabhängenden Wedeln. Liebt hohe Luftfeuchtigkeit.',
     location: 'partial-shade',
     careInfo: {
@@ -326,6 +347,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Flamingoblume',
     scientificName: 'Anthurium andreanum',
+    aliases: ['Anthurie', 'Anthurium', 'Flamingblume'],
     description: 'Lackartig glänzende rote oder pinke Hochblätter. Blüht bei guter Pflege fast ganzjährig.',
     location: 'partial-shade',
     careInfo: {
@@ -342,6 +364,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Strelitzie',
     scientificName: 'Strelitzia reginae',
+    aliases: ['Paradiesvogelblume', 'Papageienblume'],
     description: 'Tropisches Highlight mit Blüten wie Paradiesvögel. Braucht viel Licht und Platz.',
     location: 'sun',
     careInfo: {
@@ -358,6 +381,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Elefantenohr',
     scientificName: 'Alocasia macrorrhiza',
+    aliases: ['Alocasia', 'Pfeilblatt', 'Riesenblatt'],
     description: 'Riesige, herzförmige Blätter. Tropische Schönheit für helle, feuchte Räume.',
     location: 'partial-shade',
     careInfo: {
@@ -390,6 +414,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Perlenschnur',
     scientificName: 'Senecio rowleyanus',
+    aliases: ['Erbsenpflanze', 'Senecio', 'Perlenkette'],
     description: 'Außergewöhnliche Sukkulente mit kugeligen Blättern an langen Trieben. Toll als Hängepflanze.',
     location: 'sun',
     careInfo: {
@@ -422,6 +447,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Pfefferminze',
     scientificName: 'Mentha × piperita',
+    aliases: ['Minze', 'Mentha'],
     description: 'Vielseitiges Küchenkraut für Tee und Kochen. Wächst schnell, braucht regelmäßiges Ernten.',
     location: 'partial-shade',
     careInfo: {

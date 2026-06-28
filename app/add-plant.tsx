@@ -41,11 +41,14 @@ export default function AddPlantScreen() {
 
   const existingRooms = [...new Set(plants.map((p) => p.room).filter((r): r is string => !!r?.trim()))]
 
-  const filteredTemplates = PLANT_TEMPLATES.filter(
-    (t) =>
-      t.name.toLowerCase().includes(query.toLowerCase()) ||
-      (t.scientificName ?? '').toLowerCase().includes(query.toLowerCase())
-  )
+  const filteredTemplates = PLANT_TEMPLATES.filter((t) => {
+    const q = query.toLowerCase()
+    return (
+      t.name.toLowerCase().includes(q) ||
+      (t.scientificName ?? '').toLowerCase().includes(q) ||
+      (t.aliases ?? []).some((a) => a.toLowerCase().includes(q))
+    )
+  })
 
   const roomSuggestions = existingRooms.filter((r) => r !== room && r.toLowerCase().includes(room.toLowerCase()))
 
@@ -236,6 +239,11 @@ export default function AddPlantScreen() {
             <View style={styles.templateRowContent}>
               <Text style={styles.templateName}>{item.name}</Text>
               {item.scientificName ? <Text style={styles.templateScientific}>{item.scientificName}</Text> : null}
+              {item.aliases && item.aliases.length > 0 ? (
+                <Text style={styles.templateAliases}>
+                  {L('auch:', 'aka:')} {item.aliases.join(', ')}
+                </Text>
+              ) : null}
               <Text style={styles.templateMeta}>
                 💧 {item.careInfo.wateringFrequencyDays}d · 🌿 {item.careInfo.fertilizingFrequencyDays}d
               </Text>
@@ -304,6 +312,7 @@ const styles = StyleSheet.create({
   templateRowContent: { flex: 1 },
   templateName: { fontSize: 16, fontWeight: '600', color: '#1B4332' },
   templateScientific: { fontSize: 12, color: '#74C69D', fontStyle: 'italic', marginTop: 1 },
+  templateAliases: { fontSize: 11, color: '#95A5A6', marginTop: 1 },
   templateMeta: { fontSize: 12, color: '#6B7280', marginTop: 4 },
   rowArrow: { fontSize: 18, color: '#52B788', marginLeft: 8 },
   emptyHint: { padding: 32, alignItems: 'center' },
