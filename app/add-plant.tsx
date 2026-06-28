@@ -44,12 +44,10 @@ export default function AddPlantScreen() {
   const filteredTemplates = PLANT_TEMPLATES.filter(
     (t) =>
       t.name.toLowerCase().includes(query.toLowerCase()) ||
-      (t.scientificName ?? '').toLowerCase().includes(query.toLowerCase()),
+      (t.scientificName ?? '').toLowerCase().includes(query.toLowerCase())
   )
 
-  const roomSuggestions = existingRooms.filter(
-    (r) => r !== room && r.toLowerCase().includes(room.toLowerCase()),
-  )
+  const roomSuggestions = existingRooms.filter((r) => r !== room && r.toLowerCase().includes(room.toLowerCase()))
 
   const handleSelectTemplate = (template: PlantTemplate) => {
     setSelectedTemplate(template)
@@ -135,7 +133,10 @@ export default function AddPlantScreen() {
             <TextInput
               style={styles.input}
               value={room}
-              onChangeText={(v) => { setRoom(v); setShowRoomSuggestions(true) }}
+              onChangeText={(v) => {
+                setRoom(v)
+                setShowRoomSuggestions(true)
+              }}
               onFocus={() => setShowRoomSuggestions(true)}
               onBlur={() => setTimeout(() => setShowRoomSuggestions(false), 150)}
               placeholder={L('z.B. Wohnzimmer', 'e.g. Living room')}
@@ -146,7 +147,10 @@ export default function AddPlantScreen() {
                   <TouchableOpacity
                     key={r}
                     style={styles.suggestionItem}
-                    onPress={() => { setRoom(r); setShowRoomSuggestions(false) }}
+                    onPress={() => {
+                      setRoom(r)
+                      setShowRoomSuggestions(false)
+                    }}
                   >
                     <Text style={styles.suggestionText}>{r}</Text>
                   </TouchableOpacity>
@@ -171,7 +175,7 @@ export default function AddPlantScreen() {
             <Text style={styles.hint}>
               {L(
                 'Weitere Details (Fotos, Krankheiten, …) kannst du später über "Pflanzen verwalten" ergänzen.',
-                'Additional details (photos, diseases, …) can be added later via "Manage plants".',
+                'Additional details (photos, diseases, …) can be added later via "Manage plants".'
               )}
             </Text>
 
@@ -180,9 +184,7 @@ export default function AddPlantScreen() {
               onPress={handleSave}
               disabled={!name.trim()}
             >
-              <Text style={styles.saveBtnText}>
-                {L('Pflanze hinzufügen', 'Add plant')} ✓
-              </Text>
+              <Text style={styles.saveBtnText}>{L('Pflanze hinzufügen', 'Add plant')} ✓</Text>
             </TouchableOpacity>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -223,9 +225,7 @@ export default function AddPlantScreen() {
                 <Text style={styles.customRowLabel}>
                   ➕ {L('Eigene Pflanze:', 'Custom plant:')} „{query.trim()}"
                 </Text>
-                <Text style={styles.customRowSub}>
-                  {L('Ohne Vorlage hinzufügen', 'Add without template')}
-                </Text>
+                <Text style={styles.customRowSub}>{L('Ohne Vorlage hinzufügen', 'Add without template')}</Text>
               </View>
               <Text style={styles.rowArrow}>→</Text>
             </TouchableOpacity>
@@ -235,9 +235,7 @@ export default function AddPlantScreen() {
           <TouchableOpacity style={styles.templateRow} onPress={() => handleSelectTemplate(item)}>
             <View style={styles.templateRowContent}>
               <Text style={styles.templateName}>{item.name}</Text>
-              {item.scientificName ? (
-                <Text style={styles.templateScientific}>{item.scientificName}</Text>
-              ) : null}
+              {item.scientificName ? <Text style={styles.templateScientific}>{item.scientificName}</Text> : null}
               <Text style={styles.templateMeta}>
                 💧 {item.careInfo.wateringFrequencyDays}d · 🌿 {item.careInfo.fertilizingFrequencyDays}d
               </Text>

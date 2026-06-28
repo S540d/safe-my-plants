@@ -14,8 +14,20 @@ interface Props {
 }
 
 const CARDS = [
-  { key: 'overdue' as const, color: '#E63946', bg: '#FFF0F1', activeBg: '#E63946', labelKey: 'dashboard_due_today' as const },
-  { key: 'soon' as const, color: '#F4A261', bg: '#FFF8F0', activeBg: '#F4A261', labelKey: 'dashboard_this_week' as const },
+  {
+    key: 'overdue' as const,
+    color: '#E63946',
+    bg: '#FFF0F1',
+    activeBg: '#E63946',
+    labelKey: 'dashboard_due_today' as const,
+  },
+  {
+    key: 'soon' as const,
+    color: '#F4A261',
+    bg: '#FFF8F0',
+    activeBg: '#F4A261',
+    labelKey: 'dashboard_this_week' as const,
+  },
   { key: 'ok' as const, color: '#52B788', bg: '#F0FFF4', activeBg: '#52B788', labelKey: 'dashboard_all_good' as const },
 ]
 

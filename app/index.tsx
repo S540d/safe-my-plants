@@ -47,9 +47,7 @@ export default function HomeScreen() {
 
   const title = language === 'de' ? 'Meine Pflanzen' : 'My Plants'
   const emptyText =
-    language === 'de'
-      ? 'Noch keine Pflanzen.\nTippe auf ⋮ → Pflanze hinzufügen.'
-      : 'No plants yet.\nTap ⋮ → Add plant.'
+    language === 'de' ? 'Noch keine Pflanzen.\nTippe auf ⋮ → Pflanze hinzufügen.' : 'No plants yet.\nTap ⋮ → Add plant.'
 
   if (!isLoaded) return null
 

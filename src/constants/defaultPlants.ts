@@ -53,8 +53,7 @@ export const DEFAULT_PLANTS: Plant[] = [
     location: 'shade',
     careInfo: {
       wateringFrequencyDays: 10,
-      wateringTips:
-        'Erst gießen, wenn die obere Erdschicht (2–3 cm) trocken ist. Verträgt kurze Trockenperioden gut.',
+      wateringTips: 'Erst gießen, wenn die obere Erdschicht (2–3 cm) trocken ist. Verträgt kurze Trockenperioden gut.',
       fertilizingFrequencyDays: 21,
       fertilizingTips: 'Alle drei Wochen in der Wachstumsphase (Frühling/Sommer) dünn düngen.',
       locationTips:

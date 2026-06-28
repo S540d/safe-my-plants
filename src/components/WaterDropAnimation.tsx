@@ -25,10 +25,7 @@ function Drop({ left, delay, visible }: { left: string; delay: number; visible: 
 
   useEffect(() => {
     if (visible) {
-      opacity.value = withDelay(
-        delay,
-        withSequence(withTiming(1, { duration: 150 }), withTiming(0, { duration: 400 }))
-      )
+      opacity.value = withDelay(delay, withSequence(withTiming(1, { duration: 150 }), withTiming(0, { duration: 400 })))
       translateY.value = withDelay(
         delay,
         withSequence(withTiming(0, { duration: 50 }), withTiming(60, { duration: 500 }))
@@ -44,11 +41,7 @@ function Drop({ left, delay, visible }: { left: string; delay: number; visible: 
     transform: [{ translateY: translateY.value }],
   }))
 
-  return (
-    <Animated.Text style={[styles.drop, { left: left as `${number}%` }, style]}>
-      💧
-    </Animated.Text>
-  )
+  return <Animated.Text style={[styles.drop, { left: left as `${number}%` }, style]}>💧</Animated.Text>
 }
 
 export function WaterDropAnimation({ visible, onFinish }: Props) {

@@ -46,4 +46,23 @@ if [ -n "$STAGED_FILES" ]; then
   fi
 fi
 
+# ── Prettier-Format-Check (staged .ts/.tsx in src/ und app/) ────────────────
+# Stellt sicher, dass alle staged Quelldateien Prettier-konform formatiert sind.
+
+FORMAT_FILES=$(echo "$STAGED_FILES" | grep -E '^(src|app)/.*\.(ts|tsx)$' || true)
+
+if [ -n "$FORMAT_FILES" ]; then
+  # shellcheck disable=SC2086
+  if ! npx prettier --check $FORMAT_FILES >/dev/null 2>&1; then
+    echo ""
+    echo "❌  Prettier-Formatfehler in staged Dateien:"
+    # shellcheck disable=SC2086
+    npx prettier --list-different $FORMAT_FILES
+    echo ""
+    echo "Beheben mit: npm run format  (dann erneut stagen)"
+    echo "Zum Überspringen: git commit --no-verify"
+    exit 1
+  fi
+fi
+
 echo "✅  pre-commit OK"

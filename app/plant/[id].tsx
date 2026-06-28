@@ -1,14 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useState } from 'react'
-import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { CareHistoryList } from '../../src/components/CareHistoryList'
 import { DiseaseCard } from '../../src/components/DiseaseCard'
 import { NotesSection } from '../../src/components/NotesSection'
@@ -59,7 +51,12 @@ export default function PlantDetailScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header photo */}
         {plant.photos.length > 0 ? (
-          <TouchableOpacity onPress={() => { setGalleryInitialIndex(photoIndex); setGalleryVisible(true) }}>
+          <TouchableOpacity
+            onPress={() => {
+              setGalleryInitialIndex(photoIndex)
+              setGalleryVisible(true)
+            }}
+          >
             <Image source={{ uri: plant.photos[photoIndex].uri }} style={styles.heroPhoto} />
             {plant.photos.length > 1 && (
               <View style={styles.photoBadge}>
@@ -118,8 +115,16 @@ export default function PlantDetailScreen() {
 
           <View style={styles.infoGrid}>
             <InfoRow icon="📍" label={t(lang, 'detail_location')} value={LOCATION_LABELS[lang][plant.location]} />
-            <InfoRow icon="🌡️" label={t(lang, 'detail_temperature')} value={`${plant.careInfo.temperature.min}–${plant.careInfo.temperature.max} °C`} />
-            <InfoRow icon="💦" label={t(lang, 'detail_humidity')} value={HUMIDITY_LABELS[lang][plant.careInfo.humidity]} />
+            <InfoRow
+              icon="🌡️"
+              label={t(lang, 'detail_temperature')}
+              value={`${plant.careInfo.temperature.min}–${plant.careInfo.temperature.max} °C`}
+            />
+            <InfoRow
+              icon="💦"
+              label={t(lang, 'detail_humidity')}
+              value={HUMIDITY_LABELS[lang][plant.careInfo.humidity]}
+            />
             <InfoRow
               icon="💧"
               label={lang === 'de' ? 'Gießintervall' : 'Watering interval'}
@@ -133,13 +138,25 @@ export default function PlantDetailScreen() {
           </View>
 
           {plant.careInfo.locationTips ? (
-            <InfoBlock icon="📍" title={lang === 'de' ? 'Standorttipps' : 'Location tips'} text={plant.careInfo.locationTips} />
+            <InfoBlock
+              icon="📍"
+              title={lang === 'de' ? 'Standorttipps' : 'Location tips'}
+              text={plant.careInfo.locationTips}
+            />
           ) : null}
           {plant.careInfo.wateringTips ? (
-            <InfoBlock icon="💧" title={lang === 'de' ? 'Gießtipps' : 'Watering tips'} text={plant.careInfo.wateringTips} />
+            <InfoBlock
+              icon="💧"
+              title={lang === 'de' ? 'Gießtipps' : 'Watering tips'}
+              text={plant.careInfo.wateringTips}
+            />
           ) : null}
           {plant.careInfo.fertilizingTips ? (
-            <InfoBlock icon="🌿" title={lang === 'de' ? 'Düngetipps' : 'Fertilizing tips'} text={plant.careInfo.fertilizingTips} />
+            <InfoBlock
+              icon="🌿"
+              title={lang === 'de' ? 'Düngetipps' : 'Fertilizing tips'}
+              text={plant.careInfo.fertilizingTips}
+            />
           ) : null}
 
           {/* Last care dates */}
@@ -198,7 +215,9 @@ function InfoRow({ icon, label, value }: { icon: string; label: string; value: s
 function InfoBlock({ icon, title, text }: { icon: string; title: string; text: string }) {
   return (
     <View style={styles.infoBlock}>
-      <Text style={styles.infoBlockTitle}>{icon} {title}</Text>
+      <Text style={styles.infoBlockTitle}>
+        {icon} {title}
+      </Text>
       <Text style={styles.infoBlockText}>{text}</Text>
     </View>
   )
@@ -209,22 +228,33 @@ const styles = StyleSheet.create({
   notFound: { padding: 24, fontSize: 16, color: '#666' },
   heroPhoto: { width: '100%', height: 240 },
   heroPlaceholder: {
-    width: '100%', height: 200,
+    width: '100%',
+    height: 200,
     backgroundColor: '#2D6A4F',
-    alignItems: 'center', justifyContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   heroEmoji: { fontSize: 80 },
   photoBadge: {
-    position: 'absolute', right: 12, bottom: 12,
+    position: 'absolute',
+    right: 12,
+    bottom: 12,
     backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 12, paddingHorizontal: 8, paddingVertical: 2,
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
   },
   photoBadgeText: { color: '#fff', fontSize: 12 },
   backButton: {
-    position: 'absolute', top: 16, left: 16,
+    position: 'absolute',
+    top: 16,
+    left: 16,
     backgroundColor: 'rgba(0,0,0,0.4)',
-    borderRadius: 20, width: 36, height: 36,
-    alignItems: 'center', justifyContent: 'center',
+    borderRadius: 20,
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   backButtonText: { color: '#fff', fontSize: 20, lineHeight: 22 },
   content: { padding: 16 },
@@ -252,30 +282,53 @@ const styles = StyleSheet.create({
   nextCareLabel: { fontSize: 12, color: '#1B4332', fontWeight: '600' },
   nextCareValue: { fontSize: 11, color: '#2D6A4F', flex: 1 },
   sectionTitle: {
-    fontSize: 18, fontWeight: '700', color: '#1B4332',
-    marginTop: 4, marginBottom: 10,
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1B4332',
+    marginTop: 4,
+    marginBottom: 10,
   },
   infoGrid: {
-    backgroundColor: '#fff', borderRadius: 12, overflow: 'hidden',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    overflow: 'hidden',
     marginBottom: 12,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
   infoRow: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingVertical: 10, paddingHorizontal: 14,
-    borderBottomWidth: 1, borderBottomColor: '#F0FFF4',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0FFF4',
   },
   infoIcon: { fontSize: 16, width: 24 },
   infoLabel: { flex: 1, fontSize: 14, color: '#666' },
   infoValue: { fontSize: 14, fontWeight: '600', color: '#1B4332' },
   infoBlock: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 14,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 14,
     marginBottom: 10,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
-  infoBlockTitle: { fontSize: 13, fontWeight: '700', color: '#52B788', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 0.5 },
+  infoBlockTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#52B788',
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
   infoBlockText: { fontSize: 14, color: '#444', lineHeight: 20 },
   lastDatesRow: { flexDirection: 'row', gap: 16, marginBottom: 20 },
   lastDate: { fontSize: 12, color: '#74C69D' },

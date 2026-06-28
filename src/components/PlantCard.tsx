@@ -21,11 +21,7 @@ export function PlantCard({ plant, lang, onPress, onWater, onFertilize }: PlantC
   const colors = useThemeColors()
 
   return (
-    <TouchableOpacity
-      style={[styles.card, { backgroundColor: colors.surface }]}
-      onPress={onPress}
-      activeOpacity={0.85}
-    >
+    <TouchableOpacity style={[styles.card, { backgroundColor: colors.surface }]} onPress={onPress} activeOpacity={0.85}>
       {hasPhoto ? (
         <Image source={{ uri: plant.photos[0].uri }} style={styles.photo} />
       ) : (
@@ -59,30 +55,20 @@ export function PlantCard({ plant, lang, onPress, onWater, onFertilize }: PlantC
           <View style={styles.actionRow}>
             {onWater && (
               <TouchableOpacity
-                style={[
-                  styles.actionBtn,
-                  status.watering === 'overdue' && styles.actionBtnUrgent,
-                ]}
+                style={[styles.actionBtn, status.watering === 'overdue' && styles.actionBtnUrgent]}
                 onPress={onWater}
                 activeOpacity={0.75}
               >
-                <Text style={styles.actionBtnText}>
-                  {lang === 'de' ? '💧 Gegossen' : '💧 Watered'}
-                </Text>
+                <Text style={styles.actionBtnText}>{lang === 'de' ? '💧 Gegossen' : '💧 Watered'}</Text>
               </TouchableOpacity>
             )}
             {onFertilize && (
               <TouchableOpacity
-                style={[
-                  styles.actionBtn,
-                  status.fertilizing === 'overdue' && styles.actionBtnUrgent,
-                ]}
+                style={[styles.actionBtn, status.fertilizing === 'overdue' && styles.actionBtnUrgent]}
                 onPress={onFertilize}
                 activeOpacity={0.75}
               >
-                <Text style={styles.actionBtnText}>
-                  {lang === 'de' ? '🌿 Gedüngt' : '🌿 Fertilized'}
-                </Text>
+                <Text style={styles.actionBtnText}>{lang === 'de' ? '🌿 Gedüngt' : '🌿 Fertilized'}</Text>
               </TouchableOpacity>
             )}
           </View>

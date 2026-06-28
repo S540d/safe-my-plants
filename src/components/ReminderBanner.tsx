@@ -11,10 +11,7 @@ interface Props {
 export function ReminderBanner({ count, lang, onPress }: Props) {
   if (count === 0) return null
 
-  const text =
-    count === 1
-      ? t(lang, 'reminder_singular')
-      : t(lang, 'reminder_plural', { n: count })
+  const text = count === 1 ? t(lang, 'reminder_singular') : t(lang, 'reminder_plural', { n: count })
 
   const cta = t(lang, 'reminder_tap')
 

@@ -47,7 +47,8 @@ export function formatNextDate(lastDate: string | undefined, intervalDays: numbe
   const next = new Date(lastDate).getTime() + intervalDays * 24 * 60 * 60 * 1000
   const now = Date.now()
   const diffDays = Math.round((next - now) / (24 * 60 * 60 * 1000))
-  if (diffDays < 0) return lang === 'de' ? `${Math.abs(diffDays)} Tage überfällig` : `${Math.abs(diffDays)} days overdue`
+  if (diffDays < 0)
+    return lang === 'de' ? `${Math.abs(diffDays)} Tage überfällig` : `${Math.abs(diffDays)} days overdue`
   if (diffDays === 0) return lang === 'de' ? 'Heute' : 'Today'
   if (diffDays === 1) return lang === 'de' ? 'Morgen' : 'Tomorrow'
   return lang === 'de' ? `in ${diffDays} Tagen` : `in ${diffDays} days`
