@@ -86,12 +86,14 @@ export default function AddPlantScreen() {
       },
     }
 
+    const templatePhoto = selectedTemplate?.imageUrl ? [{ uri: selectedTemplate.imageUrl, takenAt: now }] : []
+
     const newPlant: Plant = {
       ...base,
       id: generateId(),
       name: plantName,
       room: room.trim() || undefined,
-      photos: [],
+      photos: templatePhoto,
       lastWatered: undefined,
       lastFertilized: undefined,
       createdAt: now,
