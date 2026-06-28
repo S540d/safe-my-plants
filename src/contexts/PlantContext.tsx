@@ -67,7 +67,11 @@ async function runMigrations(plants: Plant[]): Promise<void> {
     })
     await savePlants(migrated)
     await saveSchemaVersion(3)
-    return
+  }
+
+  // v3 → v4: add room field (optional string, no data transform; undefined = "Ohne Raum")
+  if (version < 4) {
+    await saveSchemaVersion(4)
   }
 }
 
