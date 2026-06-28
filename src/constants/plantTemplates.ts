@@ -6,6 +6,8 @@ export type PlantTemplate = Omit<
 > & {
   /** Weitere gebräuchliche Namen/Synonyme für die Suche (z. B. "Friedenslilie" für das Einblatt). */
   aliases?: string[]
+  /** Lizenzfreies Wikimedia-Commons-Vorschaubild (CC-BY-SA / Public Domain). */
+  imageUrl?: string
 }
 
 export const PLANT_TEMPLATES: PlantTemplate[] = [
@@ -13,6 +15,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Monstera',
     scientificName: 'Monstera deliciosa',
     aliases: ['Fensterblatt', 'Köstliches Fensterblatt'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/04/Monstera_deliciosa3.jpg',
     description: 'Das Fensterblatt mit charakteristischen gelochten Blättern. Pflegeleicht und wächst schnell.',
     location: 'partial-shade',
     careInfo: {
@@ -30,6 +33,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Efeutute',
     scientificName: 'Epipremnum aureum',
     aliases: ['Pothos', 'Goldene Efeutute', 'Skindapsus'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Epipremnum_aureum_31082012.jpg',
     description: 'Extrem robuste Hängepflanze. Verträgt wenig Licht und unregelmäßiges Gießen.',
     location: 'shade',
     careInfo: {
@@ -47,6 +51,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Gummibaum',
     scientificName: 'Ficus elastica',
     aliases: ['Birkenfeige', 'Ficus'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/4f/Ficus_elastica_2.jpg',
     description: 'Klassischer Zimmerbaum mit glänzend dunkelgrünen Blättern.',
     location: 'sun',
     careInfo: {
@@ -64,6 +69,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Aloe Vera',
     scientificName: 'Aloe vera',
     aliases: ['Echte Aloe', 'Wüstenlilie'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Aloe_vera_flower_inset.png',
     description: 'Sukkulente mit heilenden Eigenschaften. Braucht viel Sonne und wenig Wasser.',
     location: 'sun',
     careInfo: {
@@ -81,6 +87,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Zamioculcas',
     scientificName: 'Zamioculcas zamiifolia',
     aliases: ['Glücksfeder', 'ZZ-Pflanze', 'Kartonpapierpflanze'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/75/Zamioculcas_zamiifolia.jpg',
     description: 'Glücksfeder – extrem genügsam, verträgt Trockenheit und wenig Licht.',
     location: 'shade',
     careInfo: {
@@ -98,6 +105,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Bogenhanf',
     scientificName: 'Sansevieria trifasciata',
     aliases: ['Sansevieria', 'Schwiegermutterzunge', 'Schlangenpflanze'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/Sansevieria_trifasciata1.jpg',
     description: 'Schwertförmige Blätter, nahezu unzerstörbar. Ideal für Anfänger.',
     location: 'indoor',
     careInfo: {
@@ -115,6 +123,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Orchidee',
     scientificName: 'Phalaenopsis',
     aliases: ['Phalaenopsis', 'Schmetterlingsorchidee', 'Falterorchidee'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Phalaenopsis_amabilis1.jpg',
     description: 'Elegante Blütenpracht. Braucht hellen Standort ohne direkte Sonne und hohe Luftfeuchtigkeit.',
     location: 'partial-shade',
     careInfo: {
@@ -131,6 +140,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Basilikum',
     scientificName: 'Ocimum basilicum',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/09/Ocimum_basilicum.jpg',
     description: 'Aromatisches Küchenkraut. Braucht viel Sonne und regelmäßiges Gießen.',
     location: 'sun',
     careInfo: {
@@ -148,6 +158,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Drachenbaum',
     scientificName: 'Dracaena marginata',
     aliases: ['Dracaena', 'Madagaskar-Drachenbaum'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/de/Starr_061231-3049_Dracaena_marginata.jpg',
     description: 'Schlanker Baum mit schmalen Blättern, luftreinigend. Robust und pflegeleicht.',
     location: 'partial-shade',
     careInfo: {
@@ -164,6 +175,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Kaktus',
     scientificName: 'Cactaceae',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/73/Echinopsis_spachiana.jpg',
     description: 'Pflegeleichteste Zimmerpflanze überhaupt. Braucht Sonne und sehr wenig Wasser.',
     location: 'sun',
     careInfo: {
@@ -181,6 +193,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Sukkulente',
     scientificName: 'Echeveria',
     aliases: ['Echeverie', 'Dickblatt'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3b/Echeveria_elegans.jpg',
     description: 'Rosettenförmige Sukkulente mit fleischigen Blättern. Ideal für sonnige Fensterbänke.',
     location: 'sun',
     careInfo: {
@@ -198,6 +211,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Friedenslilie',
     scientificName: 'Spathiphyllum',
     aliases: ['Einblatt', 'Blattfahne', 'Scheidenblatt'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Spathiphyllum_cochlearispathum_RTBG.jpg',
     description: 'Elegante Schattenpflanze mit weißen Blüten. Zeigt durch hängende Blätter Durst an.',
     location: 'shade',
     careInfo: {
@@ -215,6 +229,8 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Yucca-Palme',
     scientificName: 'Yucca elephantipes',
     aliases: ['Yucca', 'Palmlilie', 'Riesen-Palmlilie'],
+    imageUrl:
+      'https://upload.wikimedia.org/wikipedia/commons/b/bd/Yucca_gigantea_-_Jard%C3%ADn_Bot%C3%A1nico_Canario_Viera_y_Clavijo_-_Gran_Canaria.jpg',
     description: 'Markante Zimmerpflanze mit schwertförmigen Blättern auf einem dicken Stamm.',
     location: 'sun',
     careInfo: {
@@ -232,6 +248,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Grünlilie',
     scientificName: 'Chlorophytum comosum',
     aliases: ['Chlorophytum', 'Graslilie', 'Spinnenpflanze'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6c/Chlorophytum_comosum_01.jpg',
     description: 'Unverwüstliche Hängepflanze mit grün-weiß gestreiften Blättern. Ideal für Anfänger.',
     location: 'partial-shade',
     careInfo: {
@@ -248,6 +265,8 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Zimmerlinde',
     scientificName: 'Sparrmannia africana',
+    imageUrl:
+      'https://upload.wikimedia.org/wikipedia/commons/e/e4/Sparrmannia_Africana_-_Tiliaceae_-_%28kamerlinde%29_Nationale_Plantentuin_Meise_10-01-2010_14-03-47.JPG',
     description: 'Großblättrige Zimmerpflanze mit weißen Blüten. Wächst schnell und braucht viel Platz.',
     location: 'partial-shade',
     careInfo: {
@@ -264,6 +283,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Philodendron',
     scientificName: 'Philodendron hederaceum',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Philodendron_scandens_subsp_oxycardium1.jpg',
     description: 'Robuste Kletterpflanze mit herzförmigen Blättern. Wächst schnell und ist sehr anpassungsfähig.',
     location: 'partial-shade',
     careInfo: {
@@ -281,6 +301,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Calathea',
     scientificName: 'Calathea orbifolia',
     aliases: ['Korbmarante', 'Pfauenpflanze', 'Schattenblume'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Gardenology.org-IMG_1398_rbgs10dec.jpg',
     description: 'Kunstvoll gemusterte Blätter. Anspruchsvoll, aber ein echter Blickfang.',
     location: 'shade',
     careInfo: {
@@ -298,6 +319,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Geldbaum',
     scientificName: 'Crassula ovata',
     aliases: ['Pfennigbaum', 'Glücksbaum', 'Dickblatt', 'Crassula'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Crassula_ovata_700.jpg',
     description: 'Sukkulente mit dicken, glänzenden Blättern. Gilt als Glücksbringer und wird sehr alt.',
     location: 'sun',
     careInfo: {
@@ -315,6 +337,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Schwertfarn',
     scientificName: 'Nephrolepis exaltata',
     aliases: ['Nephrolepis', 'Zimmerfarn', 'Boston-Farn'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Nephrolepis_exaltata_indoor0705c.jpg',
     description: 'Klassische Hängepflanze mit langen, herabhängenden Wedeln. Liebt hohe Luftfeuchtigkeit.',
     location: 'partial-shade',
     careInfo: {
@@ -331,6 +354,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Dieffenbachie',
     scientificName: 'Dieffenbachia seguine',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/99/Dieffenbachia_bauseii_a1.jpg',
     description: 'Große, grün-weiß gemusterte Blätter. Achtung: Der Pflanzensaft ist giftig.',
     location: 'partial-shade',
     careInfo: {
@@ -348,6 +372,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Flamingoblume',
     scientificName: 'Anthurium andreanum',
     aliases: ['Anthurie', 'Anthurium', 'Flamingblume'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a8/Anthurium_andraeanum.jpg',
     description: 'Lackartig glänzende rote oder pinke Hochblätter. Blüht bei guter Pflege fast ganzjährig.',
     location: 'partial-shade',
     careInfo: {
@@ -365,6 +390,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Strelitzie',
     scientificName: 'Strelitzia reginae',
     aliases: ['Paradiesvogelblume', 'Papageienblume'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2d/Strelitzia_reginae_DSC_0013.JPG',
     description: 'Tropisches Highlight mit Blüten wie Paradiesvögel. Braucht viel Licht und Platz.',
     location: 'sun',
     careInfo: {
@@ -382,6 +408,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Elefantenohr',
     scientificName: 'Alocasia macrorrhiza',
     aliases: ['Alocasia', 'Pfeilblatt', 'Riesenblatt'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Alocasia_augustiana_ies.jpg',
     description: 'Riesige, herzförmige Blätter. Tropische Schönheit für helle, feuchte Räume.',
     location: 'partial-shade',
     careInfo: {
@@ -398,6 +425,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Bromelie',
     scientificName: 'Guzmania lingulata',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/09/Guzmania_lingulata.jpg',
     description: 'Leuchtend farbige Hochblätter. Tropisch, pflegeleicht und langlebig.',
     location: 'partial-shade',
     careInfo: {
@@ -415,6 +443,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Perlenschnur',
     scientificName: 'Senecio rowleyanus',
     aliases: ['Erbsenpflanze', 'Senecio', 'Perlenkette'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3b/Senecio_rowleyanus.jpg',
     description: 'Außergewöhnliche Sukkulente mit kugeligen Blättern an langen Trieben. Toll als Hängepflanze.',
     location: 'sun',
     careInfo: {
@@ -431,6 +460,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Rosmarin',
     scientificName: 'Salvia rosmarinus',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1a/Rosmarinus_officinalis_2.jpg',
     description: 'Aromatisches Küchenkraut mit nadelartigen Blättern. Braucht viel Sonne, verträgt Trockenheit.',
     location: 'sun',
     careInfo: {
@@ -448,6 +478,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
     name: 'Pfefferminze',
     scientificName: 'Mentha × piperita',
     aliases: ['Minze', 'Mentha'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e0/Mentha_%C3%97_piperita%E2%80%93IMG_6075.jpg',
     description: 'Vielseitiges Küchenkraut für Tee und Kochen. Wächst schnell, braucht regelmäßiges Ernten.',
     location: 'partial-shade',
     careInfo: {
@@ -464,6 +495,8 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Lavendel',
     scientificName: 'Lavandula angustifolia',
+    imageUrl:
+      'https://upload.wikimedia.org/wikipedia/commons/9/9e/LAVANDULA_ANGUSTIFOLIA_-_B%C3%92FIA_-_IB-409_%28Esp%C3%ADgol%29.JPG',
     description: 'Duftet herrlich und beruhigt. Als Topfpflanze auf Balkon oder Fensterbank ein Mittelmeer-Flair.',
     location: 'sun',
     careInfo: {
@@ -480,6 +513,8 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Thymian',
     scientificName: 'Thymus vulgaris',
+    imageUrl:
+      'https://upload.wikimedia.org/wikipedia/commons/7/7e/THYMUS_VULGARIS_-_AGUDA_-_IB-910_%28Tim%C3%B3%29.JPG',
     description: 'Anspruchsloses, aromatisches Küchenkraut. Braucht viel Sonne und wenig Wasser.',
     location: 'sun',
     careInfo: {
@@ -496,6 +531,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Chilipflanze',
     scientificName: 'Capsicum annuum',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/91/Paprikapflanze.jpg',
     description: 'Dekorativ und praktisch auf der Fensterbank. Mit den richtigen Sorten ganzjährig Ernte.',
     location: 'sun',
     careInfo: {
