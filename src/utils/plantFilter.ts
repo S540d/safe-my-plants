@@ -27,9 +27,7 @@ export function filterAndSortPlants(plants: Plant[], { query, locations, statuse
   if (query.trim()) {
     const q = query.trim().toLowerCase()
     result = result.filter(
-      (p) =>
-        p.name.toLowerCase().includes(q) ||
-        (p.scientificName?.toLowerCase().includes(q) ?? false),
+      (p) => p.name.toLowerCase().includes(q) || (p.scientificName?.toLowerCase().includes(q) ?? false)
     )
   }
 

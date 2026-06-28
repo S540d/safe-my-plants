@@ -72,10 +72,8 @@ function PlantForm({ lang, initial, existingRooms, onSave, onCancel }: PlantForm
   const [newDisease, setNewDisease] = useState<Disease | null>(null)
   const [showRoomSuggestions, setShowRoomSuggestions] = useState(false)
 
-  const set = (update: Partial<Plant>) =>
-    setPlant((p) => ({ ...p, ...update, updatedAt: new Date().toISOString() }))
-  const setCare = (update: Partial<Plant['careInfo']>) =>
-    set({ careInfo: { ...plant.careInfo, ...update } })
+  const set = (update: Partial<Plant>) => setPlant((p) => ({ ...p, ...update, updatedAt: new Date().toISOString() }))
+  const setCare = (update: Partial<Plant['careInfo']>) => set({ careInfo: { ...plant.careInfo, ...update } })
 
   const addPhoto = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -88,8 +86,7 @@ function PlantForm({ lang, initial, existingRooms, onSave, onCancel }: PlantForm
     }
   }
 
-  const removePhoto = (uri: string) =>
-    set({ photos: plant.photos.filter((p) => p.uri !== uri) })
+  const removePhoto = (uri: string) => set({ photos: plant.photos.filter((p) => p.uri !== uri) })
 
   const saveDisease = () => {
     if (!newDisease || !newDisease.name.trim()) return
@@ -97,8 +94,7 @@ function PlantForm({ lang, initial, existingRooms, onSave, onCancel }: PlantForm
     setNewDisease(null)
   }
 
-  const removeDisease = (id: string) =>
-    set({ diseases: plant.diseases.filter((d) => d.id !== id) })
+  const removeDisease = (id: string) => set({ diseases: plant.diseases.filter((d) => d.id !== id) })
 
   const handleSave = () => {
     if (!plant.name.trim()) {
@@ -111,7 +107,7 @@ function PlantForm({ lang, initial, existingRooms, onSave, onCancel }: PlantForm
   const L = (de: string, en: string) => (lang === 'de' ? de : en)
 
   const roomSuggestions = existingRooms.filter(
-    (r) => r !== plant.room && r.toLowerCase().includes((plant.room ?? '').toLowerCase()),
+    (r) => r !== plant.room && r.toLowerCase().includes((plant.room ?? '').toLowerCase())
   )
 
   return (
@@ -139,7 +135,10 @@ function PlantForm({ lang, initial, existingRooms, onSave, onCancel }: PlantForm
         <TextInput
           style={formStyles.input}
           value={plant.room ?? ''}
-          onChangeText={(v) => { set({ room: v }); setShowRoomSuggestions(true) }}
+          onChangeText={(v) => {
+            set({ room: v })
+            setShowRoomSuggestions(true)
+          }}
           onFocus={() => setShowRoomSuggestions(true)}
           onBlur={() => setTimeout(() => setShowRoomSuggestions(false), 150)}
           placeholder={L('z.B. Wohnzimmer', 'e.g. Living room')}
@@ -150,7 +149,10 @@ function PlantForm({ lang, initial, existingRooms, onSave, onCancel }: PlantForm
               <TouchableOpacity
                 key={r}
                 style={formStyles.suggestionItem}
-                onPress={() => { set({ room: r }); setShowRoomSuggestions(false) }}
+                onPress={() => {
+                  set({ room: r })
+                  setShowRoomSuggestions(false)
+                }}
               >
                 <Text style={formStyles.suggestionText}>{r}</Text>
               </TouchableOpacity>
@@ -254,7 +256,7 @@ function PlantForm({ lang, initial, existingRooms, onSave, onCancel }: PlantForm
         <View style={formStyles.photoGrid}>
           {plant.photos.map((photo) => (
             <View key={photo.uri} style={formStyles.photoWrapper}>
-                  <Image source={{ uri: photo.uri }} style={formStyles.photo} />
+              <Image source={{ uri: photo.uri }} style={formStyles.photo} />
               <TouchableOpacity style={formStyles.removePhoto} onPress={() => removePhoto(photo.uri)}>
                 <Text style={formStyles.removePhotoText}>✕</Text>
               </TouchableOpacity>
@@ -299,10 +301,7 @@ function PlantForm({ lang, initial, existingRooms, onSave, onCancel }: PlantForm
               numberOfLines={2}
             />
             <View style={formStyles.row}>
-              <TouchableOpacity
-                style={[formStyles.btn, formStyles.btnSecondary]}
-                onPress={() => setNewDisease(null)}
-              >
+              <TouchableOpacity style={[formStyles.btn, formStyles.btnSecondary]} onPress={() => setNewDisease(null)}>
                 <Text style={formStyles.btnSecondaryText}>{L('Abbrechen', 'Cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[formStyles.btn, formStyles.btnPrimary]} onPress={saveDisease}>
@@ -357,7 +356,7 @@ export default function ManagePlantsScreen() {
           style: 'destructive',
           onPress: () => deletePlant(plant.id),
         },
-      ],
+      ]
     )
   }
 
@@ -369,16 +368,17 @@ export default function ManagePlantsScreen() {
             <TouchableOpacity onPress={() => setEditing(null)} style={styles.backBtn}>
               <Text style={styles.backBtnText}>← {lang === 'de' ? 'Zurück' : 'Back'}</Text>
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>
-              {lang === 'de' ? 'Pflanze bearbeiten' : 'Edit Plant'}
-            </Text>
+            <Text style={styles.headerTitle}>{lang === 'de' ? 'Pflanze bearbeiten' : 'Edit Plant'}</Text>
           </View>
         </LinearGradient>
         <PlantForm
           lang={lang}
           initial={editing}
           existingRooms={existingRooms}
-          onSave={async (p) => { await updatePlant(p); setEditing(null) }}
+          onSave={async (p) => {
+            await updatePlant(p)
+            setEditing(null)
+          }}
           onCancel={() => setEditing(null)}
         />
       </SafeAreaView>
@@ -392,18 +392,14 @@ export default function ManagePlantsScreen() {
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
             <Text style={styles.backBtnText}>← {lang === 'de' ? 'Zurück' : 'Back'}</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>
-            {lang === 'de' ? 'Pflanzen verwalten' : 'Manage Plants'}
-          </Text>
+          <Text style={styles.headerTitle}>{lang === 'de' ? 'Pflanzen verwalten' : 'Manage Plants'}</Text>
         </View>
       </LinearGradient>
       <ScrollView contentContainerStyle={styles.scroll}>
         {plants.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyEmoji}>🪴</Text>
-            <Text style={styles.emptyText}>
-              {lang === 'de' ? 'Noch keine Pflanzen vorhanden.' : 'No plants yet.'}
-            </Text>
+            <Text style={styles.emptyText}>{lang === 'de' ? 'Noch keine Pflanzen vorhanden.' : 'No plants yet.'}</Text>
           </View>
         ) : (
           plants.map((plant) => {
@@ -417,9 +413,7 @@ export default function ManagePlantsScreen() {
                     </Text>
                     <TrafficLight status={status.overall} size={12} />
                   </View>
-                  {plant.room ? (
-                    <Text style={styles.plantRoom}>📍 {plant.room}</Text>
-                  ) : null}
+                  {plant.room ? <Text style={styles.plantRoom}>📍 {plant.room}</Text> : null}
                 </View>
                 <View style={styles.plantActions}>
                   <TouchableOpacity style={styles.editBtn} onPress={() => setEditing(plant)}>

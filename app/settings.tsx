@@ -90,29 +90,25 @@ export default function SettingsScreen() {
   }
 
   const handleImport = () => {
-    Alert.alert(
-      lang === 'de' ? 'Daten importieren' : 'Import data',
-      t(lang, 'settings_import_confirm'),
-      [
-        { text: t(lang, 'cancel'), style: 'cancel' },
-        {
-          text: lang === 'de' ? 'Importieren' : 'Import',
-          onPress: async () => {
-            try {
-              const { imported, skipped } = await importData()
-              const lines = [t(lang, 'settings_import_success', { n: imported })]
-              if (skipped > 0) lines.push(t(lang, 'settings_import_skipped', { n: skipped }))
-              Alert.alert('', lines.join('\n'))
-            } catch (e) {
-              const msg = (e as Error).message
-              if (msg !== 'cancelled') {
-                Alert.alert('', t(lang, 'settings_import_error'))
-              }
+    Alert.alert(lang === 'de' ? 'Daten importieren' : 'Import data', t(lang, 'settings_import_confirm'), [
+      { text: t(lang, 'cancel'), style: 'cancel' },
+      {
+        text: lang === 'de' ? 'Importieren' : 'Import',
+        onPress: async () => {
+          try {
+            const { imported, skipped } = await importData()
+            const lines = [t(lang, 'settings_import_success', { n: imported })]
+            if (skipped > 0) lines.push(t(lang, 'settings_import_skipped', { n: skipped }))
+            Alert.alert('', lines.join('\n'))
+          } catch (e) {
+            const msg = (e as Error).message
+            if (msg !== 'cancelled') {
+              Alert.alert('', t(lang, 'settings_import_error'))
             }
-          },
+          }
         },
-      ]
-    )
+      },
+    ])
   }
 
   const handleSavePin = async () => {
@@ -137,7 +133,6 @@ export default function SettingsScreen() {
         <Text style={styles.headerTitle}>{lang === 'de' ? 'Einstellungen' : 'Settings'}</Text>
       </LinearGradient>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-
         {/* Language */}
         <Text style={styles.sectionLabel}>{lang === 'de' ? 'Sprache' : 'Language'}</Text>
         <View style={styles.chipRow}>
@@ -156,7 +151,9 @@ export default function SettingsScreen() {
         {/* Admin */}
         <Text style={styles.sectionLabel}>{lang === 'de' ? 'Admin-Bereich' : 'Admin Area'}</Text>
         <TouchableOpacity style={styles.listItem} onPress={() => setShowPinChange(!showPinChange)}>
-          <Text style={styles.listItemText}>{lang === 'de' ? 'Admin-PIN' : 'Admin PIN'} {adminPin ? '✓' : '(nicht gesetzt)'}</Text>
+          <Text style={styles.listItemText}>
+            {lang === 'de' ? 'Admin-PIN' : 'Admin PIN'} {adminPin ? '✓' : '(nicht gesetzt)'}
+          </Text>
           <Text style={styles.chevron}>›</Text>
         </TouchableOpacity>
 
@@ -265,70 +262,115 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 28, fontWeight: '700', color: '#fff' },
   scroll: { padding: 16 },
   sectionLabel: {
-    fontSize: 12, fontWeight: '700', color: '#52B788',
-    textTransform: 'uppercase', letterSpacing: 0.8,
-    marginTop: 20, marginBottom: 8,
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#52B788',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginTop: 20,
+    marginBottom: 8,
   },
   chipRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   chip: {
-    paddingHorizontal: 16, paddingVertical: 8,
-    borderRadius: 20, borderWidth: 1.5, borderColor: '#B7E4C7',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#B7E4C7',
     backgroundColor: '#fff',
   },
   chipActive: { backgroundColor: '#2D6A4F', borderColor: '#2D6A4F' },
   chipText: { fontSize: 14, color: '#2D6A4F' },
   chipTextActive: { color: '#fff', fontWeight: '600' },
   listItem: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 14,
-    flexDirection: 'row', alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
   listItemText: { flex: 1, fontSize: 15, color: '#1B4332' },
   chevron: { fontSize: 20, color: '#74C69D' },
   pinForm: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 16,
-    marginTop: 8, gap: 10,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 8,
+    gap: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
   pinInput: {
-    borderWidth: 1.5, borderColor: '#B7E4C7', borderRadius: 8,
-    padding: 10, fontSize: 16, backgroundColor: '#F0FFF4',
+    borderWidth: 1.5,
+    borderColor: '#B7E4C7',
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 16,
+    backgroundColor: '#F0FFF4',
   },
   saveBtn: {
-    backgroundColor: '#2D6A4F', borderRadius: 8,
-    padding: 12, alignItems: 'center',
+    backgroundColor: '#2D6A4F',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
   },
   saveBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
   notifCard: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 14,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
   notifRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   notifLabel: { fontSize: 15, color: '#1B4332', flex: 1 },
   timePicker: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   timeBtn: {
-    width: 28, height: 28, borderRadius: 14,
-    backgroundColor: '#D8F3DC', alignItems: 'center', justifyContent: 'center',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#D8F3DC',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   timeBtnText: { fontSize: 16, color: '#2D6A4F', fontWeight: '700', lineHeight: 20 },
   timeDisplay: { fontSize: 18, fontWeight: '700', color: '#1B4332', minWidth: 28, textAlign: 'center' },
   timeSep: { fontSize: 18, fontWeight: '700', color: '#1B4332', marginHorizontal: 2 },
   dataRow: { flexDirection: 'row', gap: 10 },
   dataBtn: {
-    flex: 1, padding: 14, borderRadius: 12, alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+    flex: 1,
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
   dataBtnExport: { backgroundColor: '#2D6A4F' },
   dataBtnImport: { backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#B7E4C7' },
   dataBtnText: { fontSize: 13, fontWeight: '600', color: '#fff' },
   aboutCard: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 16,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
   aboutTitle: { fontSize: 18, fontWeight: '700', color: '#1B4332', marginBottom: 4 },
   aboutVersion: { fontSize: 13, color: '#74C69D', marginBottom: 8 },

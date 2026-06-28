@@ -35,12 +35,7 @@ export function HeaderMenu({ lang }: HeaderMenuProps) {
         <Text style={styles.triggerText}>⋮</Text>
       </TouchableOpacity>
 
-      <Modal
-        visible={visible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setVisible(false)}
-      >
+      <Modal visible={visible} transparent animationType="fade" onRequestClose={() => setVisible(false)}>
         <Pressable style={styles.backdrop} onPress={() => setVisible(false)}>
           <View style={[styles.menu, { backgroundColor: colors.surface }]}>
             {items.map((item, index) => (

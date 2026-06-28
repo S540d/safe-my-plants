@@ -1,14 +1,5 @@
 import React, { useRef, useState } from 'react'
-import {
-  Dimensions,
-  FlatList,
-  Image,
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Dimensions, FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { PlantPhoto } from '../types/plant'
 
 interface Props {
@@ -69,17 +60,13 @@ export function PhotoGalleryModal({ photos, initialIndex = 0, visible, onClose, 
           <View style={styles.compareContainer}>
             <View style={styles.compareItem}>
               <Image source={{ uri: photos[0].uri }} style={styles.compareImage} resizeMode="cover" />
-              <Text style={styles.compareLabel}>
-                {lang === 'de' ? 'Erstes Foto' : 'First photo'}
-              </Text>
+              <Text style={styles.compareLabel}>{lang === 'de' ? 'Erstes Foto' : 'First photo'}</Text>
               <Text style={styles.compareDate}>{formatMonth(photos[0].takenAt, lang)}</Text>
             </View>
             <View style={styles.compareDivider} />
             <View style={styles.compareItem}>
               <Image source={{ uri: photos[photos.length - 1].uri }} style={styles.compareImage} resizeMode="cover" />
-              <Text style={styles.compareLabel}>
-                {lang === 'de' ? 'Neuestes Foto' : 'Latest photo'}
-              </Text>
+              <Text style={styles.compareLabel}>{lang === 'de' ? 'Neuestes Foto' : 'Latest photo'}</Text>
               <Text style={styles.compareDate}>{formatMonth(photos[photos.length - 1].takenAt, lang)}</Text>
             </View>
           </View>

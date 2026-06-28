@@ -124,9 +124,7 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
   const markWatered = useCallback(
     async (id: string) => {
       const now = new Date().toISOString()
-      await persist(
-        plants.map((p) => (p.id === id ? { ...p, lastWatered: now, updatedAt: now } : p))
-      )
+      await persist(plants.map((p) => (p.id === id ? { ...p, lastWatered: now, updatedAt: now } : p)))
       await addCareAction({
         id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
         plantId: id,
@@ -142,9 +140,7 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
   const markFertilized = useCallback(
     async (id: string) => {
       const now = new Date().toISOString()
-      await persist(
-        plants.map((p) => (p.id === id ? { ...p, lastFertilized: now, updatedAt: now } : p))
-      )
+      await persist(plants.map((p) => (p.id === id ? { ...p, lastFertilized: now, updatedAt: now } : p)))
       await addCareAction({
         id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
         plantId: id,
@@ -158,7 +154,9 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
   )
 
   return (
-    <PlantContext.Provider value={{ plants, isLoaded, addPlant, updatePlant, deletePlant, markWatered, markFertilized }}>
+    <PlantContext.Provider
+      value={{ plants, isLoaded, addPlant, updatePlant, deletePlant, markWatered, markFertilized }}
+    >
       {children}
     </PlantContext.Provider>
   )

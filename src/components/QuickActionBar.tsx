@@ -1,13 +1,5 @@
 import React, { useState } from 'react'
-import {
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { usePlants } from '../contexts/PlantContext'
 import { useCareLog } from '../hooks/useCareLog'
 import { usePreferences } from '../hooks/usePreferences'
@@ -61,12 +53,7 @@ export function QuickActionBar({ plantId }: Props) {
         style={styles.scroll}
       >
         {ACTIONS.map(({ type, icon, labelKey }) => (
-          <TouchableOpacity
-            key={type}
-            style={styles.btn}
-            onPress={() => handleAction(type)}
-            activeOpacity={0.7}
-          >
+          <TouchableOpacity key={type} style={styles.btn} onPress={() => handleAction(type)} activeOpacity={0.7}>
             <Text style={styles.icon}>{icon}</Text>
             <Text style={styles.label}>{t(language, labelKey)}</Text>
           </TouchableOpacity>

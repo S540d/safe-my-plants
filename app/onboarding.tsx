@@ -104,10 +104,7 @@ export default function OnboardingScreen() {
       {/* Pagination dots */}
       <View style={styles.pagination}>
         {SLIDES.map((_, index) => (
-          <View
-            key={index}
-            style={[styles.dot, index === currentIndex ? styles.dotActive : styles.dotInactive]}
-          />
+          <View key={index} style={[styles.dot, index === currentIndex ? styles.dotActive : styles.dotInactive]} />
         ))}
       </View>
 

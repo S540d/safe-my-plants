@@ -1,12 +1,5 @@
 import React, { useState } from 'react'
-import {
-  Modal,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import { useCareLog } from '../hooks/useCareLog'
 import { t, Language } from '../i18n/translations'
 
@@ -37,11 +30,12 @@ function NoteItem({ text, date, lang }: { text: string; date: string; lang: Lang
   // isLong: either too many chars OR too many lines
   const isLong = text.length > 180 || lines.length > 3
 
-  const displayed = !isLong || expanded
-    ? text
-    : lines.length > 3
-      ? lines.slice(0, 3).join('\n').trimEnd() + '…'
-      : text.slice(0, 180).trimEnd() + '…'
+  const displayed =
+    !isLong || expanded
+      ? text
+      : lines.length > 3
+        ? lines.slice(0, 3).join('\n').trimEnd() + '…'
+        : text.slice(0, 180).trimEnd() + '…'
 
   return (
     <View style={styles.noteItem}>
@@ -49,9 +43,7 @@ function NoteItem({ text, date, lang }: { text: string; date: string; lang: Lang
       <Text style={styles.noteText}>{displayed}</Text>
       {isLong && (
         <TouchableOpacity onPress={() => setExpanded((v) => !v)}>
-          <Text style={styles.expandLink}>
-            {expanded ? t(lang, 'notes_show_less') : t(lang, 'notes_show_more')}
-          </Text>
+          <Text style={styles.expandLink}>{expanded ? t(lang, 'notes_show_less') : t(lang, 'notes_show_more')}</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -98,17 +90,10 @@ export function NotesSection({ plantId, lang }: Props) {
       {notes.length === 0 ? (
         <Text style={styles.empty}>{t(lang, 'notes_empty')}</Text>
       ) : (
-        notes.map((note) => (
-          <NoteItem key={note.id} text={note.note ?? ''} date={note.timestamp} lang={lang} />
-        ))
+        notes.map((note) => <NoteItem key={note.id} text={note.note ?? ''} date={note.timestamp} lang={lang} />)
       )}
 
-      <Modal
-        visible={modalVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={handleClose}
-      >
+      <Modal visible={modalVisible} transparent animationType="slide" onRequestClose={handleClose}>
         <View style={styles.backdrop}>
           <View style={styles.sheet}>
             <Text style={styles.sheetTitle}>{t(lang, 'notes_add')}</Text>
@@ -124,10 +109,7 @@ export function NotesSection({ plantId, lang }: Props) {
               textAlignVertical="top"
             />
             <View style={styles.row}>
-              <TouchableOpacity
-                style={[styles.btn, styles.btnSecondary]}
-                onPress={handleClose}
-              >
+              <TouchableOpacity style={[styles.btn, styles.btnSecondary]} onPress={handleClose}>
                 <Text style={styles.btnSecondaryText}>{t(lang, 'cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.btn, styles.btnPrimary]} onPress={handleSave}>
@@ -146,8 +128,12 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
   title: { fontSize: 18, fontWeight: '700', color: '#1B4332' },
   addBtn: {
-    width: 30, height: 30, borderRadius: 15,
-    backgroundColor: '#52B788', alignItems: 'center', justifyContent: 'center',
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#52B788',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   addBtnText: { color: '#fff', fontSize: 20, lineHeight: 22, fontWeight: '600' },
   empty: { fontSize: 14, color: '#9CA3AF', fontStyle: 'italic', paddingVertical: 8 },
@@ -158,26 +144,37 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     borderLeftWidth: 3,
     borderLeftColor: '#52B788',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05, shadowRadius: 3, elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1,
   },
   noteDate: { fontSize: 11, color: '#74C69D', fontWeight: '600', marginBottom: 4 },
   noteText: { fontSize: 14, color: '#333', lineHeight: 20 },
   expandLink: { fontSize: 12, color: '#52B788', marginTop: 4, fontWeight: '600' },
   backdrop: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.45)',
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.45)',
     justifyContent: 'flex-end',
   },
   sheet: {
     backgroundColor: '#fff',
-    borderTopLeftRadius: 20, borderTopRightRadius: 20,
-    padding: 20, paddingBottom: 36,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    paddingBottom: 36,
   },
   sheetTitle: { fontSize: 17, fontWeight: '700', color: '#1B4332', marginBottom: 12 },
   input: {
-    borderWidth: 1.5, borderColor: '#B7E4C7', borderRadius: 10,
-    padding: 12, fontSize: 15, minHeight: 110,
-    backgroundColor: '#F0FFF4', color: '#1A1A1A',
+    borderWidth: 1.5,
+    borderColor: '#B7E4C7',
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 15,
+    minHeight: 110,
+    backgroundColor: '#F0FFF4',
+    color: '#1A1A1A',
   },
   row: { flexDirection: 'row', gap: 10, marginTop: 12 },
   btn: { flex: 1, padding: 12, borderRadius: 10, alignItems: 'center' },
