@@ -1,147 +1,105 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
-import React, { useMemo, useState } from 'react'
-import { FlatList, SafeAreaView, StyleSheet, Text, View } from 'react-native'
-import { DashboardFilter, DashboardSummary } from '../src/components/DashboardSummary'
-import { FilterChips } from '../src/components/FilterChips'
-import { HeroPlantCard } from '../src/components/HeroPlantCard'
+import React, { useMemo } from 'react'
+import { SafeAreaView, SectionList, StyleSheet, Text, View } from 'react-native'
+import { HeaderMenu } from '../src/components/HeaderMenu'
 import { PlantCard } from '../src/components/PlantCard'
-import { ReminderBanner } from '../src/components/ReminderBanner'
-import { SearchBar } from '../src/components/SearchBar'
-import { SortMenu } from '../src/components/SortMenu'
 import { usePlants } from '../src/contexts/PlantContext'
-import { getCareStatus } from '../src/hooks/useCareStatus'
-import { useOverdueCount } from '../src/hooks/useOverdueCount'
 import { usePreferences } from '../src/hooks/usePreferences'
-import { t } from '../src/i18n/translations'
-import { CareStatus, Plant, PlantLocation } from '../src/types/plant'
-import { filterAndSortPlants, SortOption } from '../src/utils/plantFilter'
+import { Language } from '../src/i18n/translations'
+import { Plant } from '../src/types/plant'
 
-function pickHeroPlant(plants: Plant[]): Plant | null {
-  if (plants.length === 0) return null
-  const overdue = plants.find((p) => getCareStatus(p).overall === 'overdue')
-  if (overdue) return overdue
-  const soon = plants.find((p) => getCareStatus(p).overall === 'soon')
-  return soon ?? plants[0]
+interface Section {
+  title: string
+  data: Plant[]
+}
+
+function groupByRoom(plants: Plant[], lang: Language): Section[] {
+  const groups: Record<string, Plant[]> = {}
+  const noRoom: Plant[] = []
+
+  for (const plant of plants) {
+    const room = plant.room?.trim()
+    if (room) {
+      groups[room] = [...(groups[room] ?? []), plant]
+    } else {
+      noRoom.push(plant)
+    }
+  }
+
+  const sections: Section[] = Object.entries(groups)
+    .sort(([a], [b]) => a.localeCompare(b, lang))
+    .map(([title, data]) => ({ title, data }))
+
+  if (noRoom.length > 0) {
+    sections.push({ title: lang === 'de' ? 'Ohne Raum' : 'No room', data: noRoom })
+  }
+
+  return sections
 }
 
 export default function HomeScreen() {
   const { plants, isLoaded, markWatered, markFertilized } = usePlants()
   const { language } = usePreferences()
   const router = useRouter()
-  const { overdue: overdueCount } = useOverdueCount()
 
-  const [query, setQuery] = useState('')
-  const [selectedLocations, setSelectedLocations] = useState<PlantLocation[]>([])
-  const [selectedStatuses, setSelectedStatuses] = useState<CareStatus[]>([])
-  const [sort, setSort] = useState<SortOption>('recent')
-
-  const activeDashboardFilter: DashboardFilter =
-    selectedStatuses.length === 1 ? (selectedStatuses[0] as DashboardFilter) : null
-
-  function handleDashboardFilter(filter: DashboardFilter) {
-    if (!filter || selectedStatuses.includes(filter)) {
-      setSelectedStatuses([])
-    } else {
-      setSelectedStatuses([filter])
-    }
-  }
-
-  function toggleLocation(loc: PlantLocation) {
-    setSelectedLocations((prev) => (prev.includes(loc) ? prev.filter((l) => l !== loc) : [...prev, loc]))
-  }
-
-  function toggleStatus(status: CareStatus) {
-    setSelectedStatuses((prev) => (prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]))
-  }
-
-  const filteredPlants = useMemo(
-    () => filterAndSortPlants(plants, { query, locations: selectedLocations, statuses: selectedStatuses, sort }),
-    [plants, query, selectedLocations, selectedStatuses, sort],
-  )
-
-  const heroPlant = useMemo(() => pickHeroPlant(plants), [plants])
+  const sections = useMemo(() => groupByRoom(plants, language), [plants, language])
 
   const title = language === 'de' ? 'Meine Pflanzen' : 'My Plants'
   const emptyText =
     language === 'de'
-      ? 'Noch keine Pflanzen vorhanden.\nFüge deine erste Pflanze im Admin-Bereich hinzu.'
-      : 'No plants yet.\nAdd your first plant in the Admin area.'
-  const searchPlaceholder = t(language, 'search_placeholder')
-  const noResultsText = t(language, 'filter_no_results')
+      ? 'Noch keine Pflanzen.\nTippe auf ⋮ → Pflanze hinzufügen.'
+      : 'No plants yet.\nTap ⋮ → Add plant.'
 
   if (!isLoaded) return null
-
-  const ListHeader = (
-    <>
-      {heroPlant && (
-        <HeroPlantCard
-          plant={heroPlant}
-          lang={language}
-          onPress={() => router.push(`/plant/${heroPlant.id}`)}
-          onWater={() => markWatered(heroPlant.id)}
-          onFertilize={() => markFertilized(heroPlant.id)}
-        />
-      )}
-      <ReminderBanner
-        count={overdueCount}
-        lang={language}
-        onPress={() => handleDashboardFilter('overdue')}
-      />
-      <DashboardSummary
-        plants={plants}
-        lang={language}
-        activeFilter={activeDashboardFilter}
-        onFilterChange={handleDashboardFilter}
-      />
-      <SearchBar value={query} onChangeText={setQuery} placeholder={searchPlaceholder} />
-      <FilterChips
-        selectedLocations={selectedLocations}
-        selectedStatuses={selectedStatuses}
-        onLocationToggle={toggleLocation}
-        onStatusToggle={toggleStatus}
-        lang={language}
-      />
-      <SortMenu value={sort} onChange={setSort} lang={language} />
-    </>
-  )
 
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient colors={['#1B4332', '#2D6A4F']} style={styles.header}>
-        <Text style={styles.headerTitle}>{title}</Text>
-        <Text style={styles.headerCount}>
-          {plants.length}{' '}
-          {language === 'de'
-            ? plants.length === 1
-              ? 'Pflanze'
-              : 'Pflanzen'
-            : plants.length === 1
-              ? 'plant'
-              : 'plants'}
-        </Text>
+        <View style={styles.headerRow}>
+          <View>
+            <Text style={styles.headerTitle}>{title}</Text>
+            <Text style={styles.headerCount}>
+              {plants.length}{' '}
+              {language === 'de'
+                ? plants.length === 1
+                  ? 'Pflanze'
+                  : 'Pflanzen'
+                : plants.length === 1
+                  ? 'plant'
+                  : 'plants'}
+            </Text>
+          </View>
+          <HeaderMenu lang={language} />
+        </View>
       </LinearGradient>
+
       {plants.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyEmoji}>🪴</Text>
           <Text style={styles.emptyText}>{emptyText}</Text>
         </View>
       ) : (
-        <FlatList
-          data={filteredPlants}
+        <SectionList
+          sections={sections}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <PlantCard plant={item} lang={language} onPress={() => router.push(`/plant/${item.id}`)} />
+            <PlantCard
+              plant={item}
+              lang={language}
+              onPress={() => router.push(`/plant/${item.id}`)}
+              onWater={() => markWatered(item.id)}
+              onFertilize={() => markFertilized(item.id)}
+            />
           )}
-          ListHeaderComponent={ListHeader}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyEmoji}>🔍</Text>
-              <Text style={styles.emptyText}>{noResultsText}</Text>
+          renderSectionHeader={({ section }) => (
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>{section.title}</Text>
             </View>
-          }
+          )}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
+          stickySectionHeadersEnabled={false}
         />
       )}
     </SafeAreaView>
@@ -158,6 +116,11 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 20,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
   headerTitle: {
     fontSize: 28,
     fontWeight: '700',
@@ -168,8 +131,19 @@ const styles = StyleSheet.create({
     color: '#B7E4C7',
     marginTop: 2,
   },
+  sectionHeader: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 6,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#52B788',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+  },
   list: {
-    paddingTop: 8,
     paddingBottom: 24,
   },
   emptyContainer: {
@@ -177,7 +151,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 32,
-    paddingTop: 64,
   },
   emptyEmoji: {
     fontSize: 64,
