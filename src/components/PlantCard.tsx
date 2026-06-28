@@ -1,7 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { LOCATION_ICONS } from '../constants/locationIcons'
 import { getCareStatus } from '../hooks/useCareStatus'
 import { useThemeColors } from '../hooks/useThemeColors'
 import { Language } from '../i18n/translations'
@@ -12,9 +11,11 @@ interface PlantCardProps {
   plant: Plant
   lang: Language
   onPress: () => void
+  onWater?: () => void
+  onFertilize?: () => void
 }
 
-export function PlantCard({ plant, lang, onPress }: PlantCardProps) {
+export function PlantCard({ plant, lang, onPress, onWater, onFertilize }: PlantCardProps) {
   const status = getCareStatus(plant)
   const hasPhoto = plant.photos.length > 0
   const colors = useThemeColors()
@@ -28,7 +29,7 @@ export function PlantCard({ plant, lang, onPress }: PlantCardProps) {
       {hasPhoto ? (
         <Image source={{ uri: plant.photos[0].uri }} style={styles.photo} />
       ) : (
-        <LinearGradient colors={[colors.primaryMid, colors.primaryLight]} style={styles.photoPlaceholder}>
+        <LinearGradient colors={[colors.primaryMid, colors.primaryLight]} style={styles.photo}>
           <Text style={styles.plantEmoji}>🪴</Text>
         </LinearGradient>
       )}
@@ -53,8 +54,39 @@ export function PlantCard({ plant, lang, onPress }: PlantCardProps) {
             <Text style={styles.statusLabel}>🌿</Text>
             <TrafficLight status={status.fertilizing} size={10} />
           </View>
-          <Text style={styles.locationIcon}>{LOCATION_ICONS[plant.location]}</Text>
         </View>
+        {(onWater || onFertilize) && (
+          <View style={styles.actionRow}>
+            {onWater && (
+              <TouchableOpacity
+                style={[
+                  styles.actionBtn,
+                  status.watering === 'overdue' && styles.actionBtnUrgent,
+                ]}
+                onPress={onWater}
+                activeOpacity={0.75}
+              >
+                <Text style={styles.actionBtnText}>
+                  {lang === 'de' ? '💧 Gegossen' : '💧 Watered'}
+                </Text>
+              </TouchableOpacity>
+            )}
+            {onFertilize && (
+              <TouchableOpacity
+                style={[
+                  styles.actionBtn,
+                  status.fertilizing === 'overdue' && styles.actionBtnUrgent,
+                ]}
+                onPress={onFertilize}
+                activeOpacity={0.75}
+              >
+                <Text style={styles.actionBtnText}>
+                  {lang === 'de' ? '🌿 Gedüngt' : '🌿 Fertilized'}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   )
@@ -65,7 +97,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderRadius: 12,
     marginHorizontal: 16,
-    marginVertical: 6,
+    marginVertical: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -75,11 +107,8 @@ const styles = StyleSheet.create({
   },
   photo: {
     width: 80,
-    height: 80,
-  },
-  photoPlaceholder: {
-    width: 80,
-    height: 80,
+    minHeight: 80,
+    alignSelf: 'stretch',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -88,8 +117,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 12,
+    padding: 10,
     justifyContent: 'space-between',
+    gap: 4,
   },
   header: {
     flexDirection: 'row',
@@ -97,21 +127,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   name: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     flex: 1,
     marginRight: 8,
   },
   scientificName: {
-    fontSize: 12,
+    fontSize: 11,
     fontStyle: 'italic',
-    marginTop: 2,
   },
   statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    marginTop: 6,
+    gap: 10,
   },
   statusItem: {
     flexDirection: 'row',
@@ -119,10 +147,26 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   statusLabel: {
-    fontSize: 14,
+    fontSize: 13,
   },
-  locationIcon: {
-    fontSize: 14,
-    marginLeft: 'auto',
+  actionRow: {
+    flexDirection: 'row',
+    gap: 6,
+    marginTop: 4,
+  },
+  actionBtn: {
+    flex: 1,
+    backgroundColor: '#D8F3DC',
+    borderRadius: 8,
+    paddingVertical: 5,
+    alignItems: 'center',
+  },
+  actionBtnUrgent: {
+    backgroundColor: '#FEE2E2',
+  },
+  actionBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1B4332',
   },
 })

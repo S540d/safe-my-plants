@@ -32,6 +32,7 @@ export interface Plant {
   description: string
   photos: PlantPhoto[]
   location: PlantLocation
+  room?: string
   careInfo: CareInfo
   diseases: Disease[]
   lastWatered?: string
