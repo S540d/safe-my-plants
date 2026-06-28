@@ -7,16 +7,21 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
 
 ## Wichtige Dateipfade
 
-- `app/` – Expo Router Screens (Tabs: index, admin, settings; Dynamic: plant/[id])
+- `app/` – Expo Router Screens; **kein Tab-Footer mehr**, nur Stack-Navigation
+  - `index.tsx` – Hauptscreen (SectionList nach Raum)
+  - `add-plant.tsx` – Pflanze hinzufügen (Template-Suche + Raum, kein PIN)
+  - `manage-plants.tsx` – Pflanzenliste bearbeiten/löschen (kein PIN)
+  - `admin.tsx` – Legacy-Admin mit PinGuard (bleibt erhalten, aber nicht im Hauptpfad)
+  - `settings.tsx`, `stats.tsx`, `plant/[id].tsx` – unverändert
 - `src/contexts/PlantContext.tsx` – zentraler State + AsyncStorage-Persistenz + CareLog-Writes
 - `src/hooks/useCareStatus.ts` – Ampel-Berechnung (ok / soon / overdue)
-- `src/hooks/useCareLog.ts` – CareLog CRUD (addAction, getActionsForPlant, getRecentActions)
-- `src/types/plant.ts` – vollständiges Datenmodell (Plant, CareInfo, Disease)
-- `src/types/careLog.ts` – CareAction, CareActionType (Schema v2)
+- `src/hooks/useCareLog.ts` – CareLog CRUD
+- `src/types/plant.ts` – Datenmodell inkl. `room?: string` (seit Schema v4)
+- `src/types/careLog.ts` – CareAction, CareActionType
 - `src/constants/defaultPlants.ts` – 3 vorinstallierte Musterpflanzen
 - `src/i18n/translations.ts` – DE/EN-Strings
-- `src/components/DashboardSummary.tsx` – 3 Filter-Karten (overdue/soon/ok) + Counts
-- `src/components/HeroPlantCard.tsx` – Hero-Tile für dringendste Pflanze
+- `src/components/HeaderMenu.tsx` – ⋮-Menü oben rechts (add-plant / manage-plants / stats / settings)
+- `src/components/PlantCard.tsx` – Karte mit Inline-Buttons „💧 Gegossen" / „🌿 Gedüngt"
 
 ## Entscheidungen & Einschränkungen
 
@@ -24,9 +29,16 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
 - **Kein EAS** – APK-Build lokal mit `./gradlew assembleRelease`
 - **Kein Force-Push auf main**
 - Keystore liegt lokal (außerhalb des Repos), Pfad via `keystore.properties` – niemals einchecken
-- **CareLog** (`smp-carelog`): additiver Store, `lastWatered`/`lastFertilized` bleiben als Schnellzugriff erhalten
-- **Schema-Version** (`smp-schema-version`): aktuell 2; idempotente Migration in `PlantContext` beim Start
+- **CareLog** (`smp-carelog`): additiver Store, `lastWatered`/`lastFertilized` bleiben als Schnellzugriff
 - **useCareLog Subscriber-Pattern**: module-level Subscribers, `notifyCareLogUpdate()` nach externen Writes aufrufen
+- **Kein PinGuard im Standardpfad** (seit Phase D, Issue #72): add-plant und manage-plants ohne PIN; admin.tsx bleibt für PIN-Flows erhalten
+
+## Navigation (seit Issue #72 Phase A)
+
+Kein Tab-Footer mehr. Alle Screens über Stack-Navigation:
+- Hauptscreen (`/`) → ⋮-Menü → `/add-plant`, `/manage-plants`, `/stats`, `/settings`
+- Pflanzdetail: `router.push('/plant/<id>')`
+- Admin (Legacy): über `/admin` erreichbar (noch mit PinGuard)
 
 ## AsyncStorage-Keys
 
@@ -37,12 +49,35 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
 | `smp-language` | `'de' \| 'en'` |
 | `smp-theme` | `'light' \| 'dark' \| 'system'` |
 | `smp-carelog` | `CareAction[]` |
-| `smp-schema-version` | `number` (aktuell: 2) |
+| `smp-schema-version` | `number` (aktuell: **4**) |
+
+## Schema-Migrationen
+
+| Von → Nach | Was |
+|-----------|-----|
+| v1 → v2 | `lastWatered`/`lastFertilized` → CareLog-Einträge |
+| v2 → v3 | `photos: string[]` → `photos: PlantPhoto[]` |
+| v3 → v4 | `room?: string` hinzugefügt (optional, bestehende Pflanzen = „Ohne Raum") |
+
+## Datenmodell Plant (aktuell)
+
+```typescript
+Plant {
+  id, name, scientificName?, description
+  photos: PlantPhoto[]        // { uri, takenAt }
+  location: PlantLocation     // 'sun'|'partial-shade'|'shade'|'indoor'
+  room?: string               // Raum/Aufstellort für Gruppierung (seit v4)
+  careInfo: CareInfo
+  diseases: Disease[]
+  lastWatered?, lastFertilized?
+  createdAt, updatedAt
+}
+```
 
 ## Branch-Strategie
 
 - `main` – Produktions-Stand
-- `testing` – Staging/QA (von main abgezweigt)
+- `testing` – Staging/QA (PRs immer gegen testing)
 - `feature/*` – kurzlebig → testing → main
 
 ## Ampel-Schwellen
@@ -51,11 +86,11 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
 - Gelb: 0–20 %
 - Rot: überfällig oder nie gegossen/gedüngt
 
-## Künftige Zusammenführung mit Pflanzkalender
+## Offene Phasen aus Issue #72
 
-- Gleiche `PlantLocation`-Typen verwenden
-- Plant-IDs auf UUID-Format umstellen (TODO: vor Zusammenführung)
-- JSON-Export-Struktur kompatibel halten
+- **Phase E** – Lokaler Katalog ausbauen (~50–100 Pflanzen, lokalisierbare Namen)
+- **Phase F** – Auto-Spracherkennung via `expo-localization` (kein hartkodiertes `'de'`)
+- **Phase G** – Design-Tokens aus `theme.ts` konsequent, Dark-Mode-Audit
 
 ## Aktuelle Abhängigkeiten (Stand 2026-05)
 
