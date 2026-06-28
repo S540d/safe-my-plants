@@ -1,6 +1,7 @@
 import * as Haptics from 'expo-haptics'
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { DEFAULT_PLANTS } from '../constants/defaultPlants'
+import { PLANT_TEMPLATES } from '../constants/plantTemplates'
 import {
   addCareAction,
   getCareLog,
@@ -26,8 +27,9 @@ interface PlantContextValue {
 
 const PlantContext = createContext<PlantContextValue | null>(null)
 
-async function runMigrations(plants: Plant[]): Promise<void> {
+async function runMigrations(plants: Plant[]): Promise<Plant[]> {
   const version = await getSchemaVersion()
+  let current = plants
 
   // v1 → v2: migrate lastWatered/lastFertilized to CareLog entries
   if (version < 2) {
@@ -58,14 +60,14 @@ async function runMigrations(plants: Plant[]): Promise<void> {
 
   // v2 → v3: migrate photos: string[] to photos: PlantPhoto[]
   if (version < 3) {
-    const migrated = plants.map((plant) => {
+    current = current.map((plant) => {
       const rawPhotos = plant.photos as unknown as (string | PlantPhoto)[]
       const converted: PlantPhoto[] = rawPhotos.map((p) =>
         typeof p === 'string' ? { uri: p, takenAt: plant.createdAt } : p
       )
       return { ...plant, photos: converted }
     })
-    await savePlants(migrated)
+    await savePlants(current)
     await saveSchemaVersion(3)
   }
 
@@ -73,6 +75,26 @@ async function runMigrations(plants: Plant[]): Promise<void> {
   if (version < 4) {
     await saveSchemaVersion(4)
   }
+
+  // v4 → v5: backfill template imageUrl as first photo for plants without photos
+  if (version < 5) {
+    const templateByName = new Map(PLANT_TEMPLATES.filter((t) => t.imageUrl).map((t) => [t.name, t.imageUrl!]))
+    const now = new Date().toISOString()
+    const migrated = current.map((plant) => {
+      if (plant.photos.length > 0) return plant
+      const imageUrl = templateByName.get(plant.name)
+      if (!imageUrl) return plant
+      return { ...plant, photos: [{ uri: imageUrl, takenAt: now }] }
+    })
+    const changed = migrated.some((p, i) => p !== current[i])
+    if (changed) {
+      current = migrated
+      await savePlants(current)
+    }
+    await saveSchemaVersion(5)
+  }
+
+  return current
 }
 
 export function PlantProvider({ children }: { children: React.ReactNode }) {
@@ -82,14 +104,10 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const load = async () => {
       const stored = await getPlants()
-      if (stored.length === 0) {
-        await savePlants(DEFAULT_PLANTS)
-        setPlants(DEFAULT_PLANTS)
-        await runMigrations(DEFAULT_PLANTS)
-      } else {
-        setPlants(stored)
-        await runMigrations(stored)
-      }
+      const source = stored.length === 0 ? DEFAULT_PLANTS : stored
+      if (stored.length === 0) await savePlants(DEFAULT_PLANTS)
+      const migrated = await runMigrations(source)
+      setPlants(migrated)
       setIsLoaded(true)
     }
     load()
