@@ -14,8 +14,11 @@ import {
   View,
 } from 'react-native'
 import { PLANT_TEMPLATES, PlantTemplate } from '../src/constants/plantTemplates'
+import { Radius, Shadow, Spacing } from '../src/constants/theme'
 import { usePlants } from '../src/contexts/PlantContext'
 import { usePreferences } from '../src/hooks/usePreferences'
+import { useThemeColors } from '../src/hooks/useThemeColors'
+import { t } from '../src/i18n/translations'
 import { Plant } from '../src/types/plant'
 
 function generateId() {
@@ -26,9 +29,9 @@ type Step = 'search' | 'details'
 
 export default function AddPlantScreen() {
   const { plants, addPlant } = usePlants()
-  const { language } = usePreferences()
+  const { language: lang } = usePreferences()
+  const colors = useThemeColors()
   const router = useRouter()
-  const lang = language
 
   const [step, setStep] = useState<Step>('search')
   const [query, setQuery] = useState('')
@@ -37,16 +40,14 @@ export default function AddPlantScreen() {
   const [room, setRoom] = useState('')
   const [showRoomSuggestions, setShowRoomSuggestions] = useState(false)
 
-  const L = (de: string, en: string) => (lang === 'de' ? de : en)
-
   const existingRooms = [...new Set(plants.map((p) => p.room).filter((r): r is string => !!r?.trim()))]
 
-  const filteredTemplates = PLANT_TEMPLATES.filter((t) => {
+  const filteredTemplates = PLANT_TEMPLATES.filter((tmpl) => {
     const q = query.toLowerCase()
     return (
-      t.name.toLowerCase().includes(q) ||
-      (t.scientificName ?? '').toLowerCase().includes(q) ||
-      (t.aliases ?? []).some((a) => a.toLowerCase().includes(q))
+      tmpl.name.toLowerCase().includes(q) ||
+      (tmpl.scientificName ?? '').toLowerCase().includes(q) ||
+      (tmpl.aliases ?? []).some((a) => a.toLowerCase().includes(q))
     )
   })
 
@@ -106,37 +107,44 @@ export default function AddPlantScreen() {
 
   if (step === 'details') {
     return (
-      <SafeAreaView style={styles.container}>
-        <LinearGradient colors={['#1B4332', '#2D6A4F']} style={styles.header}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
           <View style={styles.headerRow}>
             <TouchableOpacity onPress={() => setStep('search')} style={styles.backBtn}>
-              <Text style={styles.backBtnText}>←</Text>
+              <Text style={[styles.backBtnText, { color: colors.gradientText }]}>←</Text>
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>{L('Pflanze hinzufügen', 'Add Plant')}</Text>
+            <Text style={styles.headerTitle}>{t(lang, 'add_plant_title')}</Text>
           </View>
         </LinearGradient>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
           <ScrollView contentContainerStyle={styles.detailScroll} showsVerticalScrollIndicator={false}>
             {selectedTemplate && (
-              <View style={styles.templateBadge}>
-                <Text style={styles.templateBadgeText}>
-                  📋 {L('Vorlage:', 'Template:')} {selectedTemplate.name}
+              <View style={[styles.templateBadge, { backgroundColor: colors.accentSurface }]}>
+                <Text style={[styles.templateBadgeText, { color: colors.primary }]}>
+                  📋 {t(lang, 'add_plant_template_badge')} {selectedTemplate.name}
                 </Text>
               </View>
             )}
 
-            <Text style={styles.fieldLabel}>{L('Name *', 'Name *')}</Text>
+            <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>{t(lang, 'add_plant_field_name')}</Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                { borderColor: colors.border, backgroundColor: colors.surface, color: colors.text },
+              ]}
               value={name}
               onChangeText={setName}
-              placeholder={L('Pflanzenname', 'Plant name')}
+              placeholder={t(lang, 'add_plant_field_name_placeholder')}
+              placeholderTextColor={colors.textSubtle}
               autoFocus={!selectedTemplate}
             />
 
-            <Text style={styles.fieldLabel}>{L('Raum / Aufstellort', 'Room / Location')}</Text>
+            <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>{t(lang, 'add_plant_field_room')}</Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                { borderColor: colors.border, backgroundColor: colors.surface, color: colors.text },
+              ]}
               value={room}
               onChangeText={(v) => {
                 setRoom(v)
@@ -144,52 +152,54 @@ export default function AddPlantScreen() {
               }}
               onFocus={() => setShowRoomSuggestions(true)}
               onBlur={() => setTimeout(() => setShowRoomSuggestions(false), 150)}
-              placeholder={L('z.B. Wohnzimmer', 'e.g. Living room')}
+              placeholder={t(lang, 'add_plant_field_room_placeholder')}
+              placeholderTextColor={colors.textSubtle}
             />
             {showRoomSuggestions && roomSuggestions.length > 0 && (
-              <View style={styles.suggestions}>
+              <View style={[styles.suggestions, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                 {roomSuggestions.map((r) => (
                   <TouchableOpacity
                     key={r}
-                    style={styles.suggestionItem}
+                    style={[styles.suggestionItem, { borderBottomColor: colors.background }]}
                     onPress={() => {
                       setRoom(r)
                       setShowRoomSuggestions(false)
                     }}
                   >
-                    <Text style={styles.suggestionText}>{r}</Text>
+                    <Text style={[styles.suggestionText, { color: colors.primaryMid }]}>{r}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
             )}
 
             {selectedTemplate && (
-              <View style={styles.previewCard}>
-                <Text style={styles.previewTitle}>{L('Pflegeinfo', 'Care info')}</Text>
-                <Text style={styles.previewItem}>
-                  💧 {L('Gießen alle', 'Water every')} {selectedTemplate.careInfo.wateringFrequencyDays}{' '}
-                  {L('Tage', 'days')}
+              <View style={[styles.previewCard, { backgroundColor: colors.surfaceAlt, borderColor: colors.border }]}>
+                <Text style={[styles.previewTitle, { color: colors.primaryLight }]}>
+                  {t(lang, 'add_plant_care_preview_title')}
                 </Text>
-                <Text style={styles.previewItem}>
-                  🌿 {L('Düngen alle', 'Fertilize every')} {selectedTemplate.careInfo.fertilizingFrequencyDays}{' '}
-                  {L('Tage', 'days')}
+                <Text style={[styles.previewItem, { color: colors.primary }]}>
+                  💧 {t(lang, 'add_plant_water_every')} {selectedTemplate.careInfo.wateringFrequencyDays}{' '}
+                  {t(lang, 'days')}
+                </Text>
+                <Text style={[styles.previewItem, { color: colors.primary }]}>
+                  🌿 {t(lang, 'add_plant_fertilize_every')} {selectedTemplate.careInfo.fertilizingFrequencyDays}{' '}
+                  {t(lang, 'days')}
                 </Text>
               </View>
             )}
 
-            <Text style={styles.hint}>
-              {L(
-                'Weitere Details (Fotos, Krankheiten, …) kannst du später über "Pflanzen verwalten" ergänzen.',
-                'Additional details (photos, diseases, …) can be added later via "Manage plants".'
-              )}
-            </Text>
+            <Text style={[styles.hint, { color: colors.textSubtle }]}>{t(lang, 'add_plant_hint')}</Text>
 
             <TouchableOpacity
-              style={[styles.saveBtn, !name.trim() && styles.saveBtnDisabled]}
+              style={[
+                styles.saveBtn,
+                { backgroundColor: colors.primaryMid },
+                !name.trim() && { backgroundColor: colors.accentMuted },
+              ]}
               onPress={handleSave}
               disabled={!name.trim()}
             >
-              <Text style={styles.saveBtnText}>{L('Pflanze hinzufügen', 'Add plant')} ✓</Text>
+              <Text style={styles.saveBtnText}>{t(lang, 'add_plant_save')} ✓</Text>
             </TouchableOpacity>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -198,23 +208,26 @@ export default function AddPlantScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <LinearGradient colors={['#1B4332', '#2D6A4F']} style={styles.header}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Text style={styles.backBtnText}>←</Text>
+            <Text style={[styles.backBtnText, { color: colors.gradientText }]}>←</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{L('Pflanze hinzufügen', 'Add Plant')}</Text>
+          <Text style={styles.headerTitle}>{t(lang, 'add_plant_title')}</Text>
         </View>
       </LinearGradient>
 
       <View style={styles.searchContainer}>
         <TextInput
-          style={styles.searchInput}
+          style={[
+            styles.searchInput,
+            { borderColor: colors.border, backgroundColor: colors.surface, color: colors.text },
+          ]}
           value={query}
           onChangeText={setQuery}
-          placeholder={L('Name oder wissenschaftlicher Name …', 'Name or scientific name …')}
-          placeholderTextColor="#9CA3AF"
+          placeholder={t(lang, 'add_plant_search_placeholder')}
+          placeholderTextColor={colors.textSubtle}
           autoFocus
         />
       </View>
@@ -225,40 +238,48 @@ export default function AddPlantScreen() {
         contentContainerStyle={styles.templateList}
         ListHeaderComponent={
           query.trim() ? (
-            <TouchableOpacity style={styles.customRow} onPress={handleCustomPlant}>
+            <TouchableOpacity
+              style={[styles.customRow, { backgroundColor: colors.accentSurface, borderColor: colors.primaryLight }]}
+              onPress={handleCustomPlant}
+            >
               <View style={styles.customRowContent}>
-                <Text style={styles.customRowLabel}>
-                  ➕ {L('Eigene Pflanze:', 'Custom plant:')} „{query.trim()}"
+                <Text style={[styles.customRowLabel, { color: colors.primary }]}>
+                  ➕ {t(lang, 'add_plant_custom_label')} „{query.trim()}"
                 </Text>
-                <Text style={styles.customRowSub}>{L('Ohne Vorlage hinzufügen', 'Add without template')}</Text>
+                <Text style={[styles.customRowSub, { color: colors.primaryLight }]}>
+                  {t(lang, 'add_plant_custom_sub')}
+                </Text>
               </View>
-              <Text style={styles.rowArrow}>→</Text>
+              <Text style={[styles.rowArrow, { color: colors.primaryLight }]}>→</Text>
             </TouchableOpacity>
           ) : null
         }
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.templateRow} onPress={() => handleSelectTemplate(item)}>
+          <TouchableOpacity
+            style={[styles.templateRow, { backgroundColor: colors.surface }, Shadow.cardSm]}
+            onPress={() => handleSelectTemplate(item)}
+          >
             <View style={styles.templateRowContent}>
-              <Text style={styles.templateName}>{item.name}</Text>
-              {item.scientificName ? <Text style={styles.templateScientific}>{item.scientificName}</Text> : null}
+              <Text style={[styles.templateName, { color: colors.primary }]}>{item.name}</Text>
+              {item.scientificName ? (
+                <Text style={[styles.templateScientific, { color: colors.accent }]}>{item.scientificName}</Text>
+              ) : null}
               {item.aliases && item.aliases.length > 0 ? (
-                <Text style={styles.templateAliases}>
-                  {L('auch:', 'aka:')} {item.aliases.join(', ')}
+                <Text style={[styles.templateAliases, { color: colors.textSubtle }]}>
+                  {t(lang, 'add_plant_aka')} {item.aliases.join(', ')}
                 </Text>
               ) : null}
-              <Text style={styles.templateMeta}>
+              <Text style={[styles.templateMeta, { color: colors.textMuted }]}>
                 💧 {item.careInfo.wateringFrequencyDays}d · 🌿 {item.careInfo.fertilizingFrequencyDays}d
               </Text>
             </View>
-            <Text style={styles.rowArrow}>→</Text>
+            <Text style={[styles.rowArrow, { color: colors.primaryLight }]}>→</Text>
           </TouchableOpacity>
         )}
         ListEmptyComponent={
           query.trim() ? null : (
             <View style={styles.emptyHint}>
-              <Text style={styles.emptyHintText}>
-                {L('Tippe einen Pflanzennamen ein, um loszulegen.', 'Type a plant name to get started.')}
-              </Text>
+              <Text style={[styles.emptyHintText, { color: colors.accent }]}>{t(lang, 'add_plant_empty_hint')}</Text>
             </View>
           )
         }
@@ -269,101 +290,81 @@ export default function AddPlantScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F0FFF4' },
-  header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 20 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  backBtn: { paddingVertical: 4, paddingRight: 8 },
-  backBtnText: { color: '#B7E4C7', fontSize: 20, fontWeight: '600' },
+  container: { flex: 1 },
+  header: { paddingHorizontal: Spacing.xl, paddingTop: Spacing.lg, paddingBottom: Spacing.xl },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  backBtn: { paddingVertical: Spacing.xs, paddingRight: Spacing.sm },
+  backBtnText: { fontSize: 20, fontWeight: '600' },
   headerTitle: { fontSize: 22, fontWeight: '700', color: '#fff', flex: 1 },
-  searchContainer: { padding: 12 },
+  searchContainer: { padding: Spacing.md },
   searchInput: {
     borderWidth: 1.5,
-    borderColor: '#B7E4C7',
-    borderRadius: 12,
-    padding: 12,
+    borderRadius: Radius.lg,
+    padding: Spacing.md,
     fontSize: 15,
-    backgroundColor: '#fff',
-    color: '#1A1A1A',
   },
-  templateList: { paddingHorizontal: 12, paddingBottom: 24, gap: 8 },
+  templateList: { paddingHorizontal: Spacing.md, paddingBottom: Spacing.xxl, gap: Spacing.sm },
   customRow: {
-    backgroundColor: '#E8F5E9',
-    borderRadius: 12,
-    padding: 14,
+    borderRadius: Radius.lg,
+    padding: Spacing.md + 2,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: '#52B788',
-    marginBottom: 4,
+    marginBottom: Spacing.xs,
   },
   customRowContent: { flex: 1 },
-  customRowLabel: { fontSize: 15, fontWeight: '600', color: '#1B4332' },
-  customRowSub: { fontSize: 12, color: '#52B788', marginTop: 2 },
+  customRowLabel: { fontSize: 15, fontWeight: '600' },
+  customRowSub: { fontSize: 12, marginTop: 2 },
   templateRow: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 14,
+    borderRadius: Radius.lg,
+    padding: Spacing.md + 2,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
   },
   templateRowContent: { flex: 1 },
-  templateName: { fontSize: 16, fontWeight: '600', color: '#1B4332' },
-  templateScientific: { fontSize: 12, color: '#74C69D', fontStyle: 'italic', marginTop: 1 },
-  templateAliases: { fontSize: 11, color: '#95A5A6', marginTop: 1 },
-  templateMeta: { fontSize: 12, color: '#6B7280', marginTop: 4 },
-  rowArrow: { fontSize: 18, color: '#52B788', marginLeft: 8 },
+  templateName: { fontSize: 16, fontWeight: '600' },
+  templateScientific: { fontSize: 12, fontStyle: 'italic', marginTop: 1 },
+  templateAliases: { fontSize: 11, marginTop: 1 },
+  templateMeta: { fontSize: 12, marginTop: Spacing.xs },
+  rowArrow: { fontSize: 18, marginLeft: Spacing.sm },
   emptyHint: { padding: 32, alignItems: 'center' },
-  emptyHintText: { fontSize: 15, color: '#74C69D', textAlign: 'center' },
-  detailScroll: { padding: 20, gap: 4 },
+  emptyHintText: { fontSize: 15, textAlign: 'center' },
+  detailScroll: { padding: Spacing.xl, gap: Spacing.xs },
   templateBadge: {
-    backgroundColor: '#D8F3DC',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 12,
+    borderRadius: Radius.sm,
+    padding: Spacing.md - 2,
+    marginBottom: Spacing.md,
   },
-  templateBadgeText: { fontSize: 13, color: '#1B4332', fontWeight: '500' },
-  fieldLabel: { fontSize: 13, color: '#666', marginTop: 12, marginBottom: 4 },
+  templateBadgeText: { fontSize: 13, fontWeight: '500' },
+  fieldLabel: { fontSize: 13, marginTop: Spacing.md, marginBottom: Spacing.xs },
   input: {
     borderWidth: 1.5,
-    borderColor: '#B7E4C7',
-    borderRadius: 10,
-    padding: 12,
+    borderRadius: Radius.md,
+    padding: Spacing.md,
     fontSize: 15,
-    backgroundColor: '#fff',
   },
   suggestions: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: '#B7E4C7',
     marginTop: 2,
     overflow: 'hidden',
   },
-  suggestionItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#F0FFF4' },
-  suggestionText: { fontSize: 14, color: '#2D6A4F' },
+  suggestionItem: { padding: Spacing.md - 2, borderBottomWidth: 1 },
+  suggestionText: { fontSize: 14 },
   previewCard: {
-    backgroundColor: '#F0FFF4',
-    borderRadius: 10,
-    padding: 12,
-    marginTop: 12,
+    borderRadius: Radius.md,
+    padding: Spacing.md,
+    marginTop: Spacing.md,
     borderWidth: 1,
-    borderColor: '#B7E4C7',
   },
-  previewTitle: { fontSize: 12, fontWeight: '700', color: '#52B788', marginBottom: 6 },
-  previewItem: { fontSize: 14, color: '#1B4332', marginBottom: 3 },
-  hint: { fontSize: 13, color: '#9CA3AF', marginTop: 16, lineHeight: 18 },
+  previewTitle: { fontSize: 12, fontWeight: '700', marginBottom: Spacing.xs + 2 },
+  previewItem: { fontSize: 14, marginBottom: 3 },
+  hint: { fontSize: 13, marginTop: Spacing.lg, lineHeight: 18 },
   saveBtn: {
-    backgroundColor: '#2D6A4F',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: Radius.lg,
+    padding: Spacing.lg,
     alignItems: 'center',
-    marginTop: 24,
+    marginTop: Spacing.xxl,
   },
-  saveBtnDisabled: { backgroundColor: '#B7E4C7' },
   saveBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 })

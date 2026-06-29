@@ -1,33 +1,34 @@
 import { useRouter } from 'expo-router'
 import React, { useState } from 'react'
 import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Radius, Shadow, Spacing } from '../constants/theme'
 import { useThemeColors } from '../hooks/useThemeColors'
-import { Language } from '../i18n/translations'
+import { t, Language } from '../i18n/translations'
 
 interface HeaderMenuProps {
   lang: Language
 }
 
-const MENU_ITEMS = {
-  de: [
-    { key: 'add-plant', label: '➕  Pflanze hinzufügen', route: '/add-plant' },
-    { key: 'manage-plants', label: '🪴  Pflanzen verwalten', route: '/manage-plants' },
-    { key: 'stats', label: '📊  Statistik', route: '/stats' },
-    { key: 'settings', label: '⚙️  Einstellungen', route: '/settings' },
-  ],
-  en: [
-    { key: 'add-plant', label: '➕  Add plant', route: '/add-plant' },
-    { key: 'manage-plants', label: '🪴  Manage plants', route: '/manage-plants' },
-    { key: 'stats', label: '📊  Statistics', route: '/stats' },
-    { key: 'settings', label: '⚙️  Settings', route: '/settings' },
-  ],
-} as const
+type MenuItem = { key: string; labelKey: 'home_title'; route: string }
+
+const MENU_ITEMS: { key: string; labelKey: Parameters<typeof t>[1]; route: string }[] = [
+  { key: 'add-plant', labelKey: 'add_plant_title', route: '/add-plant' },
+  { key: 'manage-plants', labelKey: 'manage_plants_title', route: '/manage-plants' },
+  { key: 'stats', labelKey: 'stats_title', route: '/stats' },
+  { key: 'settings', labelKey: 'settings_title', route: '/settings' },
+]
+
+const MENU_ICONS: Record<string, string> = {
+  'add-plant': '➕',
+  'manage-plants': '🪴',
+  stats: '📊',
+  settings: '⚙️',
+}
 
 export function HeaderMenu({ lang }: HeaderMenuProps) {
   const [visible, setVisible] = useState(false)
   const router = useRouter()
   const colors = useThemeColors()
-  const items = MENU_ITEMS[lang]
 
   return (
     <>
@@ -37,21 +38,25 @@ export function HeaderMenu({ lang }: HeaderMenuProps) {
 
       <Modal visible={visible} transparent animationType="fade" onRequestClose={() => setVisible(false)}>
         <Pressable style={styles.backdrop} onPress={() => setVisible(false)}>
-          <View style={[styles.menu, { backgroundColor: colors.surface }]}>
-            {items.map((item, index) => (
+          <View style={[styles.menu, { backgroundColor: colors.surface }, Shadow.menu]}>
+            {MENU_ITEMS.map((item, index) => (
               <TouchableOpacity
                 key={item.key}
                 style={[
                   styles.menuItem,
-                  index < items.length - 1 && { borderBottomWidth: 1, borderBottomColor: '#D8F3DC' },
+                  index < MENU_ITEMS.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.accentSurface },
                 ]}
                 onPress={() => {
                   setVisible(false)
-                  router.push(item.route)
+                  router.push(item.route as Parameters<typeof router.push>[0])
                 }}
                 activeOpacity={0.7}
               >
-                <Text style={[styles.menuLabel, { color: colors.primary }]}>{item.label}</Text>
+                <Text style={[styles.menuLabel, { color: colors.primary }]}>
+                  {MENU_ICONS[item.key]}
+                  {'  '}
+                  {t(lang, item.labelKey)}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -63,7 +68,7 @@ export function HeaderMenu({ lang }: HeaderMenuProps) {
 
 const styles = StyleSheet.create({
   trigger: {
-    paddingHorizontal: 4,
+    paddingHorizontal: Spacing.xs,
     paddingVertical: 2,
   },
   triggerText: {
@@ -78,21 +83,16 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'flex-end',
     paddingTop: 72,
-    paddingRight: 16,
+    paddingRight: Spacing.lg,
   },
   menu: {
-    borderRadius: 14,
+    borderRadius: Radius.xl,
     minWidth: 220,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
     overflow: 'hidden',
   },
   menuItem: {
-    paddingVertical: 14,
-    paddingHorizontal: 18,
+    paddingVertical: Spacing.md + 2,
+    paddingHorizontal: Spacing.lg + 2,
   },
   menuLabel: {
     fontSize: 16,

@@ -4,9 +4,11 @@ import React, { useMemo } from 'react'
 import { SafeAreaView, SectionList, StyleSheet, Text, View } from 'react-native'
 import { HeaderMenu } from '../src/components/HeaderMenu'
 import { PlantCard } from '../src/components/PlantCard'
+import { Radius, Spacing } from '../src/constants/theme'
 import { usePlants } from '../src/contexts/PlantContext'
 import { usePreferences } from '../src/hooks/usePreferences'
-import { Language } from '../src/i18n/translations'
+import { useThemeColors } from '../src/hooks/useThemeColors'
+import { t, Language } from '../src/i18n/translations'
 import { Plant } from '../src/types/plant'
 
 interface Section {
@@ -32,7 +34,7 @@ function groupByRoom(plants: Plant[], lang: Language): Section[] {
     .map(([title, data]) => ({ title, data }))
 
   if (noRoom.length > 0) {
-    sections.push({ title: lang === 'de' ? 'Ohne Raum' : 'No room', data: noRoom })
+    sections.push({ title: t(lang, 'home_no_room'), data: noRoom })
   }
 
   return sections
@@ -41,31 +43,24 @@ function groupByRoom(plants: Plant[], lang: Language): Section[] {
 export default function HomeScreen() {
   const { plants, isLoaded, markWatered, markFertilized } = usePlants()
   const { language } = usePreferences()
+  const colors = useThemeColors()
   const router = useRouter()
 
   const sections = useMemo(() => groupByRoom(plants, language), [plants, language])
 
-  const title = language === 'de' ? 'Meine Pflanzen' : 'My Plants'
-  const emptyText =
-    language === 'de' ? 'Noch keine Pflanzen.\nTippe auf ⋮ → Pflanze hinzufügen.' : 'No plants yet.\nTap ⋮ → Add plant.'
+  const plantCount = plants.length
+  const countLabel = plantCount === 1 ? t(language, 'home_plant_singular') : t(language, 'home_plant_plural')
 
   if (!isLoaded) return null
 
   return (
-    <SafeAreaView style={styles.container}>
-      <LinearGradient colors={['#1B4332', '#2D6A4F']} style={styles.header}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
         <View style={styles.headerRow}>
           <View>
-            <Text style={styles.headerTitle}>{title}</Text>
-            <Text style={styles.headerCount}>
-              {plants.length}{' '}
-              {language === 'de'
-                ? plants.length === 1
-                  ? 'Pflanze'
-                  : 'Pflanzen'
-                : plants.length === 1
-                  ? 'plant'
-                  : 'plants'}
+            <Text style={styles.headerTitle}>{t(language, 'home_title')}</Text>
+            <Text style={[styles.headerCount, { color: colors.gradientText }]}>
+              {plantCount} {countLabel}
             </Text>
           </View>
           <HeaderMenu lang={language} />
@@ -75,7 +70,7 @@ export default function HomeScreen() {
       {plants.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyEmoji}>🪴</Text>
-          <Text style={styles.emptyText}>{emptyText}</Text>
+          <Text style={[styles.emptyText, { color: colors.primaryLight }]}>{t(language, 'home_empty_tap')}</Text>
         </View>
       ) : (
         <SectionList
@@ -92,7 +87,7 @@ export default function HomeScreen() {
           )}
           renderSectionHeader={({ section }) => (
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>{section.title}</Text>
+              <Text style={[styles.sectionTitle, { color: colors.primaryLight }]}>{section.title}</Text>
             </View>
           )}
           contentContainerStyle={styles.list}
@@ -107,12 +102,11 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F0FFF4',
   },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 20,
+    paddingHorizontal: Spacing.xl,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.xl,
   },
   headerRow: {
     flexDirection: 'row',
@@ -126,23 +120,21 @@ const styles = StyleSheet.create({
   },
   headerCount: {
     fontSize: 14,
-    color: '#B7E4C7',
     marginTop: 2,
   },
   sectionHeader: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 6,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.xs + 2,
   },
   sectionTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#52B788',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
   list: {
-    paddingBottom: 24,
+    paddingBottom: Spacing.xxl,
   },
   emptyContainer: {
     flex: 1,
@@ -152,11 +144,10 @@ const styles = StyleSheet.create({
   },
   emptyEmoji: {
     fontSize: 64,
-    marginBottom: 16,
+    marginBottom: Spacing.lg,
   },
   emptyText: {
     fontSize: 16,
-    color: '#52B788',
     textAlign: 'center',
     lineHeight: 24,
   },

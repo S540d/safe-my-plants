@@ -3,7 +3,8 @@ import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { getCareStatus } from '../hooks/useCareStatus'
 import { useThemeColors } from '../hooks/useThemeColors'
-import { Language } from '../i18n/translations'
+import { t, Language } from '../i18n/translations'
+import { Radius, Shadow, Spacing } from '../constants/theme'
 import { Plant } from '../types/plant'
 import { TrafficLight } from './TrafficLight'
 
@@ -21,7 +22,11 @@ export function PlantCard({ plant, lang, onPress, onWater, onFertilize }: PlantC
   const colors = useThemeColors()
 
   return (
-    <TouchableOpacity style={[styles.card, { backgroundColor: colors.surface }]} onPress={onPress} activeOpacity={0.85}>
+    <TouchableOpacity
+      style={[styles.card, { backgroundColor: colors.surface }, Shadow.card]}
+      onPress={onPress}
+      activeOpacity={0.85}
+    >
       {hasPhoto ? (
         <Image source={{ uri: plant.photos[0].uri }} style={styles.photo} />
       ) : (
@@ -55,20 +60,28 @@ export function PlantCard({ plant, lang, onPress, onWater, onFertilize }: PlantC
           <View style={styles.actionRow}>
             {onWater && (
               <TouchableOpacity
-                style={[styles.actionBtn, status.watering === 'overdue' && styles.actionBtnUrgent]}
+                style={[
+                  styles.actionBtn,
+                  { backgroundColor: colors.accentSurface },
+                  status.watering === 'overdue' && { backgroundColor: colors.statusOverdueSurface },
+                ]}
                 onPress={onWater}
                 activeOpacity={0.75}
               >
-                <Text style={styles.actionBtnText}>{lang === 'de' ? '💧 Gegossen' : '💧 Watered'}</Text>
+                <Text style={[styles.actionBtnText, { color: colors.primary }]}>{t(lang, 'card_watered')}</Text>
               </TouchableOpacity>
             )}
             {onFertilize && (
               <TouchableOpacity
-                style={[styles.actionBtn, status.fertilizing === 'overdue' && styles.actionBtnUrgent]}
+                style={[
+                  styles.actionBtn,
+                  { backgroundColor: colors.accentSurface },
+                  status.fertilizing === 'overdue' && { backgroundColor: colors.statusOverdueSurface },
+                ]}
                 onPress={onFertilize}
                 activeOpacity={0.75}
               >
-                <Text style={styles.actionBtnText}>{lang === 'de' ? '🌿 Gedüngt' : '🌿 Fertilized'}</Text>
+                <Text style={[styles.actionBtnText, { color: colors.primary }]}>{t(lang, 'card_fertilized')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -81,14 +94,9 @@ export function PlantCard({ plant, lang, onPress, onWater, onFertilize }: PlantC
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    borderRadius: 12,
-    marginHorizontal: 16,
-    marginVertical: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
+    borderRadius: Radius.lg,
+    marginHorizontal: Spacing.lg,
+    marginVertical: Spacing.xs + 1,
     overflow: 'hidden',
   },
   photo: {
@@ -103,9 +111,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 10,
+    padding: Spacing.md - 2,
     justifyContent: 'space-between',
-    gap: 4,
+    gap: Spacing.xs,
   },
   header: {
     flexDirection: 'row',
@@ -116,7 +124,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     flex: 1,
-    marginRight: 8,
+    marginRight: Spacing.sm,
   },
   scientificName: {
     fontSize: 11,
@@ -125,34 +133,29 @@ const styles = StyleSheet.create({
   statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: Spacing.md - 2,
   },
   statusItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: Spacing.xs,
   },
   statusLabel: {
     fontSize: 13,
   },
   actionRow: {
     flexDirection: 'row',
-    gap: 6,
-    marginTop: 4,
+    gap: Spacing.xs + 2,
+    marginTop: Spacing.xs,
   },
   actionBtn: {
     flex: 1,
-    backgroundColor: '#D8F3DC',
-    borderRadius: 8,
-    paddingVertical: 5,
+    borderRadius: Radius.sm,
+    paddingVertical: Spacing.xs + 1,
     alignItems: 'center',
-  },
-  actionBtnUrgent: {
-    backgroundColor: '#FEE2E2',
   },
   actionBtnText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#1B4332',
   },
 })

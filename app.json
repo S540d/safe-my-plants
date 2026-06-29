@@ -43,7 +43,8 @@
           "photosPermission": "Safe My Plants möchte auf deine Fotos zugreifen, um Pflanzenbilder hinzuzufügen.",
           "cameraPermission": "Safe My Plants möchte deine Kamera nutzen, um Pflanzenfotos aufzunehmen."
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "scheme": "safemyplants"
   }
