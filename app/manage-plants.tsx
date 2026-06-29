@@ -447,6 +447,12 @@ export default function ManagePlantsScreen() {
         </View>
       </LinearGradient>
       <ScrollView contentContainerStyle={styles.scroll}>
+        <TouchableOpacity
+          style={[styles.addBtn, { backgroundColor: colors.primaryMid }]}
+          onPress={() => router.push('/add-plant')}
+        >
+          <Text style={styles.addBtnText}>+ {lang === 'de' ? 'Pflanze hinzufügen' : 'Add plant'}</Text>
+        </TouchableOpacity>
         {plants.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyEmoji}>🪴</Text>
@@ -469,10 +475,18 @@ export default function ManagePlantsScreen() {
                   ) : null}
                 </View>
                 <View style={styles.plantActions}>
-                  <TouchableOpacity style={styles.editBtn} onPress={() => setEditing(plant)}>
+                  <TouchableOpacity
+                    style={styles.editBtn}
+                    onPress={() => setEditing(plant)}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
                     <Text style={styles.editBtnText}>✏️</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.deleteBtn} onPress={() => handleDelete(plant)}>
+                  <TouchableOpacity
+                    style={styles.deleteBtn}
+                    onPress={() => handleDelete(plant)}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
                     <Text style={styles.deleteBtnText}>🗑️</Text>
                   </TouchableOpacity>
                 </View>
@@ -494,6 +508,13 @@ const styles = StyleSheet.create({
   backBtnText: { fontSize: 15 },
   headerTitle: { fontSize: 22, fontWeight: '700', color: '#fff', flex: 1 },
   scroll: { padding: Spacing.lg },
+  addBtn: {
+    borderRadius: Radius.lg,
+    padding: Spacing.md + 2,
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+  },
+  addBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
   emptyContainer: { alignItems: 'center', paddingTop: 60 },
   emptyEmoji: { fontSize: 48, marginBottom: Spacing.md },
   emptyText: { fontSize: 16, textAlign: 'center' },

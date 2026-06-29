@@ -29,6 +29,7 @@ type ThemeMode = 'light' | 'dark' | 'system'
 export default function SettingsScreen() {
   const { language, theme, adminPin, setLanguage, setTheme, setAdminPin } = usePreferences()
   const router = useRouter()
+  const canGoBack = router.canGoBack()
   const [showPinChange, setShowPinChange] = useState(false)
   const [newPin, setNewPin] = useState('')
   const [confirmPin, setConfirmPin] = useState('')
@@ -130,7 +131,14 @@ export default function SettingsScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient colors={['#1B4332', '#2D6A4F']} style={styles.header}>
-        <Text style={styles.headerTitle}>{lang === 'de' ? 'Einstellungen' : 'Settings'}</Text>
+        <View style={styles.headerRow}>
+          {canGoBack && (
+            <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+              <Text style={styles.backBtnText}>← {lang === 'de' ? 'Zurück' : 'Back'}</Text>
+            </TouchableOpacity>
+          )}
+          <Text style={styles.headerTitle}>{lang === 'de' ? 'Einstellungen' : 'Settings'}</Text>
+        </View>
       </LinearGradient>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Language */}
@@ -184,7 +192,14 @@ export default function SettingsScreen() {
         )}
 
         {/* Notifications */}
-        <Text style={styles.sectionLabel}>{t(lang, 'settings_notifications')}</Text>
+        <View style={styles.sectionLabelRow}>
+          <Text style={[styles.sectionLabel, { marginTop: 0, marginBottom: 0 }]}>
+            {t(lang, 'settings_notifications')}
+          </Text>
+          <View style={styles.betaBadge}>
+            <Text style={styles.betaBadgeText}>Beta</Text>
+          </View>
+        </View>
         <View style={styles.notifCard}>
           <View style={styles.notifRow}>
             <Text style={styles.notifLabel}>{t(lang, 'settings_notifications_enable')}</Text>
@@ -259,8 +274,19 @@ function Chip({ label, active, onPress }: { label: string; active: boolean; onPr
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F0FFF4' },
   header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 20 },
-  headerTitle: { fontSize: 28, fontWeight: '700', color: '#fff' },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  backBtn: { paddingVertical: 4, paddingRight: 8 },
+  backBtnText: { fontSize: 15, color: '#B7E4C7', fontWeight: '500' },
+  headerTitle: { fontSize: 28, fontWeight: '700', color: '#fff', flex: 1 },
   scroll: { padding: 16 },
+  sectionLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 20, marginBottom: 8 },
+  betaBadge: {
+    backgroundColor: '#F4A261',
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  betaBadgeText: { fontSize: 10, fontWeight: '700', color: '#fff', textTransform: 'uppercase', letterSpacing: 0.5 },
   sectionLabel: {
     fontSize: 12,
     fontWeight: '700',
