@@ -15,8 +15,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { Radius, Shadow, Spacing, ThemeColors } from '../src/constants/theme'
 import { usePlants } from '../src/contexts/PlantContext'
 import { usePreferences } from '../src/hooks/usePreferences'
+import { useThemeColors } from '../src/hooks/useThemeColors'
+import { t } from '../src/i18n/translations'
 import { Disease, Plant, PlantLocation, PlantPhoto } from '../src/types/plant'
 import { getCareStatus } from '../src/hooks/useCareStatus'
 import { TrafficLight } from '../src/components/TrafficLight'
@@ -61,13 +64,14 @@ function emptyDisease(): Disease {
 
 interface PlantFormProps {
   lang: 'de' | 'en'
+  colors: ThemeColors
   initial?: Plant
   existingRooms: string[]
   onSave: (plant: Plant) => void
   onCancel: () => void
 }
 
-function PlantForm({ lang, initial, existingRooms, onSave, onCancel }: PlantFormProps) {
+function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: PlantFormProps) {
   const [plant, setPlant] = useState<Plant>(initial ?? emptyPlant())
   const [newDisease, setNewDisease] = useState<Disease | null>(null)
   const [showRoomSuggestions, setShowRoomSuggestions] = useState(false)
@@ -98,42 +102,49 @@ function PlantForm({ lang, initial, existingRooms, onSave, onCancel }: PlantForm
 
   const handleSave = () => {
     if (!plant.name.trim()) {
-      Alert.alert('', lang === 'de' ? 'Name ist erforderlich.' : 'Name is required.')
+      Alert.alert('', t(lang, 'form_name_required'))
       return
     }
     onSave(plant)
   }
 
-  const L = (de: string, en: string) => (lang === 'de' ? de : en)
-
   const roomSuggestions = existingRooms.filter(
     (r) => r !== plant.room && r.toLowerCase().includes((plant.room ?? '').toLowerCase())
   )
 
+  const inputStyle = [
+    formStyles.input,
+    { borderColor: colors.border, backgroundColor: colors.surface, color: colors.text },
+  ]
+  const labelStyle = [formStyles.label, { color: colors.textMuted }]
+  const sectionLabelStyle = [formStyles.sectionLabel, { color: colors.primaryLight }]
+
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={formStyles.scroll} showsVerticalScrollIndicator={false}>
-        <SectionLabel text={L('Pflanzendaten', 'Plant Info')} />
+        <Text style={sectionLabelStyle}>{t(lang, 'form_section_plant_info')}</Text>
 
-        <Label text={L('Name *', 'Name *')} />
+        <Text style={labelStyle}>{t(lang, 'add_plant_field_name')}</Text>
         <TextInput
-          style={formStyles.input}
+          style={inputStyle}
           value={plant.name}
           onChangeText={(v) => set({ name: v })}
-          placeholder={L('z.B. Monstera', 'e.g. Monstera')}
+          placeholder={t(lang, 'form_plant_name_placeholder')}
+          placeholderTextColor={colors.textSubtle}
         />
 
-        <Label text={L('Wissenschaftlicher Name', 'Scientific Name')} />
+        <Text style={labelStyle}>{t(lang, 'form_field_scientific')}</Text>
         <TextInput
-          style={formStyles.input}
+          style={inputStyle}
           value={plant.scientificName}
           onChangeText={(v) => set({ scientificName: v })}
           placeholder="Monstera deliciosa"
+          placeholderTextColor={colors.textSubtle}
         />
 
-        <Label text={L('Raum / Aufstellort', 'Room / Location')} />
+        <Text style={labelStyle}>{t(lang, 'add_plant_field_room')}</Text>
         <TextInput
-          style={formStyles.input}
+          style={inputStyle}
           value={plant.room ?? ''}
           onChangeText={(v) => {
             set({ room: v })
@@ -141,118 +152,142 @@ function PlantForm({ lang, initial, existingRooms, onSave, onCancel }: PlantForm
           }}
           onFocus={() => setShowRoomSuggestions(true)}
           onBlur={() => setTimeout(() => setShowRoomSuggestions(false), 150)}
-          placeholder={L('z.B. Wohnzimmer', 'e.g. Living room')}
+          placeholder={t(lang, 'form_room_placeholder')}
+          placeholderTextColor={colors.textSubtle}
         />
         {showRoomSuggestions && roomSuggestions.length > 0 && (
-          <View style={formStyles.suggestions}>
+          <View style={[formStyles.suggestions, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             {roomSuggestions.map((r) => (
               <TouchableOpacity
                 key={r}
-                style={formStyles.suggestionItem}
+                style={[formStyles.suggestionItem, { borderBottomColor: colors.background }]}
                 onPress={() => {
                   set({ room: r })
                   setShowRoomSuggestions(false)
                 }}
               >
-                <Text style={formStyles.suggestionText}>{r}</Text>
+                <Text style={[formStyles.suggestionText, { color: colors.primaryMid }]}>{r}</Text>
               </TouchableOpacity>
             ))}
           </View>
         )}
 
-        <Label text={L('Beschreibung', 'Description')} />
+        <Text style={labelStyle}>{t(lang, 'form_field_description')}</Text>
         <TextInput
-          style={[formStyles.input, formStyles.multiline]}
+          style={[inputStyle, formStyles.multiline]}
           value={plant.description}
           onChangeText={(v) => set({ description: v })}
           multiline
           numberOfLines={3}
-          placeholder={L('Kurze Beschreibung...', 'Short description...')}
+          placeholder={t(lang, 'form_description_placeholder')}
+          placeholderTextColor={colors.textSubtle}
         />
 
-        <SectionLabel text={L('Standort', 'Sun exposure')} />
+        <Text style={sectionLabelStyle}>{t(lang, 'form_section_sun')}</Text>
         <View style={formStyles.chipRow}>
           {LOCATIONS.map((loc) => (
             <TouchableOpacity
               key={loc}
-              style={[formStyles.chip, plant.location === loc && formStyles.chipActive]}
+              style={[
+                formStyles.chip,
+                { borderColor: colors.border, backgroundColor: colors.surface },
+                plant.location === loc && { backgroundColor: colors.primaryMid, borderColor: colors.primaryMid },
+              ]}
               onPress={() => set({ location: loc })}
             >
-              <Text style={[formStyles.chipText, plant.location === loc && formStyles.chipTextActive]}>
+              <Text
+                style={[
+                  formStyles.chipText,
+                  { color: colors.primaryMid },
+                  plant.location === loc && { color: '#fff', fontWeight: '600' },
+                ]}
+              >
                 {LOCATION_LABELS[lang][loc]}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <SectionLabel text={L('Pflege', 'Care')} />
+        <Text style={sectionLabelStyle}>{t(lang, 'form_section_care')}</Text>
 
-        <Label text={L('Gießintervall (Tage)', 'Watering interval (days)')} />
+        <Text style={labelStyle}>{t(lang, 'form_watering_interval')}</Text>
         <TextInput
-          style={formStyles.input}
+          style={inputStyle}
           value={String(plant.careInfo.wateringFrequencyDays)}
           onChangeText={(v) => setCare({ wateringFrequencyDays: parseInt(v) || 7 })}
           keyboardType="number-pad"
         />
 
-        <Label text={L('Gießtipps', 'Watering tips')} />
+        <Text style={labelStyle}>{t(lang, 'form_watering_tips')}</Text>
         <TextInput
-          style={[formStyles.input, formStyles.multiline]}
+          style={[inputStyle, formStyles.multiline]}
           value={plant.careInfo.wateringTips}
           onChangeText={(v) => setCare({ wateringTips: v })}
           multiline
           numberOfLines={2}
+          placeholderTextColor={colors.textSubtle}
         />
 
-        <Label text={L('Düngintervall (Tage)', 'Fertilizing interval (days)')} />
+        <Text style={labelStyle}>{t(lang, 'form_fertilizing_interval')}</Text>
         <TextInput
-          style={formStyles.input}
+          style={inputStyle}
           value={String(plant.careInfo.fertilizingFrequencyDays)}
           onChangeText={(v) => setCare({ fertilizingFrequencyDays: parseInt(v) || 14 })}
           keyboardType="number-pad"
         />
 
-        <Label text={L('Düngetipps', 'Fertilizing tips')} />
+        <Text style={labelStyle}>{t(lang, 'form_fertilizing_tips')}</Text>
         <TextInput
-          style={[formStyles.input, formStyles.multiline]}
+          style={[inputStyle, formStyles.multiline]}
           value={plant.careInfo.fertilizingTips}
           onChangeText={(v) => setCare({ fertilizingTips: v })}
           multiline
           numberOfLines={2}
+          placeholderTextColor={colors.textSubtle}
         />
 
-        <Label text={L('Temperatur min (°C)', 'Temperature min (°C)')} />
+        <Text style={labelStyle}>{t(lang, 'form_temp_min')}</Text>
         <TextInput
-          style={formStyles.input}
+          style={inputStyle}
           value={String(plant.careInfo.temperature.min)}
           onChangeText={(v) => setCare({ temperature: { ...plant.careInfo.temperature, min: parseInt(v) || 0 } })}
           keyboardType="number-pad"
         />
 
-        <Label text={L('Temperatur max (°C)', 'Temperature max (°C)')} />
+        <Text style={labelStyle}>{t(lang, 'form_temp_max')}</Text>
         <TextInput
-          style={formStyles.input}
+          style={inputStyle}
           value={String(plant.careInfo.temperature.max)}
           onChangeText={(v) => setCare({ temperature: { ...plant.careInfo.temperature, max: parseInt(v) || 30 } })}
           keyboardType="number-pad"
         />
 
-        <Label text={L('Luftfeuchtigkeit', 'Humidity')} />
+        <Text style={labelStyle}>{t(lang, 'form_humidity')}</Text>
         <View style={formStyles.chipRow}>
           {(['low', 'medium', 'high'] as const).map((h) => (
             <TouchableOpacity
               key={h}
-              style={[formStyles.chip, plant.careInfo.humidity === h && formStyles.chipActive]}
+              style={[
+                formStyles.chip,
+                { borderColor: colors.border, backgroundColor: colors.surface },
+                plant.careInfo.humidity === h && { backgroundColor: colors.primaryMid, borderColor: colors.primaryMid },
+              ]}
               onPress={() => setCare({ humidity: h })}
             >
-              <Text style={[formStyles.chipText, plant.careInfo.humidity === h && formStyles.chipTextActive]}>
-                {h === 'low' ? L('Niedrig', 'Low') : h === 'medium' ? L('Mittel', 'Medium') : L('Hoch', 'High')}
+              <Text
+                style={[
+                  formStyles.chipText,
+                  { color: colors.primaryMid },
+                  plant.careInfo.humidity === h && { color: '#fff', fontWeight: '600' },
+                ]}
+              >
+                {t(lang, h === 'low' ? 'humidity_low' : h === 'medium' ? 'humidity_medium' : 'humidity_high')}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        <SectionLabel text={L('Fotos', 'Photos')} />
+        <Text style={sectionLabelStyle}>{t(lang, 'form_section_photos')}</Text>
         <View style={formStyles.photoGrid}>
           {plant.photos.map((photo) => (
             <View key={photo.uri} style={formStyles.photoWrapper}>
@@ -262,65 +297,91 @@ function PlantForm({ lang, initial, existingRooms, onSave, onCancel }: PlantForm
               </TouchableOpacity>
             </View>
           ))}
-          <TouchableOpacity style={formStyles.addPhotoBtn} onPress={addPhoto}>
-            <Text style={formStyles.addPhotoText}>+</Text>
+          <TouchableOpacity
+            style={[formStyles.addPhotoBtn, { borderColor: colors.border, backgroundColor: colors.surfaceAlt }]}
+            onPress={addPhoto}
+          >
+            <Text style={[formStyles.addPhotoText, { color: colors.primaryLight }]}>+</Text>
           </TouchableOpacity>
         </View>
 
-        <SectionLabel text={L('Krankheiten & Schädlinge', 'Diseases & Pests')} />
+        <Text style={sectionLabelStyle}>{t(lang, 'form_section_diseases')}</Text>
         {plant.diseases.map((d) => (
-          <View key={d.id} style={formStyles.diseaseChip}>
-            <Text style={formStyles.diseaseChipText}>🦠 {d.name}</Text>
+          <View
+            key={d.id}
+            style={[
+              formStyles.diseaseChip,
+              { backgroundColor: colors.statusSoonSurface, borderLeftColor: colors.statusSoon },
+            ]}
+          >
+            <Text style={[formStyles.diseaseChipText, { color: colors.primary }]}>🦠 {d.name}</Text>
             <TouchableOpacity onPress={() => removeDisease(d.id)}>
               <Text style={formStyles.removePhotoText}>✕</Text>
             </TouchableOpacity>
           </View>
         ))}
         {newDisease ? (
-          <View style={formStyles.diseaseForm}>
-            <Label text={L('Krankheitsname', 'Disease name')} />
+          <View style={[formStyles.diseaseForm, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <Text style={labelStyle}>{t(lang, 'form_disease_name')}</Text>
             <TextInput
-              style={formStyles.input}
+              style={inputStyle}
               value={newDisease.name}
               onChangeText={(v) => setNewDisease({ ...newDisease, name: v })}
             />
-            <Label text={L('Symptome', 'Symptoms')} />
+            <Text style={labelStyle}>{t(lang, 'form_disease_symptoms')}</Text>
             <TextInput
-              style={[formStyles.input, formStyles.multiline]}
+              style={[inputStyle, formStyles.multiline]}
               value={newDisease.symptoms}
               onChangeText={(v) => setNewDisease({ ...newDisease, symptoms: v })}
               multiline
               numberOfLines={2}
             />
-            <Label text={L('Behandlung', 'Treatment')} />
+            <Text style={labelStyle}>{t(lang, 'form_disease_treatment')}</Text>
             <TextInput
-              style={[formStyles.input, formStyles.multiline]}
+              style={[inputStyle, formStyles.multiline]}
               value={newDisease.treatment}
               onChangeText={(v) => setNewDisease({ ...newDisease, treatment: v })}
               multiline
               numberOfLines={2}
             />
             <View style={formStyles.row}>
-              <TouchableOpacity style={[formStyles.btn, formStyles.btnSecondary]} onPress={() => setNewDisease(null)}>
-                <Text style={formStyles.btnSecondaryText}>{L('Abbrechen', 'Cancel')}</Text>
+              <TouchableOpacity
+                style={[formStyles.btn, formStyles.btnSecondary, { borderColor: colors.border }]}
+                onPress={() => setNewDisease(null)}
+              >
+                <Text style={[formStyles.btnSecondaryText, { color: colors.primaryMid }]}>{t(lang, 'cancel')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[formStyles.btn, formStyles.btnPrimary]} onPress={saveDisease}>
-                <Text style={formStyles.btnPrimaryText}>{L('Hinzufügen', 'Add')}</Text>
+              <TouchableOpacity
+                style={[formStyles.btn, formStyles.btnPrimary, { backgroundColor: colors.primaryMid }]}
+                onPress={saveDisease}
+              >
+                <Text style={formStyles.btnPrimaryText}>{t(lang, 'form_add')}</Text>
               </TouchableOpacity>
             </View>
           </View>
         ) : (
-          <TouchableOpacity style={formStyles.addDiseaseBtn} onPress={() => setNewDisease(emptyDisease())}>
-            <Text style={formStyles.addDiseaseBtnText}>+ {L('Krankheit hinzufügen', 'Add disease')}</Text>
+          <TouchableOpacity
+            style={[formStyles.addDiseaseBtn, { borderColor: colors.border }]}
+            onPress={() => setNewDisease(emptyDisease())}
+          >
+            <Text style={[formStyles.addDiseaseBtnText, { color: colors.primaryLight }]}>
+              + {t(lang, 'form_disease_add')}
+            </Text>
           </TouchableOpacity>
         )}
 
         <View style={formStyles.actions}>
-          <TouchableOpacity style={[formStyles.btn, formStyles.btnSecondary]} onPress={onCancel}>
-            <Text style={formStyles.btnSecondaryText}>{L('Abbrechen', 'Cancel')}</Text>
+          <TouchableOpacity
+            style={[formStyles.btn, formStyles.btnSecondary, { borderColor: colors.border }]}
+            onPress={onCancel}
+          >
+            <Text style={[formStyles.btnSecondaryText, { color: colors.primaryMid }]}>{t(lang, 'cancel')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[formStyles.btn, formStyles.btnPrimary]} onPress={handleSave}>
-            <Text style={formStyles.btnPrimaryText}>{L('Speichern', 'Save')}</Text>
+          <TouchableOpacity
+            style={[formStyles.btn, formStyles.btnPrimary, { backgroundColor: colors.primaryMid }]}
+            onPress={handleSave}
+          >
+            <Text style={formStyles.btnPrimaryText}>{t(lang, 'save')}</Text>
           </TouchableOpacity>
         </View>
         <View style={{ height: 40 }} />
@@ -329,50 +390,40 @@ function PlantForm({ lang, initial, existingRooms, onSave, onCancel }: PlantForm
   )
 }
 
-function Label({ text }: { text: string }) {
-  return <Text style={formStyles.label}>{text}</Text>
-}
-function SectionLabel({ text }: { text: string }) {
-  return <Text style={formStyles.sectionLabel}>{text}</Text>
-}
-
 export default function ManagePlantsScreen() {
-  const { plants, addPlant, updatePlant, deletePlant } = usePlants()
-  const { language } = usePreferences()
+  const { plants, updatePlant, deletePlant } = usePlants()
+  const { language: lang } = usePreferences()
+  const colors = useThemeColors()
   const router = useRouter()
   const [editing, setEditing] = useState<Plant | null>(null)
-  const lang = language
 
   const existingRooms = [...new Set(plants.map((p) => p.room).filter((r): r is string => !!r?.trim()))]
 
   const handleDelete = (plant: Plant) => {
-    Alert.alert(
-      lang === 'de' ? 'Löschen?' : 'Delete?',
-      lang === 'de' ? `"${plant.name}" wirklich löschen?` : `Really delete "${plant.name}"?`,
-      [
-        { text: lang === 'de' ? 'Abbrechen' : 'Cancel', style: 'cancel' },
-        {
-          text: lang === 'de' ? 'Löschen' : 'Delete',
-          style: 'destructive',
-          onPress: () => deletePlant(plant.id),
-        },
-      ]
-    )
+    Alert.alert(t(lang, 'manage_plants_delete_title'), t(lang, 'manage_plants_delete_body', { name: plant.name }), [
+      { text: t(lang, 'cancel'), style: 'cancel' },
+      {
+        text: t(lang, 'delete'),
+        style: 'destructive',
+        onPress: () => deletePlant(plant.id),
+      },
+    ])
   }
 
   if (editing) {
     return (
-      <SafeAreaView style={styles.container}>
-        <LinearGradient colors={['#1B4332', '#2D6A4F']} style={styles.header}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
           <View style={styles.headerRow}>
             <TouchableOpacity onPress={() => setEditing(null)} style={styles.backBtn}>
-              <Text style={styles.backBtnText}>← {lang === 'de' ? 'Zurück' : 'Back'}</Text>
+              <Text style={[styles.backBtnText, { color: colors.gradientText }]}>← {t(lang, 'back')}</Text>
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>{lang === 'de' ? 'Pflanze bearbeiten' : 'Edit Plant'}</Text>
+            <Text style={styles.headerTitle}>{t(lang, 'manage_plants_edit_title')}</Text>
           </View>
         </LinearGradient>
         <PlantForm
           lang={lang}
+          colors={colors}
           initial={editing}
           existingRooms={existingRooms}
           onSave={async (p) => {
@@ -386,34 +437,36 @@ export default function ManagePlantsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <LinearGradient colors={['#1B4332', '#2D6A4F']} style={styles.header}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
         <View style={styles.headerRow}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-            <Text style={styles.backBtnText}>← {lang === 'de' ? 'Zurück' : 'Back'}</Text>
+            <Text style={[styles.backBtnText, { color: colors.gradientText }]}>← {t(lang, 'back')}</Text>
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{lang === 'de' ? 'Pflanzen verwalten' : 'Manage Plants'}</Text>
+          <Text style={styles.headerTitle}>{t(lang, 'manage_plants_title')}</Text>
         </View>
       </LinearGradient>
       <ScrollView contentContainerStyle={styles.scroll}>
         {plants.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyEmoji}>🪴</Text>
-            <Text style={styles.emptyText}>{lang === 'de' ? 'Noch keine Pflanzen vorhanden.' : 'No plants yet.'}</Text>
+            <Text style={[styles.emptyText, { color: colors.primaryLight }]}>{t(lang, 'manage_plants_empty')}</Text>
           </View>
         ) : (
           plants.map((plant) => {
             const status = getCareStatus(plant)
             return (
-              <View key={plant.id} style={styles.plantRow}>
+              <View key={plant.id} style={[styles.plantRow, { backgroundColor: colors.surface }, Shadow.cardSm]}>
                 <View style={styles.plantInfo}>
                   <View style={styles.plantNameRow}>
-                    <Text style={styles.plantName} numberOfLines={1}>
+                    <Text style={[styles.plantName, { color: colors.primary }]} numberOfLines={1}>
                       {plant.name}
                     </Text>
                     <TrafficLight status={status.overall} size={12} />
                   </View>
-                  {plant.room ? <Text style={styles.plantRoom}>📍 {plant.room}</Text> : null}
+                  {plant.room ? (
+                    <Text style={[styles.plantRoom, { color: colors.accent }]}>📍 {plant.room}</Text>
+                  ) : null}
                 </View>
                 <View style={styles.plantActions}>
                   <TouchableOpacity style={styles.editBtn} onPress={() => setEditing(plant)}>
@@ -434,82 +487,69 @@ export default function ManagePlantsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F0FFF4' },
-  header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 20 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  backBtn: { paddingVertical: 4 },
-  backBtnText: { color: '#B7E4C7', fontSize: 15 },
+  container: { flex: 1 },
+  header: { paddingHorizontal: Spacing.xl, paddingTop: Spacing.lg, paddingBottom: Spacing.xl },
+  headerRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
+  backBtn: { paddingVertical: Spacing.xs },
+  backBtnText: { fontSize: 15 },
   headerTitle: { fontSize: 22, fontWeight: '700', color: '#fff', flex: 1 },
-  scroll: { padding: 16 },
+  scroll: { padding: Spacing.lg },
   emptyContainer: { alignItems: 'center', paddingTop: 60 },
-  emptyEmoji: { fontSize: 48, marginBottom: 12 },
-  emptyText: { fontSize: 16, color: '#52B788', textAlign: 'center' },
+  emptyEmoji: { fontSize: 48, marginBottom: Spacing.md },
+  emptyText: { fontSize: 16, textAlign: 'center' },
   plantRow: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 14,
+    borderRadius: Radius.lg,
+    padding: Spacing.md + 2,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    marginBottom: Spacing.sm,
   },
   plantInfo: { flex: 1 },
-  plantNameRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  plantName: { fontSize: 16, color: '#1B4332', fontWeight: '500', flex: 1 },
-  plantRoom: { fontSize: 12, color: '#74C69D', marginTop: 2 },
-  plantActions: { flexDirection: 'row', gap: 8 },
-  editBtn: { padding: 6 },
+  plantNameRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
+  plantName: { fontSize: 16, fontWeight: '500', flex: 1 },
+  plantRoom: { fontSize: 12, marginTop: 2 },
+  plantActions: { flexDirection: 'row', gap: Spacing.sm },
+  editBtn: { padding: Spacing.xs + 2 },
   editBtnText: { fontSize: 18 },
-  deleteBtn: { padding: 6 },
+  deleteBtn: { padding: Spacing.xs + 2 },
   deleteBtnText: { fontSize: 18 },
 })
 
 const formStyles = StyleSheet.create({
-  scroll: { padding: 16 },
+  scroll: { padding: Spacing.lg },
   sectionLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#52B788',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
-    marginTop: 20,
-    marginBottom: 8,
+    marginTop: Spacing.xl,
+    marginBottom: Spacing.sm,
   },
-  label: { fontSize: 13, color: '#666', marginBottom: 4, marginTop: 10 },
+  label: { fontSize: 13, marginBottom: Spacing.xs, marginTop: Spacing.md - 2 },
   input: {
     borderWidth: 1.5,
-    borderColor: '#B7E4C7',
-    borderRadius: 8,
-    padding: 10,
+    borderRadius: Radius.sm,
+    padding: Spacing.md - 2,
     fontSize: 15,
-    backgroundColor: '#fff',
   },
   multiline: { minHeight: 70, textAlignVertical: 'top' },
-  chipRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
+  chipRow: { flexDirection: 'row', gap: Spacing.sm, flexWrap: 'wrap' },
   chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 18,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs + 3,
+    borderRadius: Radius.full,
     borderWidth: 1.5,
-    borderColor: '#B7E4C7',
-    backgroundColor: '#fff',
   },
-  chipActive: { backgroundColor: '#2D6A4F', borderColor: '#2D6A4F' },
-  chipText: { fontSize: 13, color: '#2D6A4F' },
-  chipTextActive: { color: '#fff', fontWeight: '600' },
-  photoGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  chipText: { fontSize: 13 },
+  photoGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
   photoWrapper: { position: 'relative' },
-  photo: { width: 80, height: 80, borderRadius: 8 },
+  photo: { width: 80, height: 80, borderRadius: Radius.sm },
   removePhoto: {
     position: 'absolute',
     top: -6,
     right: -6,
     backgroundColor: '#E63946',
-    borderRadius: 10,
+    borderRadius: Radius.full,
     width: 20,
     height: 20,
     alignItems: 'center',
@@ -519,60 +559,51 @@ const formStyles = StyleSheet.create({
   addPhotoBtn: {
     width: 80,
     height: 80,
-    borderRadius: 8,
+    borderRadius: Radius.sm,
     borderWidth: 2,
-    borderColor: '#B7E4C7',
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F0FFF4',
   },
-  addPhotoText: { fontSize: 28, color: '#52B788' },
+  addPhotoText: { fontSize: 28 },
   diseaseChip: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#FFF9F0',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 6,
+    borderRadius: Radius.sm,
+    padding: Spacing.md - 2,
+    marginBottom: Spacing.xs + 2,
     borderLeftWidth: 3,
-    borderLeftColor: '#F4A261',
   },
-  diseaseChipText: { fontSize: 14, color: '#1B4332' },
+  diseaseChipText: { fontSize: 14 },
   diseaseForm: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 8,
+    borderRadius: Radius.lg,
+    padding: Spacing.md,
+    marginBottom: Spacing.sm,
     borderWidth: 1,
-    borderColor: '#B7E4C7',
   },
   addDiseaseBtn: {
-    padding: 10,
+    padding: Spacing.md - 2,
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: Radius.sm,
     borderWidth: 1.5,
-    borderColor: '#B7E4C7',
     borderStyle: 'dashed',
-    marginTop: 4,
+    marginTop: Spacing.xs,
   },
-  addDiseaseBtnText: { color: '#52B788', fontSize: 14 },
-  actions: { flexDirection: 'row', gap: 10, marginTop: 24 },
-  row: { flexDirection: 'row', gap: 8, marginTop: 8 },
-  btn: { flex: 1, padding: 12, borderRadius: 10, alignItems: 'center' },
-  btnPrimary: { backgroundColor: '#2D6A4F' },
-  btnSecondary: { backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#B7E4C7' },
+  addDiseaseBtnText: { fontSize: 14 },
+  actions: { flexDirection: 'row', gap: Spacing.md - 2, marginTop: Spacing.xxl },
+  row: { flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.sm },
+  btn: { flex: 1, padding: Spacing.md, borderRadius: Radius.md, alignItems: 'center' },
+  btnPrimary: {},
+  btnSecondary: { backgroundColor: 'transparent', borderWidth: 1.5 },
   btnPrimaryText: { color: '#fff', fontSize: 15, fontWeight: '600' },
-  btnSecondaryText: { color: '#2D6A4F', fontSize: 15 },
+  btnSecondaryText: { fontSize: 15 },
   suggestions: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: '#B7E4C7',
     marginTop: 2,
     overflow: 'hidden',
   },
-  suggestionItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#F0FFF4' },
-  suggestionText: { fontSize: 14, color: '#2D6A4F' },
+  suggestionItem: { padding: Spacing.md - 2, borderBottomWidth: 1 },
+  suggestionText: { fontSize: 14 },
 })

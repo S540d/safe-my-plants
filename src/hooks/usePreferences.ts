@@ -1,3 +1,4 @@
+import { getLocales } from 'expo-localization'
 import { useCallback, useEffect, useState } from 'react'
 import { getAdminPin, getLanguage, getTheme, saveAdminPin, saveLanguage, saveTheme } from '../services/storage'
 import { Language } from '../i18n/translations'
@@ -15,8 +16,13 @@ interface Preferences {
   verifyAdminPin: (pin: string) => boolean
 }
 
+function getDeviceLanguage(): Language {
+  const locale = getLocales()[0]?.languageCode ?? 'de'
+  return locale === 'en' ? 'en' : 'de'
+}
+
 export function usePreferences(): Preferences {
-  const [language, setLanguageState] = useState<Language>('de')
+  const [language, setLanguageState] = useState<Language>(getDeviceLanguage())
   const [theme, setThemeState] = useState<ThemeMode>('system')
   const [adminPin, setAdminPinState] = useState<string | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
