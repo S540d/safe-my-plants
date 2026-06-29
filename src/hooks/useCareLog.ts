@@ -48,9 +48,7 @@ export function useCareLog() {
   const getRecentActions = useCallback(
     (days: number) => {
       const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
-      return actions
-        .filter((a) => a.timestamp >= cutoff)
-        .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
+      return actions.filter((a) => a.timestamp >= cutoff).sort((a, b) => b.timestamp.localeCompare(a.timestamp))
     },
     [actions]
   )

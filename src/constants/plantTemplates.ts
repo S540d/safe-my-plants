@@ -1,11 +1,21 @@
 import { Plant } from '../types/plant'
 
-export type PlantTemplate = Omit<Plant, 'id' | 'photos' | 'lastWatered' | 'lastFertilized' | 'createdAt' | 'updatedAt'>
+export type PlantTemplate = Omit<
+  Plant,
+  'id' | 'photos' | 'lastWatered' | 'lastFertilized' | 'createdAt' | 'updatedAt'
+> & {
+  /** Weitere gebräuchliche Namen/Synonyme für die Suche (z. B. "Friedenslilie" für das Einblatt). */
+  aliases?: string[]
+  /** Lizenzfreies Wikimedia-Commons-Vorschaubild (CC-BY-SA / Public Domain). */
+  imageUrl?: string
+}
 
 export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Monstera',
     scientificName: 'Monstera deliciosa',
+    aliases: ['Fensterblatt', 'Köstliches Fensterblatt'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/04/Monstera_deliciosa3.jpg',
     description: 'Das Fensterblatt mit charakteristischen gelochten Blättern. Pflegeleicht und wächst schnell.',
     location: 'partial-shade',
     careInfo: {
@@ -22,6 +32,8 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Efeutute',
     scientificName: 'Epipremnum aureum',
+    aliases: ['Pothos', 'Goldene Efeutute', 'Skindapsus'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/9d/Epipremnum_aureum_31082012.jpg',
     description: 'Extrem robuste Hängepflanze. Verträgt wenig Licht und unregelmäßiges Gießen.',
     location: 'shade',
     careInfo: {
@@ -38,6 +50,8 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Gummibaum',
     scientificName: 'Ficus elastica',
+    aliases: ['Birkenfeige', 'Ficus'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/4f/Ficus_elastica_2.jpg',
     description: 'Klassischer Zimmerbaum mit glänzend dunkelgrünen Blättern.',
     location: 'sun',
     careInfo: {
@@ -54,6 +68,8 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Aloe Vera',
     scientificName: 'Aloe vera',
+    aliases: ['Echte Aloe', 'Wüstenlilie'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/Aloe_vera_flower_inset.png',
     description: 'Sukkulente mit heilenden Eigenschaften. Braucht viel Sonne und wenig Wasser.',
     location: 'sun',
     careInfo: {
@@ -70,6 +86,8 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Zamioculcas',
     scientificName: 'Zamioculcas zamiifolia',
+    aliases: ['Glücksfeder', 'ZZ-Pflanze', 'Kartonpapierpflanze'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/75/Zamioculcas_zamiifolia.jpg',
     description: 'Glücksfeder – extrem genügsam, verträgt Trockenheit und wenig Licht.',
     location: 'shade',
     careInfo: {
@@ -86,6 +104,8 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Bogenhanf',
     scientificName: 'Sansevieria trifasciata',
+    aliases: ['Sansevieria', 'Schwiegermutterzunge', 'Schlangenpflanze'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3d/Sansevieria_trifasciata1.jpg',
     description: 'Schwertförmige Blätter, nahezu unzerstörbar. Ideal für Anfänger.',
     location: 'indoor',
     careInfo: {
@@ -102,6 +122,8 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Orchidee',
     scientificName: 'Phalaenopsis',
+    aliases: ['Phalaenopsis', 'Schmetterlingsorchidee', 'Falterorchidee'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6b/Phalaenopsis_amabilis1.jpg',
     description: 'Elegante Blütenpracht. Braucht hellen Standort ohne direkte Sonne und hohe Luftfeuchtigkeit.',
     location: 'partial-shade',
     careInfo: {
@@ -118,6 +140,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Basilikum',
     scientificName: 'Ocimum basilicum',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/09/Ocimum_basilicum.jpg',
     description: 'Aromatisches Küchenkraut. Braucht viel Sonne und regelmäßiges Gießen.',
     location: 'sun',
     careInfo: {
@@ -134,6 +157,8 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Drachenbaum',
     scientificName: 'Dracaena marginata',
+    aliases: ['Dracaena', 'Madagaskar-Drachenbaum'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/de/Starr_061231-3049_Dracaena_marginata.jpg',
     description: 'Schlanker Baum mit schmalen Blättern, luftreinigend. Robust und pflegeleicht.',
     location: 'partial-shade',
     careInfo: {
@@ -150,6 +175,7 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Kaktus',
     scientificName: 'Cactaceae',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/7/73/Echinopsis_spachiana.jpg',
     description: 'Pflegeleichteste Zimmerpflanze überhaupt. Braucht Sonne und sehr wenig Wasser.',
     location: 'sun',
     careInfo: {
@@ -166,6 +192,8 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Sukkulente',
     scientificName: 'Echeveria',
+    aliases: ['Echeverie', 'Dickblatt'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3b/Echeveria_elegans.jpg',
     description: 'Rosettenförmige Sukkulente mit fleischigen Blättern. Ideal für sonnige Fensterbänke.',
     location: 'sun',
     careInfo: {
@@ -182,6 +210,8 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Friedenslilie',
     scientificName: 'Spathiphyllum',
+    aliases: ['Einblatt', 'Blattfahne', 'Scheidenblatt'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/bd/Spathiphyllum_cochlearispathum_RTBG.jpg',
     description: 'Elegante Schattenpflanze mit weißen Blüten. Zeigt durch hängende Blätter Durst an.',
     location: 'shade',
     careInfo: {
@@ -198,6 +228,9 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Yucca-Palme',
     scientificName: 'Yucca elephantipes',
+    aliases: ['Yucca', 'Palmlilie', 'Riesen-Palmlilie'],
+    imageUrl:
+      'https://upload.wikimedia.org/wikipedia/commons/b/bd/Yucca_gigantea_-_Jard%C3%ADn_Bot%C3%A1nico_Canario_Viera_y_Clavijo_-_Gran_Canaria.jpg',
     description: 'Markante Zimmerpflanze mit schwertförmigen Blättern auf einem dicken Stamm.',
     location: 'sun',
     careInfo: {
@@ -214,6 +247,8 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Grünlilie',
     scientificName: 'Chlorophytum comosum',
+    aliases: ['Chlorophytum', 'Graslilie', 'Spinnenpflanze'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6c/Chlorophytum_comosum_01.jpg',
     description: 'Unverwüstliche Hängepflanze mit grün-weiß gestreiften Blättern. Ideal für Anfänger.',
     location: 'partial-shade',
     careInfo: {
@@ -230,6 +265,8 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
   {
     name: 'Zimmerlinde',
     scientificName: 'Sparrmannia africana',
+    imageUrl:
+      'https://upload.wikimedia.org/wikipedia/commons/e/e4/Sparrmannia_Africana_-_Tiliaceae_-_%28kamerlinde%29_Nationale_Plantentuin_Meise_10-01-2010_14-03-47.JPG',
     description: 'Großblättrige Zimmerpflanze mit weißen Blüten. Wächst schnell und braucht viel Platz.',
     location: 'partial-shade',
     careInfo: {
@@ -239,6 +276,271 @@ export const PLANT_TEMPLATES: PlantTemplate[] = [
       fertilizingTips: 'Wachstumsphase alle zwei Wochen mit Flüssigdünger.',
       locationTips: 'Heller Standort ohne direkte Mittagssonne. Im Sommer auch draußen.',
       temperature: { min: 12, max: 24 },
+      humidity: 'medium',
+    },
+    diseases: [],
+  },
+  {
+    name: 'Philodendron',
+    scientificName: 'Philodendron hederaceum',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Philodendron_scandens_subsp_oxycardium1.jpg',
+    description: 'Robuste Kletterpflanze mit herzförmigen Blättern. Wächst schnell und ist sehr anpassungsfähig.',
+    location: 'partial-shade',
+    careInfo: {
+      wateringFrequencyDays: 7,
+      wateringTips: 'Obere Erdschicht antrocknen lassen, dann gründlich gießen. Im Winter weniger.',
+      fertilizingFrequencyDays: 14,
+      fertilizingTips: 'Frühling bis Herbst alle zwei Wochen mit Grünpflanzendünger.',
+      locationTips: 'Helles bis halbschattiges Licht. Verträgt auch weniger Licht.',
+      temperature: { min: 16, max: 28 },
+      humidity: 'medium',
+    },
+    diseases: [],
+  },
+  {
+    name: 'Calathea',
+    scientificName: 'Calathea orbifolia',
+    aliases: ['Korbmarante', 'Pfauenpflanze', 'Schattenblume'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e2/Gardenology.org-IMG_1398_rbgs10dec.jpg',
+    description: 'Kunstvoll gemusterte Blätter. Anspruchsvoll, aber ein echter Blickfang.',
+    location: 'shade',
+    careInfo: {
+      wateringFrequencyDays: 5,
+      wateringTips: 'Gleichmäßig feucht halten, nie nass. Nur weiches oder gefiltertes Wasser.',
+      fertilizingFrequencyDays: 14,
+      fertilizingTips: 'Frühling bis Herbst alle zwei Wochen mit verdünntem Grünpflanzendünger.',
+      locationTips: 'Kein direktes Sonnenlicht. Feuchter, schattiger Standort ideal.',
+      temperature: { min: 18, max: 26 },
+      humidity: 'high',
+    },
+    diseases: [],
+  },
+  {
+    name: 'Geldbaum',
+    scientificName: 'Crassula ovata',
+    aliases: ['Pfennigbaum', 'Glücksbaum', 'Dickblatt', 'Crassula'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Crassula_ovata_700.jpg',
+    description: 'Sukkulente mit dicken, glänzenden Blättern. Gilt als Glücksbringer und wird sehr alt.',
+    location: 'sun',
+    careInfo: {
+      wateringFrequencyDays: 14,
+      wateringTips: 'Sparsam gießen, Erde vollständig abtrocknen lassen. Im Winter fast kein Wasser.',
+      fertilizingFrequencyDays: 30,
+      fertilizingTips: 'Einmal monatlich von April bis September mit Sukkulentendünger.',
+      locationTips: 'Heller, sonniger Standort. Verträgt direkte Sonne gut.',
+      temperature: { min: 10, max: 28 },
+      humidity: 'low',
+    },
+    diseases: [],
+  },
+  {
+    name: 'Schwertfarn',
+    scientificName: 'Nephrolepis exaltata',
+    aliases: ['Nephrolepis', 'Zimmerfarn', 'Boston-Farn'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/f/f7/Nephrolepis_exaltata_indoor0705c.jpg',
+    description: 'Klassische Hängepflanze mit langen, herabhängenden Wedeln. Liebt hohe Luftfeuchtigkeit.',
+    location: 'partial-shade',
+    careInfo: {
+      wateringFrequencyDays: 4,
+      wateringTips: 'Erde immer leicht feucht halten – Farne mögen keine Trockenheit. Regelmäßig besprühen.',
+      fertilizingFrequencyDays: 14,
+      fertilizingTips: 'Alle zwei Wochen von April bis September mit verdünntem Flüssigdünger.',
+      locationTips: 'Halbschattig, hohe Luftfeuchtigkeit. Ideal für Badezimmer.',
+      temperature: { min: 15, max: 24 },
+      humidity: 'high',
+    },
+    diseases: [],
+  },
+  {
+    name: 'Dieffenbachie',
+    scientificName: 'Dieffenbachia seguine',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/99/Dieffenbachia_bauseii_a1.jpg',
+    description: 'Große, grün-weiß gemusterte Blätter. Achtung: Der Pflanzensaft ist giftig.',
+    location: 'partial-shade',
+    careInfo: {
+      wateringFrequencyDays: 7,
+      wateringTips: 'Gleichmäßig feucht halten, keine Staunässe. Im Winter weniger gießen.',
+      fertilizingFrequencyDays: 14,
+      fertilizingTips: 'Alle zwei Wochen von März bis Oktober mit Grünpflanzendünger.',
+      locationTips: 'Helles, indirektes Licht. Keine direkte Sonne.',
+      temperature: { min: 18, max: 28 },
+      humidity: 'medium',
+    },
+    diseases: [],
+  },
+  {
+    name: 'Flamingoblume',
+    scientificName: 'Anthurium andreanum',
+    aliases: ['Anthurie', 'Anthurium', 'Flamingblume'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/a/a8/Anthurium_andraeanum.jpg',
+    description: 'Lackartig glänzende rote oder pinke Hochblätter. Blüht bei guter Pflege fast ganzjährig.',
+    location: 'partial-shade',
+    careInfo: {
+      wateringFrequencyDays: 7,
+      wateringTips: 'Erde gleichmäßig feucht halten, nie austrocknen lassen. Regelmäßig besprühen.',
+      fertilizingFrequencyDays: 14,
+      fertilizingTips: 'Alle zwei Wochen mit Blühpflanzendünger von März bis Oktober.',
+      locationTips: 'Helles, indirektes Licht ohne direkte Sonne. Keine Zugluft.',
+      temperature: { min: 18, max: 28 },
+      humidity: 'high',
+    },
+    diseases: [],
+  },
+  {
+    name: 'Strelitzie',
+    scientificName: 'Strelitzia reginae',
+    aliases: ['Paradiesvogelblume', 'Papageienblume'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2d/Strelitzia_reginae_DSC_0013.JPG',
+    description: 'Tropisches Highlight mit Blüten wie Paradiesvögel. Braucht viel Licht und Platz.',
+    location: 'sun',
+    careInfo: {
+      wateringFrequencyDays: 10,
+      wateringTips: 'Mäßig gießen, Erde zwischen den Gaben leicht abtrocknen lassen. Im Winter weniger.',
+      fertilizingFrequencyDays: 14,
+      fertilizingTips: 'Von März bis September alle zwei Wochen mit Blühpflanzendünger.',
+      locationTips: 'Sehr heller, sonniger Standort. Sommer gerne draußen.',
+      temperature: { min: 12, max: 28 },
+      humidity: 'medium',
+    },
+    diseases: [],
+  },
+  {
+    name: 'Elefantenohr',
+    scientificName: 'Alocasia macrorrhiza',
+    aliases: ['Alocasia', 'Pfeilblatt', 'Riesenblatt'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/5/5a/Alocasia_augustiana_ies.jpg',
+    description: 'Riesige, herzförmige Blätter. Tropische Schönheit für helle, feuchte Räume.',
+    location: 'partial-shade',
+    careInfo: {
+      wateringFrequencyDays: 5,
+      wateringTips: 'Erde gleichmäßig feucht halten, nicht austrocknen lassen, keine Staunässe.',
+      fertilizingFrequencyDays: 14,
+      fertilizingTips: 'Alle zwei Wochen von März bis September mit Grünpflanzendünger.',
+      locationTips: 'Helles, indirektes Licht. Keine direkte Sonne.',
+      temperature: { min: 18, max: 28 },
+      humidity: 'high',
+    },
+    diseases: [],
+  },
+  {
+    name: 'Bromelie',
+    scientificName: 'Guzmania lingulata',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/09/Guzmania_lingulata.jpg',
+    description: 'Leuchtend farbige Hochblätter. Tropisch, pflegeleicht und langlebig.',
+    location: 'partial-shade',
+    careInfo: {
+      wateringFrequencyDays: 7,
+      wateringTips: 'Wasser in die Blatttrichter füllen und alle 2 Wochen wechseln. Erde nur leicht feucht.',
+      fertilizingFrequencyDays: 30,
+      fertilizingTips: 'Einmal monatlich verdünnten Flüssigdünger in die Trichter geben.',
+      locationTips: 'Helles, indirektes Licht. Keine direkte Mittagssonne.',
+      temperature: { min: 18, max: 28 },
+      humidity: 'high',
+    },
+    diseases: [],
+  },
+  {
+    name: 'Perlenschnur',
+    scientificName: 'Senecio rowleyanus',
+    aliases: ['Erbsenpflanze', 'Senecio', 'Perlenkette'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/3/3b/Senecio_rowleyanus.jpg',
+    description: 'Außergewöhnliche Sukkulente mit kugeligen Blättern an langen Trieben. Toll als Hängepflanze.',
+    location: 'sun',
+    careInfo: {
+      wateringFrequencyDays: 14,
+      wateringTips: 'Sehr selten gießen – nur wenn Perlen schrumpelig werden. Erde vollständig abtrocknen lassen.',
+      fertilizingFrequencyDays: 30,
+      fertilizingTips: 'Einmal monatlich im Sommer mit stark verdünntem Sukkulentendünger.',
+      locationTips: 'Helles bis sonniges Fensterbrett, verträgt Direktsonne.',
+      temperature: { min: 10, max: 28 },
+      humidity: 'low',
+    },
+    diseases: [],
+  },
+  {
+    name: 'Rosmarin',
+    scientificName: 'Salvia rosmarinus',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/1/1a/Rosmarinus_officinalis_2.jpg',
+    description: 'Aromatisches Küchenkraut mit nadelartigen Blättern. Braucht viel Sonne, verträgt Trockenheit.',
+    location: 'sun',
+    careInfo: {
+      wateringFrequencyDays: 7,
+      wateringTips: 'Mäßig gießen, Erde leicht antrocknen lassen. Staunässe ist tödlich.',
+      fertilizingFrequencyDays: 21,
+      fertilizingTips: 'Alle drei Wochen von März bis September mit Kräuterdünger.',
+      locationTips: 'Vollsonniger Standort. Liebt Südbalkon oder Küchenfenster.',
+      temperature: { min: 5, max: 30 },
+      humidity: 'low',
+    },
+    diseases: [],
+  },
+  {
+    name: 'Pfefferminze',
+    scientificName: 'Mentha × piperita',
+    aliases: ['Minze', 'Mentha'],
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e0/Mentha_%C3%97_piperita%E2%80%93IMG_6075.jpg',
+    description: 'Vielseitiges Küchenkraut für Tee und Kochen. Wächst schnell, braucht regelmäßiges Ernten.',
+    location: 'partial-shade',
+    careInfo: {
+      wateringFrequencyDays: 3,
+      wateringTips: 'Gleichmäßig feucht halten, keine Staunässe. Lieber öfter wenig als selten viel.',
+      fertilizingFrequencyDays: 14,
+      fertilizingTips: 'Alle zwei Wochen mit Kräuterdünger in halber Dosierung.',
+      locationTips: 'Halbschattiger Standort, verträgt auch etwas Sonne.',
+      temperature: { min: 8, max: 25 },
+      humidity: 'medium',
+    },
+    diseases: [],
+  },
+  {
+    name: 'Lavendel',
+    scientificName: 'Lavandula angustifolia',
+    imageUrl:
+      'https://upload.wikimedia.org/wikipedia/commons/9/9e/LAVANDULA_ANGUSTIFOLIA_-_B%C3%92FIA_-_IB-409_%28Esp%C3%ADgol%29.JPG',
+    description: 'Duftet herrlich und beruhigt. Als Topfpflanze auf Balkon oder Fensterbank ein Mittelmeer-Flair.',
+    location: 'sun',
+    careInfo: {
+      wateringFrequencyDays: 7,
+      wateringTips: 'Mäßig gießen, gut abtrocknen lassen. Staunässe ist die häufigste Todesursache.',
+      fertilizingFrequencyDays: 30,
+      fertilizingTips: 'Einmal monatlich im Frühling/Sommer oder gar nicht – Lavendel mag magere Böden.',
+      locationTips: 'Vollsonniger Standort, mindestens 6 Stunden Sonne täglich.',
+      temperature: { min: -10, max: 30 },
+      humidity: 'low',
+    },
+    diseases: [],
+  },
+  {
+    name: 'Thymian',
+    scientificName: 'Thymus vulgaris',
+    imageUrl:
+      'https://upload.wikimedia.org/wikipedia/commons/7/7e/THYMUS_VULGARIS_-_AGUDA_-_IB-910_%28Tim%C3%B3%29.JPG',
+    description: 'Anspruchsloses, aromatisches Küchenkraut. Braucht viel Sonne und wenig Wasser.',
+    location: 'sun',
+    careInfo: {
+      wateringFrequencyDays: 7,
+      wateringTips: 'Mäßig gießen, Erde gut abtrocknen lassen. Lieber zu trocken als zu nass.',
+      fertilizingFrequencyDays: 30,
+      fertilizingTips: 'Sparsam düngen – zu viel Dünger mindert das Aroma.',
+      locationTips: 'Sonnigster Platz im Haus oder auf dem Balkon.',
+      temperature: { min: 5, max: 30 },
+      humidity: 'low',
+    },
+    diseases: [],
+  },
+  {
+    name: 'Chilipflanze',
+    scientificName: 'Capsicum annuum',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/91/Paprikapflanze.jpg',
+    description: 'Dekorativ und praktisch auf der Fensterbank. Mit den richtigen Sorten ganzjährig Ernte.',
+    location: 'sun',
+    careInfo: {
+      wateringFrequencyDays: 4,
+      wateringTips: 'Gleichmäßig feucht halten, keine Staunässe. Im Sommer regelmäßiger gießen.',
+      fertilizingFrequencyDays: 14,
+      fertilizingTips: 'Alle zwei Wochen mit Tomatendünger ab der Blüte.',
+      locationTips: 'Vollsonniger Standort, mindestens 6 Stunden Sonne. Südbalkon ideal.',
+      temperature: { min: 15, max: 32 },
       humidity: 'medium',
     },
     diseases: [],

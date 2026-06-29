@@ -18,13 +18,23 @@ const COLORS = ['#52B788', '#74C69D', '#B7E4C7', '#F4A261', '#E63946', '#2D6A4F'
 const PIECES = Array.from({ length: 20 }, (_, i) => ({
   id: i,
   color: COLORS[i % COLORS.length],
-  startX: (Math.sin(i * 1.3) * 120),
-  startY: (Math.cos(i * 1.7) * 80),
+  startX: Math.sin(i * 1.3) * 120,
+  startY: Math.cos(i * 1.7) * 80,
   delay: Math.floor(i * 30),
 }))
 
-function Piece({ color, startX, startY, delay, visible }: {
-  color: string; startX: number; startY: number; delay: number; visible: boolean
+function Piece({
+  color,
+  startX,
+  startY,
+  delay,
+  visible,
+}: {
+  color: string
+  startX: number
+  startY: number
+  delay: number
+  visible: boolean
 }) {
   const opacity = useSharedValue(0)
   const translateX = useSharedValue(0)
@@ -33,16 +43,10 @@ function Piece({ color, startX, startY, delay, visible }: {
 
   useEffect(() => {
     if (visible) {
-      opacity.value = withDelay(delay, withSequence(
-        withTiming(1, { duration: 100 }),
-        withTiming(0, { duration: 600 })
-      ))
+      opacity.value = withDelay(delay, withSequence(withTiming(1, { duration: 100 }), withTiming(0, { duration: 600 })))
       translateX.value = withDelay(delay, withTiming(startX, { duration: 700 }))
       translateY.value = withDelay(delay, withTiming(startY, { duration: 700 }))
-      scale.value = withDelay(delay, withSequence(
-        withTiming(1, { duration: 150 }),
-        withTiming(0.5, { duration: 550 })
-      ))
+      scale.value = withDelay(delay, withSequence(withTiming(1, { duration: 150 }), withTiming(0.5, { duration: 550 })))
     } else {
       opacity.value = 0
       translateX.value = 0
@@ -53,11 +57,7 @@ function Piece({ color, startX, startY, delay, visible }: {
 
   const style = useAnimatedStyle(() => ({
     opacity: opacity.value,
-    transform: [
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-      { scale: scale.value },
-    ],
+    transform: [{ translateX: translateX.value }, { translateY: translateY.value }, { scale: scale.value }],
   }))
 
   return <Animated.View style={[styles.piece, { backgroundColor: color }, style]} />
@@ -76,14 +76,7 @@ export function CareConfetti({ visible, onFinish }: Props) {
   return (
     <View style={styles.container} pointerEvents="none">
       {PIECES.map((p) => (
-        <Piece
-          key={p.id}
-          color={p.color}
-          startX={p.startX}
-          startY={p.startY}
-          delay={p.delay}
-          visible={visible}
-        />
+        <Piece key={p.id} color={p.color} startX={p.startX} startY={p.startY} delay={p.delay} visible={visible} />
       ))}
     </View>
   )

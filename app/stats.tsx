@@ -1,11 +1,5 @@
 import React, { useMemo } from 'react'
-import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native'
+import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useCareLog } from '../src/hooks/useCareLog'
 import { usePlants } from '../src/contexts/PlantContext'
 import { usePreferences } from '../src/hooks/usePreferences'
@@ -29,9 +23,11 @@ export default function StatsScreen() {
 
   const thirstiestPlant = useMemo(() => {
     const counts: Record<string, number> = {}
-    monthActions.filter((a) => a.type === 'water').forEach((a) => {
-      counts[a.plantId] = (counts[a.plantId] ?? 0) + 1
-    })
+    monthActions
+      .filter((a) => a.type === 'water')
+      .forEach((a) => {
+        counts[a.plantId] = (counts[a.plantId] ?? 0) + 1
+      })
     const topId = Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0]
     return topId ? plants.find((p) => p.id === topId) : undefined
   }, [monthActions, plants])
@@ -71,16 +67,8 @@ export default function StatsScreen() {
         {/* Plant highlights */}
         <Text style={styles.sectionTitle}>{t(language, 'stats_highlights')}</Text>
         <View style={styles.highlightCards}>
-          <HighlightCard
-            icon="💧"
-            title={t(language, 'stats_thirstiest')}
-            plantName={thirstiestPlant?.name}
-          />
-          <HighlightCard
-            icon="⭐"
-            title={t(language, 'stats_most_active')}
-            plantName={mostActivePlant?.name}
-          />
+          <HighlightCard icon="💧" title={t(language, 'stats_thirstiest')} plantName={thirstiestPlant?.name} />
+          <HighlightCard icon="⭐" title={t(language, 'stats_most_active')} plantName={mostActivePlant?.name} />
         </View>
       </ScrollView>
     </SafeAreaView>

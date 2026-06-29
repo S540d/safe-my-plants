@@ -45,12 +45,8 @@ export function useStreak() {
     const log = await getCareLog()
     const yesterday = toDateStr(new Date(Date.now() - 86400000))
 
-    const hadActivityYesterday = log.some(
-      (a) => a.timestamp.slice(0, 10) === yesterday
-    )
-    const hadActivityToday = log.some(
-      (a) => a.timestamp.slice(0, 10) === today
-    )
+    const hadActivityYesterday = log.some((a) => a.timestamp.slice(0, 10) === yesterday)
+    const hadActivityToday = log.some((a) => a.timestamp.slice(0, 10) === today)
 
     let newCurrent = current.current
     if (hadActivityToday) {

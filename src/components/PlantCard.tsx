@@ -1,10 +1,10 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import React from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { LOCATION_ICONS } from '../constants/locationIcons'
 import { getCareStatus } from '../hooks/useCareStatus'
 import { useThemeColors } from '../hooks/useThemeColors'
-import { Language } from '../i18n/translations'
+import { t, Language } from '../i18n/translations'
+import { Radius, Shadow, Spacing } from '../constants/theme'
 import { Plant } from '../types/plant'
 import { TrafficLight } from './TrafficLight'
 
@@ -12,23 +12,25 @@ interface PlantCardProps {
   plant: Plant
   lang: Language
   onPress: () => void
+  onWater?: () => void
+  onFertilize?: () => void
 }
 
-export function PlantCard({ plant, lang, onPress }: PlantCardProps) {
+export function PlantCard({ plant, lang, onPress, onWater, onFertilize }: PlantCardProps) {
   const status = getCareStatus(plant)
   const hasPhoto = plant.photos.length > 0
   const colors = useThemeColors()
 
   return (
     <TouchableOpacity
-      style={[styles.card, { backgroundColor: colors.surface }]}
+      style={[styles.card, { backgroundColor: colors.surface }, Shadow.card]}
       onPress={onPress}
       activeOpacity={0.85}
     >
       {hasPhoto ? (
         <Image source={{ uri: plant.photos[0].uri }} style={styles.photo} />
       ) : (
-        <LinearGradient colors={[colors.primaryMid, colors.primaryLight]} style={styles.photoPlaceholder}>
+        <LinearGradient colors={[colors.primaryMid, colors.primaryLight]} style={styles.photo}>
           <Text style={styles.plantEmoji}>🪴</Text>
         </LinearGradient>
       )}
@@ -53,8 +55,37 @@ export function PlantCard({ plant, lang, onPress }: PlantCardProps) {
             <Text style={styles.statusLabel}>🌿</Text>
             <TrafficLight status={status.fertilizing} size={10} />
           </View>
-          <Text style={styles.locationIcon}>{LOCATION_ICONS[plant.location]}</Text>
         </View>
+        {(onWater || onFertilize) && (
+          <View style={styles.actionRow}>
+            {onWater && (
+              <TouchableOpacity
+                style={[
+                  styles.actionBtn,
+                  { backgroundColor: colors.accentSurface },
+                  status.watering === 'overdue' && { backgroundColor: colors.statusOverdueSurface },
+                ]}
+                onPress={onWater}
+                activeOpacity={0.75}
+              >
+                <Text style={[styles.actionBtnText, { color: colors.primary }]}>{t(lang, 'card_watered')}</Text>
+              </TouchableOpacity>
+            )}
+            {onFertilize && (
+              <TouchableOpacity
+                style={[
+                  styles.actionBtn,
+                  { backgroundColor: colors.accentSurface },
+                  status.fertilizing === 'overdue' && { backgroundColor: colors.statusOverdueSurface },
+                ]}
+                onPress={onFertilize}
+                activeOpacity={0.75}
+              >
+                <Text style={[styles.actionBtnText, { color: colors.primary }]}>{t(lang, 'card_fertilized')}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
       </View>
     </TouchableOpacity>
   )
@@ -63,23 +94,15 @@ export function PlantCard({ plant, lang, onPress }: PlantCardProps) {
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
-    borderRadius: 12,
-    marginHorizontal: 16,
-    marginVertical: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
+    borderRadius: Radius.lg,
+    marginHorizontal: Spacing.lg,
+    marginVertical: Spacing.xs + 1,
     overflow: 'hidden',
   },
   photo: {
     width: 80,
-    height: 80,
-  },
-  photoPlaceholder: {
-    width: 80,
-    height: 80,
+    minHeight: 80,
+    alignSelf: 'stretch',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -88,8 +111,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 12,
+    padding: Spacing.md - 2,
     justifyContent: 'space-between',
+    gap: Spacing.xs,
   },
   header: {
     flexDirection: 'row',
@@ -97,32 +121,41 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   name: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     flex: 1,
-    marginRight: 8,
+    marginRight: Spacing.sm,
   },
   scientificName: {
-    fontSize: 12,
+    fontSize: 11,
     fontStyle: 'italic',
-    marginTop: 2,
   },
   statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    marginTop: 6,
+    gap: Spacing.md - 2,
   },
   statusItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: Spacing.xs,
   },
   statusLabel: {
-    fontSize: 14,
+    fontSize: 13,
   },
-  locationIcon: {
-    fontSize: 14,
-    marginLeft: 'auto',
+  actionRow: {
+    flexDirection: 'row',
+    gap: Spacing.xs + 2,
+    marginTop: Spacing.xs,
+  },
+  actionBtn: {
+    flex: 1,
+    borderRadius: Radius.sm,
+    paddingVertical: Spacing.xs + 1,
+    alignItems: 'center',
+  },
+  actionBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
   },
 })

@@ -23,7 +23,7 @@ export function SearchBar({ value, onChangeText, placeholder }: Props) {
     () => () => {
       if (timer.current) clearTimeout(timer.current)
     },
-    [],
+    []
   )
 
   function handleChange(text: string) {

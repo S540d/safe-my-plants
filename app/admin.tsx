@@ -66,7 +66,15 @@ function PinGuard({ lang, adminPin, onUnlock }: { lang: 'de' | 'en'; adminPin: s
   return (
     <View style={pinStyles.container}>
       <Text style={pinStyles.emoji}>🔐</Text>
-      <Text style={pinStyles.title}>{isFirstTime ? (lang === 'de' ? 'Admin-PIN festlegen' : 'Set Admin PIN') : (lang === 'de' ? 'Admin-PIN eingeben' : 'Enter Admin PIN')}</Text>
+      <Text style={pinStyles.title}>
+        {isFirstTime
+          ? lang === 'de'
+            ? 'Admin-PIN festlegen'
+            : 'Set Admin PIN'
+          : lang === 'de'
+            ? 'Admin-PIN eingeben'
+            : 'Enter Admin PIN'}
+      </Text>
       <TextInput
         style={pinStyles.input}
         placeholder={lang === 'de' ? '4-stellige PIN' : '4-digit PIN'}
@@ -74,7 +82,10 @@ function PinGuard({ lang, adminPin, onUnlock }: { lang: 'de' | 'en'; adminPin: s
         maxLength={4}
         secureTextEntry
         value={pin}
-        onChangeText={(v) => { setPin(v); setError('') }}
+        onChangeText={(v) => {
+          setPin(v)
+          setError('')
+        }}
       />
       {isFirstTime && (
         <TextInput
@@ -84,7 +95,10 @@ function PinGuard({ lang, adminPin, onUnlock }: { lang: 'de' | 'en'; adminPin: s
           maxLength={4}
           secureTextEntry
           value={confirm}
-          onChangeText={(v) => { setConfirm(v); setError('') }}
+          onChangeText={(v) => {
+            setConfirm(v)
+            setError('')
+          }}
         />
       )}
       {error ? <Text style={pinStyles.error}>{error}</Text> : null}
@@ -175,19 +189,42 @@ function PlantForm({ lang, initial, onSave, onCancel }: PlantFormProps) {
         <SectionLabel text={L('Pflanzendaten', 'Plant Info')} />
 
         <Label text={L('Name *', 'Name *')} />
-        <TextInput style={formStyles.input} value={plant.name} onChangeText={(v) => set({ name: v })} placeholder={L('z.B. Monstera', 'e.g. Monstera')} />
+        <TextInput
+          style={formStyles.input}
+          value={plant.name}
+          onChangeText={(v) => set({ name: v })}
+          placeholder={L('z.B. Monstera', 'e.g. Monstera')}
+        />
 
         <Label text={L('Wissenschaftlicher Name', 'Scientific Name')} />
-        <TextInput style={formStyles.input} value={plant.scientificName} onChangeText={(v) => set({ scientificName: v })} placeholder="Monstera deliciosa" />
+        <TextInput
+          style={formStyles.input}
+          value={plant.scientificName}
+          onChangeText={(v) => set({ scientificName: v })}
+          placeholder="Monstera deliciosa"
+        />
 
         <Label text={L('Beschreibung', 'Description')} />
-        <TextInput style={[formStyles.input, formStyles.multiline]} value={plant.description} onChangeText={(v) => set({ description: v })} multiline numberOfLines={3} placeholder={L('Kurze Beschreibung der Pflanze...', 'Short plant description...')} />
+        <TextInput
+          style={[formStyles.input, formStyles.multiline]}
+          value={plant.description}
+          onChangeText={(v) => set({ description: v })}
+          multiline
+          numberOfLines={3}
+          placeholder={L('Kurze Beschreibung der Pflanze...', 'Short plant description...')}
+        />
 
         <SectionLabel text={L('Standort', 'Location')} />
         <View style={formStyles.chipRow}>
           {LOCATIONS.map((loc) => (
-            <TouchableOpacity key={loc} style={[formStyles.chip, plant.location === loc && formStyles.chipActive]} onPress={() => set({ location: loc })}>
-              <Text style={[formStyles.chipText, plant.location === loc && formStyles.chipTextActive]}>{LOCATION_LABELS[lang][loc]}</Text>
+            <TouchableOpacity
+              key={loc}
+              style={[formStyles.chip, plant.location === loc && formStyles.chipActive]}
+              onPress={() => set({ location: loc })}
+            >
+              <Text style={[formStyles.chipText, plant.location === loc && formStyles.chipTextActive]}>
+                {LOCATION_LABELS[lang][loc]}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -195,30 +232,72 @@ function PlantForm({ lang, initial, onSave, onCancel }: PlantFormProps) {
         <SectionLabel text={L('Pflege', 'Care')} />
 
         <Label text={L('Gießintervall (Tage)', 'Watering interval (days)')} />
-        <TextInput style={formStyles.input} value={String(plant.careInfo.wateringFrequencyDays)} onChangeText={(v) => setCare({ wateringFrequencyDays: parseInt(v) || 7 })} keyboardType="number-pad" />
+        <TextInput
+          style={formStyles.input}
+          value={String(plant.careInfo.wateringFrequencyDays)}
+          onChangeText={(v) => setCare({ wateringFrequencyDays: parseInt(v) || 7 })}
+          keyboardType="number-pad"
+        />
 
         <Label text={L('Gießtipps', 'Watering tips')} />
-        <TextInput style={[formStyles.input, formStyles.multiline]} value={plant.careInfo.wateringTips} onChangeText={(v) => setCare({ wateringTips: v })} multiline numberOfLines={2} />
+        <TextInput
+          style={[formStyles.input, formStyles.multiline]}
+          value={plant.careInfo.wateringTips}
+          onChangeText={(v) => setCare({ wateringTips: v })}
+          multiline
+          numberOfLines={2}
+        />
 
         <Label text={L('Düngintervall (Tage)', 'Fertilizing interval (days)')} />
-        <TextInput style={formStyles.input} value={String(plant.careInfo.fertilizingFrequencyDays)} onChangeText={(v) => setCare({ fertilizingFrequencyDays: parseInt(v) || 14 })} keyboardType="number-pad" />
+        <TextInput
+          style={formStyles.input}
+          value={String(plant.careInfo.fertilizingFrequencyDays)}
+          onChangeText={(v) => setCare({ fertilizingFrequencyDays: parseInt(v) || 14 })}
+          keyboardType="number-pad"
+        />
 
         <Label text={L('Düngetipps', 'Fertilizing tips')} />
-        <TextInput style={[formStyles.input, formStyles.multiline]} value={plant.careInfo.fertilizingTips} onChangeText={(v) => setCare({ fertilizingTips: v })} multiline numberOfLines={2} />
+        <TextInput
+          style={[formStyles.input, formStyles.multiline]}
+          value={plant.careInfo.fertilizingTips}
+          onChangeText={(v) => setCare({ fertilizingTips: v })}
+          multiline
+          numberOfLines={2}
+        />
 
         <Label text={L('Standorttipps', 'Location tips')} />
-        <TextInput style={[formStyles.input, formStyles.multiline]} value={plant.careInfo.locationTips} onChangeText={(v) => setCare({ locationTips: v })} multiline numberOfLines={2} />
+        <TextInput
+          style={[formStyles.input, formStyles.multiline]}
+          value={plant.careInfo.locationTips}
+          onChangeText={(v) => setCare({ locationTips: v })}
+          multiline
+          numberOfLines={2}
+        />
 
         <Label text={L('Temperatur min (°C)', 'Temperature min (°C)')} />
-        <TextInput style={formStyles.input} value={String(plant.careInfo.temperature.min)} onChangeText={(v) => setCare({ temperature: { ...plant.careInfo.temperature, min: parseInt(v) || 0 } })} keyboardType="number-pad" />
+        <TextInput
+          style={formStyles.input}
+          value={String(plant.careInfo.temperature.min)}
+          onChangeText={(v) => setCare({ temperature: { ...plant.careInfo.temperature, min: parseInt(v) || 0 } })}
+          keyboardType="number-pad"
+        />
 
         <Label text={L('Temperatur max (°C)', 'Temperature max (°C)')} />
-        <TextInput style={formStyles.input} value={String(plant.careInfo.temperature.max)} onChangeText={(v) => setCare({ temperature: { ...plant.careInfo.temperature, max: parseInt(v) || 30 } })} keyboardType="number-pad" />
+        <TextInput
+          style={formStyles.input}
+          value={String(plant.careInfo.temperature.max)}
+          onChangeText={(v) => setCare({ temperature: { ...plant.careInfo.temperature, max: parseInt(v) || 30 } })}
+          keyboardType="number-pad"
+        />
 
         <Label text={L('Luftfeuchtigkeit', 'Humidity')} />
         <View style={formStyles.chipRow}>
           {(['low', 'medium', 'high'] as const).map((h) => (
-            <TouchableOpacity key={h} style={[formStyles.chip, plant.careInfo.humidity === h && formStyles.chipActive]} onPress={() => setCare({ humidity: h })}>
+            <TouchableOpacity
+              key={h}
+              style={[formStyles.chip, plant.careInfo.humidity === h && formStyles.chipActive]}
+              onPress={() => setCare({ humidity: h })}
+            >
               <Text style={[formStyles.chipText, plant.careInfo.humidity === h && formStyles.chipTextActive]}>
                 {h === 'low' ? L('Niedrig', 'Low') : h === 'medium' ? L('Mittel', 'Medium') : L('Hoch', 'High')}
               </Text>
@@ -254,11 +333,27 @@ function PlantForm({ lang, initial, onSave, onCancel }: PlantFormProps) {
         {newDisease ? (
           <View style={formStyles.diseaseForm}>
             <Label text={L('Krankheitsname', 'Disease name')} />
-            <TextInput style={formStyles.input} value={newDisease.name} onChangeText={(v) => setNewDisease({ ...newDisease, name: v })} />
+            <TextInput
+              style={formStyles.input}
+              value={newDisease.name}
+              onChangeText={(v) => setNewDisease({ ...newDisease, name: v })}
+            />
             <Label text={L('Symptome', 'Symptoms')} />
-            <TextInput style={[formStyles.input, formStyles.multiline]} value={newDisease.symptoms} onChangeText={(v) => setNewDisease({ ...newDisease, symptoms: v })} multiline numberOfLines={2} />
+            <TextInput
+              style={[formStyles.input, formStyles.multiline]}
+              value={newDisease.symptoms}
+              onChangeText={(v) => setNewDisease({ ...newDisease, symptoms: v })}
+              multiline
+              numberOfLines={2}
+            />
             <Label text={L('Behandlung', 'Treatment')} />
-            <TextInput style={[formStyles.input, formStyles.multiline]} value={newDisease.treatment} onChangeText={(v) => setNewDisease({ ...newDisease, treatment: v })} multiline numberOfLines={2} />
+            <TextInput
+              style={[formStyles.input, formStyles.multiline]}
+              value={newDisease.treatment}
+              onChangeText={(v) => setNewDisease({ ...newDisease, treatment: v })}
+              multiline
+              numberOfLines={2}
+            />
             <View style={formStyles.row}>
               <TouchableOpacity style={[formStyles.btn, formStyles.btnSecondary]} onPress={() => setNewDisease(null)}>
                 <Text style={formStyles.btnSecondaryText}>{L('Abbrechen', 'Cancel')}</Text>
@@ -306,9 +401,10 @@ interface TemplatesModalProps {
 
 function TemplatesModal({ lang, visible, onSelect, onClose }: TemplatesModalProps) {
   const [query, setQuery] = useState('')
-  const filtered = PLANT_TEMPLATES.filter((t) =>
-    t.name.toLowerCase().includes(query.toLowerCase()) ||
-    (t.scientificName ?? '').toLowerCase().includes(query.toLowerCase())
+  const filtered = PLANT_TEMPLATES.filter(
+    (t) =>
+      t.name.toLowerCase().includes(query.toLowerCase()) ||
+      (t.scientificName ?? '').toLowerCase().includes(query.toLowerCase())
   )
 
   return (
@@ -335,9 +431,7 @@ function TemplatesModal({ lang, visible, onSelect, onClose }: TemplatesModalProp
             <TouchableOpacity style={tmStyles.row} onPress={() => onSelect(item)}>
               <View style={tmStyles.rowContent}>
                 <Text style={tmStyles.rowName}>{item.name}</Text>
-                {item.scientificName ? (
-                  <Text style={tmStyles.rowScientific}>{item.scientificName}</Text>
-                ) : null}
+                {item.scientificName ? <Text style={tmStyles.rowScientific}>{item.scientificName}</Text> : null}
                 <Text style={tmStyles.rowMeta}>
                   💧 {item.careInfo.wateringFrequencyDays}d · 🌿 {item.careInfo.fertilizingFrequencyDays}d
                 </Text>
@@ -354,23 +448,38 @@ function TemplatesModal({ lang, visible, onSelect, onClose }: TemplatesModalProp
 const tmStyles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F0FFF4' },
   header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    padding: 16, borderBottomWidth: 1, borderBottomColor: '#D8F3DC',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#D8F3DC',
   },
   title: { fontSize: 20, fontWeight: '700', color: '#1B4332' },
   closeBtn: { padding: 6 },
   closeBtnText: { fontSize: 20, color: '#74C69D' },
   searchInput: {
-    margin: 12, borderWidth: 1.5, borderColor: '#B7E4C7',
-    borderRadius: 10, padding: 10, fontSize: 15,
-    backgroundColor: '#fff', color: '#1A1A1A',
+    margin: 12,
+    borderWidth: 1.5,
+    borderColor: '#B7E4C7',
+    borderRadius: 10,
+    padding: 10,
+    fontSize: 15,
+    backgroundColor: '#fff',
+    color: '#1A1A1A',
   },
   list: { padding: 12, gap: 8 },
   row: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 14,
-    flexDirection: 'row', alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
   rowContent: { flex: 1 },
   rowName: { fontSize: 16, fontWeight: '600', color: '#1B4332' },
@@ -424,7 +533,10 @@ export default function AdminScreen() {
         </LinearGradient>
         <PlantForm
           lang={lang}
-          onSave={async (p) => { await addPlant(p); setCreating(false) }}
+          onSave={async (p) => {
+            await addPlant(p)
+            setCreating(false)
+          }}
           onCancel={() => setCreating(false)}
         />
       </SafeAreaView>
@@ -440,7 +552,10 @@ export default function AdminScreen() {
         <PlantForm
           lang={lang}
           initial={editing}
-          onSave={async (p) => { await updatePlant(p); setEditing(null) }}
+          onSave={async (p) => {
+            await updatePlant(p)
+            setEditing(null)
+          }}
           onCancel={() => setEditing(null)}
         />
       </SafeAreaView>
@@ -475,11 +590,15 @@ export default function AdminScreen() {
           <Text style={styles.addBtnText}>+ {lang === 'de' ? 'Neue Pflanze' : 'New Plant'}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.templateBtn} onPress={() => setShowTemplates(true)}>
-          <Text style={styles.templateBtnText}>📋 {lang === 'de' ? 'Aus Vorlage hinzufügen' : 'Add from template'}</Text>
+          <Text style={styles.templateBtnText}>
+            📋 {lang === 'de' ? 'Aus Vorlage hinzufügen' : 'Add from template'}
+          </Text>
         </TouchableOpacity>
         {plants.map((plant) => (
           <View key={plant.id} style={styles.plantRow}>
-            <Text style={styles.plantName} numberOfLines={1}>{plant.name}</Text>
+            <Text style={styles.plantName} numberOfLines={1}>
+              {plant.name}
+            </Text>
             <View style={styles.plantActions}>
               <TouchableOpacity style={styles.editBtn} onPress={() => setEditing(plant)}>
                 <Text style={styles.editBtnText}>✏️</Text>
@@ -506,22 +625,35 @@ const styles = StyleSheet.create({
   headerSub: { fontSize: 14, color: '#B7E4C7', marginTop: 2 },
   scroll: { padding: 16 },
   addBtn: {
-    backgroundColor: '#2D6A4F', borderRadius: 12,
-    padding: 14, alignItems: 'center', marginBottom: 8,
+    backgroundColor: '#2D6A4F',
+    borderRadius: 12,
+    padding: 14,
+    alignItems: 'center',
+    marginBottom: 8,
   },
   addBtnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   templateBtn: {
-    backgroundColor: '#D8F3DC', borderRadius: 12,
-    padding: 14, alignItems: 'center', marginBottom: 16,
-    borderWidth: 1.5, borderColor: '#52B788',
+    backgroundColor: '#D8F3DC',
+    borderRadius: 12,
+    padding: 14,
+    alignItems: 'center',
+    marginBottom: 16,
+    borderWidth: 1.5,
+    borderColor: '#52B788',
   },
   templateBtnText: { color: '#1B4332', fontSize: 15, fontWeight: '600' },
   plantRow: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 14,
-    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 8,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
   },
   plantName: { flex: 1, fontSize: 16, color: '#1B4332', fontWeight: '500' },
   plantActions: { flexDirection: 'row', gap: 8 },
@@ -530,26 +662,41 @@ const styles = StyleSheet.create({
   deleteBtn: { padding: 6 },
   deleteBtnText: { fontSize: 18 },
   lockBtn: {
-    marginTop: 24, padding: 12, alignItems: 'center',
+    marginTop: 24,
+    padding: 12,
+    alignItems: 'center',
   },
   lockBtnText: { fontSize: 14, color: '#74C69D' },
 })
 
 const pinStyles = StyleSheet.create({
   container: {
-    flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 32,
   },
   emoji: { fontSize: 56, marginBottom: 16 },
   title: { fontSize: 20, fontWeight: '700', color: '#1B4332', marginBottom: 20, textAlign: 'center' },
   input: {
-    width: '100%', borderWidth: 1.5, borderColor: '#B7E4C7',
-    borderRadius: 10, padding: 12, fontSize: 20, textAlign: 'center',
-    backgroundColor: '#fff', marginBottom: 12, letterSpacing: 8,
+    width: '100%',
+    borderWidth: 1.5,
+    borderColor: '#B7E4C7',
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 20,
+    textAlign: 'center',
+    backgroundColor: '#fff',
+    marginBottom: 12,
+    letterSpacing: 8,
   },
   error: { color: '#E63946', fontSize: 14, marginBottom: 8 },
   btn: {
-    backgroundColor: '#2D6A4F', borderRadius: 10,
-    paddingVertical: 12, paddingHorizontal: 40, marginTop: 8,
+    backgroundColor: '#2D6A4F',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 40,
+    marginTop: 8,
   },
   btnText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 })
@@ -557,20 +704,32 @@ const pinStyles = StyleSheet.create({
 const formStyles = StyleSheet.create({
   scroll: { padding: 16 },
   sectionLabel: {
-    fontSize: 12, fontWeight: '700', color: '#52B788',
-    textTransform: 'uppercase', letterSpacing: 0.8,
-    marginTop: 20, marginBottom: 8,
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#52B788',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginTop: 20,
+    marginBottom: 8,
   },
   label: { fontSize: 13, color: '#666', marginBottom: 4, marginTop: 10 },
   input: {
-    borderWidth: 1.5, borderColor: '#B7E4C7', borderRadius: 8,
-    padding: 10, fontSize: 15, backgroundColor: '#fff',
+    borderWidth: 1.5,
+    borderColor: '#B7E4C7',
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 15,
+    backgroundColor: '#fff',
   },
   multiline: { minHeight: 70, textAlignVertical: 'top' },
   chipRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   chip: {
-    paddingHorizontal: 12, paddingVertical: 7, borderRadius: 18,
-    borderWidth: 1.5, borderColor: '#B7E4C7', backgroundColor: '#fff',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    borderColor: '#B7E4C7',
+    backgroundColor: '#fff',
   },
   chipActive: { backgroundColor: '#2D6A4F', borderColor: '#2D6A4F' },
   chipText: { fontSize: 13, color: '#2D6A4F' },
@@ -579,31 +738,56 @@ const formStyles = StyleSheet.create({
   photoWrapper: { position: 'relative' },
   photo: { width: 80, height: 80, borderRadius: 8 },
   removePhoto: {
-    position: 'absolute', top: -6, right: -6,
-    backgroundColor: '#E63946', borderRadius: 10, width: 20, height: 20,
-    alignItems: 'center', justifyContent: 'center',
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    backgroundColor: '#E63946',
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   removePhotoText: { color: '#fff', fontSize: 11, fontWeight: '700' },
   addPhotoBtn: {
-    width: 80, height: 80, borderRadius: 8,
-    borderWidth: 2, borderColor: '#B7E4C7', borderStyle: 'dashed',
-    alignItems: 'center', justifyContent: 'center',
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#B7E4C7',
+    borderStyle: 'dashed',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#F0FFF4',
   },
   addPhotoText: { fontSize: 28, color: '#52B788' },
   diseaseChip: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    backgroundColor: '#FFF9F0', borderRadius: 8, padding: 10,
-    marginBottom: 6, borderLeftWidth: 3, borderLeftColor: '#F4A261',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#FFF9F0',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 6,
+    borderLeftWidth: 3,
+    borderLeftColor: '#F4A261',
   },
   diseaseChipText: { fontSize: 14, color: '#1B4332' },
   diseaseForm: {
-    backgroundColor: '#fff', borderRadius: 12, padding: 12, marginBottom: 8,
-    borderWidth: 1, borderColor: '#B7E4C7',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#B7E4C7',
   },
   addDiseaseBtn: {
-    padding: 10, alignItems: 'center', borderRadius: 8,
-    borderWidth: 1.5, borderColor: '#B7E4C7', borderStyle: 'dashed',
+    padding: 10,
+    alignItems: 'center',
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: '#B7E4C7',
+    borderStyle: 'dashed',
     marginTop: 4,
   },
   addDiseaseBtnText: { color: '#52B788', fontSize: 14 },
