@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useState } from 'react'
 import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { CareConfetti } from '../../src/components/CareConfetti'
 import { CareHistoryList } from '../../src/components/CareHistoryList'
 import { DiseaseCard } from '../../src/components/DiseaseCard'
 import { NotesSection } from '../../src/components/NotesSection'
@@ -32,6 +33,7 @@ export default function PlantDetailScreen() {
   const [galleryVisible, setGalleryVisible] = useState(false)
   const [galleryInitialIndex, setGalleryInitialIndex] = useState(0)
   const [showWaterDrop, setShowWaterDrop] = useState(false)
+  const [showConfetti, setShowConfetti] = useState(false)
 
   const plant = plants.find((p) => p.id === id)
 
@@ -90,7 +92,11 @@ export default function PlantDetailScreen() {
 
           {/* Quick action bar (replaces individual water/fertilize buttons) */}
           <Text style={styles.sectionTitle}>{t(lang, 'detail_quick_actions')}</Text>
-          <QuickActionBar plantId={plant.id} />
+          <QuickActionBar
+            plantId={plant.id}
+            onWater={() => setShowWaterDrop(true)}
+            onFertilize={() => setShowConfetti(true)}
+          />
 
           {/* Next care dates */}
           <View style={styles.nextCareRow}>
@@ -198,6 +204,7 @@ export default function PlantDetailScreen() {
         />
       )}
       <WaterDropAnimation visible={showWaterDrop} onFinish={() => setShowWaterDrop(false)} />
+      <CareConfetti visible={showConfetti} onFinish={() => setShowConfetti(false)} />
     </SafeAreaView>
   )
 }

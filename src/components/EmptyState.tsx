@@ -1,5 +1,6 @@
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated'
 import { useThemeColors } from '../hooks/useThemeColors'
 
 interface EmptyStateProps {
@@ -14,8 +15,10 @@ export function EmptyState({ icon, title, body, ctaLabel, onCta }: EmptyStatePro
   const colors = useThemeColors()
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.surface }]}>
-      <Text style={styles.icon}>{icon}</Text>
+    <Animated.View entering={FadeIn.duration(400)} style={[styles.card, { backgroundColor: colors.surface }]}>
+      <Animated.Text entering={ZoomIn.duration(450).delay(100).springify().damping(12)} style={styles.icon}>
+        {icon}
+      </Animated.Text>
       <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
       {body ? <Text style={[styles.body, { color: colors.textMuted }]}>{body}</Text> : null}
       {ctaLabel && onCta ? (
@@ -23,7 +26,7 @@ export function EmptyState({ icon, title, body, ctaLabel, onCta }: EmptyStatePro
           <Text style={styles.ctaLabel}>{ctaLabel}</Text>
         </TouchableOpacity>
       ) : null}
-    </View>
+    </Animated.View>
   )
 }
 
