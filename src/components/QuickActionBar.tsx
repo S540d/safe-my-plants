@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { usePlants } from '../contexts/PlantContext'
 import { useCareLog } from '../hooks/useCareLog'
 import { usePreferences } from '../hooks/usePreferences'
@@ -7,6 +8,8 @@ import { t } from '../i18n/translations'
 
 interface Props {
   plantId: string
+  onWater?: () => void
+  onFertilize?: () => void
 }
 
 const ACTIONS = [
@@ -17,7 +20,7 @@ const ACTIONS = [
   { type: 'note' as const, icon: '📝', labelKey: 'action_note' as const },
 ]
 
-export function QuickActionBar({ plantId }: Props) {
+export function QuickActionBar({ plantId, onWater, onFertilize }: Props) {
   const { markWatered, markFertilized } = usePlants()
   const { addAction } = useCareLog()
   const { language } = usePreferences()
@@ -27,8 +30,10 @@ export function QuickActionBar({ plantId }: Props) {
   const handleAction = async (type: (typeof ACTIONS)[number]['type']) => {
     if (type === 'water') {
       await markWatered(plantId)
+      onWater?.()
     } else if (type === 'fertilize') {
       await markFertilized(plantId)
+      onFertilize?.()
     } else if (type === 'note') {
       setNoteModalVisible(true)
     } else {
@@ -53,10 +58,7 @@ export function QuickActionBar({ plantId }: Props) {
         style={styles.scroll}
       >
         {ACTIONS.map(({ type, icon, labelKey }) => (
-          <TouchableOpacity key={type} style={styles.btn} onPress={() => handleAction(type)} activeOpacity={0.7}>
-            <Text style={styles.icon}>{icon}</Text>
-            <Text style={styles.label}>{t(language, labelKey)}</Text>
-          </TouchableOpacity>
+          <QuickActionButton key={type} icon={icon} label={t(language, labelKey)} onPress={() => handleAction(type)} />
         ))}
       </ScrollView>
 
@@ -92,6 +94,37 @@ export function QuickActionBar({ plantId }: Props) {
         </View>
       </Modal>
     </>
+  )
+}
+
+interface QuickActionButtonProps {
+  icon: string
+  label: string
+  onPress: () => void
+}
+
+function QuickActionButton({ icon, label, onPress }: QuickActionButtonProps) {
+  const scale = useSharedValue(1)
+  const buttonStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }))
+
+  return (
+    <Animated.View style={buttonStyle}>
+      <Pressable
+        style={styles.btn}
+        onPress={onPress}
+        onPressIn={() => {
+          scale.value = withSpring(0.92, { damping: 12, stiffness: 320 })
+        }}
+        onPressOut={() => {
+          scale.value = withSpring(1, { damping: 12, stiffness: 320 })
+        }}
+      >
+        <Text style={styles.icon}>{icon}</Text>
+        <Text style={styles.label}>{label}</Text>
+      </Pressable>
+    </Animated.View>
   )
 }
 

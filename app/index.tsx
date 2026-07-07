@@ -2,6 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import React, { useMemo } from 'react'
 import { SafeAreaView, SectionList, StyleSheet, Text, View } from 'react-native'
+import { EmptyState } from '../src/components/EmptyState'
 import { HeaderMenu } from '../src/components/HeaderMenu'
 import { PlantCard } from '../src/components/PlantCard'
 import { Radius, Spacing } from '../src/constants/theme'
@@ -69,17 +70,17 @@ export default function HomeScreen() {
 
       {plants.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyEmoji}>🪴</Text>
-          <Text style={[styles.emptyText, { color: colors.primaryLight }]}>{t(language, 'home_empty_tap')}</Text>
+          <EmptyState icon="🪴" title={t(language, 'home_empty_tap')} />
         </View>
       ) : (
         <SectionList
           sections={sections}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
+          renderItem={({ item, index }) => (
             <PlantCard
               plant={item}
               lang={language}
+              index={index}
               onPress={() => router.push(`/plant/${item.id}`)}
               onWater={() => markWatered(item.id)}
               onFertilize={() => markFertilized(item.id)}
@@ -141,14 +142,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 32,
-  },
-  emptyEmoji: {
-    fontSize: 64,
-    marginBottom: Spacing.lg,
-  },
-  emptyText: {
-    fontSize: 16,
-    textAlign: 'center',
-    lineHeight: 24,
   },
 })
