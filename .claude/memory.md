@@ -21,7 +21,10 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
 - `src/constants/defaultPlants.ts` – 3 vorinstallierte Musterpflanzen
 - `src/i18n/translations.ts` – DE/EN-Strings
 - `src/components/HeaderMenu.tsx` – ⋮-Menü oben rechts (add-plant / manage-plants / stats / settings)
-- `src/components/PlantCard.tsx` – Karte mit Inline-Buttons „💧 Gegossen" / „🌿 Gedüngt"
+- `src/components/PlantCard.tsx` – Karte mit Inline-Buttons „💧 Gegossen" / „🌿 Gedüngt", Press-Scale + gestaffelte Eintritts-Animation (Reanimated)
+- `src/components/QuickActionBar.tsx` – Aktionsleiste im Plant-Detail (water/fertilize/repot/prune/note), Press-Scale-Buttons, `onWater`/`onFertilize`-Callbacks
+- `src/components/WaterDropAnimation.tsx`, `src/components/CareConfetti.tsx` – Reanimated-Effekte, ausgelöst über `QuickActionBar`-Callbacks im Plant-Detail-Screen (seit PR #82)
+- `src/components/EmptyState.tsx` – wiederverwendbarer Leerzustand mit Fade-/Zoom-Eintrittsanimation, genutzt in `index.tsx` und `manage-plants.tsx`
 
 ## Entscheidungen & Einschränkungen
 
@@ -49,7 +52,8 @@ Kein Tab-Footer mehr. Alle Screens über Stack-Navigation:
 | `smp-language` | `'de' \| 'en'` |
 | `smp-theme` | `'light' \| 'dark' \| 'system'` |
 | `smp-carelog` | `CareAction[]` |
-| `smp-schema-version` | `number` (aktuell: **4**) |
+| `smp-schema-version` | `number` (aktuell: **5**) |
+| `smp-reminders` | `ReminderSettings` (`{ enabled, time }`, Default aus) |
 
 ## Schema-Migrationen
 
@@ -58,6 +62,7 @@ Kein Tab-Footer mehr. Alle Screens über Stack-Navigation:
 | v1 → v2 | `lastWatered`/`lastFertilized` → CareLog-Einträge |
 | v2 → v3 | `photos: string[]` → `photos: PlantPhoto[]` |
 | v3 → v4 | `room?: string` hinzugefügt (optional, bestehende Pflanzen = „Ohne Raum") |
+| v4 → v5 | Bestandspflanzen ohne Foto bekommen Template-Bild (Name-Match gegen `PLANT_TEMPLATES`) |
 
 ## Datenmodell Plant (aktuell)
 
@@ -86,15 +91,27 @@ Plant {
 - Gelb: 0–20 %
 - Rot: überfällig oder nie gegossen/gedüngt
 
-## Offene Phasen aus Issue #72
+## Issue #72 – abgeschlossen
 
-- **Phase E** – Lokaler Katalog ausbauen (~50–100 Pflanzen, lokalisierbare Namen)
-- **Phase F** – Auto-Spracherkennung via `expo-localization` (kein hartkodiertes `'de'`)
-- **Phase G** – Design-Tokens aus `theme.ts` konsequent, Dark-Mode-Audit
+Alle Phasen A–G sind gemerged, Issue geschlossen. Nachfolge-Arbeit läuft über eigenständige Issues.
 
-## Aktuelle Abhängigkeiten (Stand 2026-05)
+## Issue #77 – UI-Verbesserung (laufend)
+
+PR #82 (gemerged in `testing`) hat einen ersten Schub Micro-Animationen umgesetzt:
+- `WaterDropAnimation`/`CareConfetti` waren seit ihrer Einführung nie ausgelöst (dead code) – jetzt über `QuickActionBar`-Callbacks im Plant-Detail-Screen live
+- Press-Scale-Feedback (Reanimated `withSpring`) auf `PlantCard` + Aktions-Buttons + `QuickActionBar`
+- Gestaffelte Listen-Eintrittsanimation (`FadeInDown`) in `app/index.tsx`
+- `EmptyState` animiert (Fade+Zoom), jetzt auch auf dem Hauptscreen genutzt
+
+**Wichtige Lektion:** Reanimated wirft eine Warnung, wenn ein `entering`-Layout-Animation und ein manueller `useAnimatedStyle`-Transform (z. B. Press-Scale) auf demselben `Animated.View`-Node liegen – beide konkurrieren um `transform`. Lösung: zwei verschachtelte `Animated.View`s (äußere für `entering`, innere für den manuellen Transform).
+
+**Noch offen für #77 / als Backlog notiert:** `app/plant/[id].tsx`, `app/settings.tsx`, `app/stats.tsx` nutzen weiterhin hardcodierte Hex-Farben statt `theme.ts`-Tokens (kein Dark-Mode dort) – bewusst nicht in PR #82 angefasst, eigenes Aufräum-Thema.
+
+## Aktuelle Abhängigkeiten (Stand 2026-07)
 
 - expo ~56.0.8
 - react 19.2.3 / react-native 0.85.3
 - expo-router ~56.2.8
 - typescript ~6.0.3
+- react-native-reanimated ~4.4.1 + react-native-worklets ~0.9.1 (Babel-Plugin `react-native-reanimated/plugin` muss letztes Plugin in `babel.config.js` sein)
+- expo-haptics ~56.0.3
