@@ -1,9 +1,10 @@
 import { useRouter } from 'expo-router'
 import React, { useState } from 'react'
-import { Modal, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native'
 import { Radius, Shadow, Spacing } from '../constants/theme'
 import { useThemeColors } from '../hooks/useThemeColors'
 import { t, Language } from '../i18n/translations'
+import { AnimatedPressable } from './AnimatedPressable'
 
 interface HeaderMenuProps {
   lang: Language
@@ -32,15 +33,15 @@ export function HeaderMenu({ lang }: HeaderMenuProps) {
 
   return (
     <>
-      <TouchableOpacity onPress={() => setVisible(true)} style={styles.trigger} hitSlop={12}>
+      <AnimatedPressable onPress={() => setVisible(true)} style={styles.trigger} scaleTo={0.85} hitSlop={12}>
         <Text style={styles.triggerText}>⋮</Text>
-      </TouchableOpacity>
+      </AnimatedPressable>
 
       <Modal visible={visible} transparent animationType="fade" onRequestClose={() => setVisible(false)}>
         <Pressable style={styles.backdrop} onPress={() => setVisible(false)}>
           <View style={[styles.menu, { backgroundColor: colors.surface }, Shadow.menu]}>
             {MENU_ITEMS.map((item, index) => (
-              <TouchableOpacity
+              <AnimatedPressable
                 key={item.key}
                 style={[
                   styles.menuItem,
@@ -50,14 +51,14 @@ export function HeaderMenu({ lang }: HeaderMenuProps) {
                   setVisible(false)
                   router.push(item.route as Parameters<typeof router.push>[0])
                 }}
-                activeOpacity={0.7}
+                scaleTo={0.96}
               >
                 <Text style={[styles.menuLabel, { color: colors.primary }]}>
                   {MENU_ICONS[item.key]}
                   {'  '}
                   {t(lang, item.labelKey)}
                 </Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             ))}
           </View>
         </Pressable>

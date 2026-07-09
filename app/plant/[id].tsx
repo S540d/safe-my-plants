@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useState } from 'react'
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { AnimatedPressable } from '../../src/components/AnimatedPressable'
 import { CareConfetti } from '../../src/components/CareConfetti'
 import { CareHistoryList } from '../../src/components/CareHistoryList'
 import { DiseaseCard } from '../../src/components/DiseaseCard'
@@ -53,7 +54,8 @@ export default function PlantDetailScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header photo */}
         {plant.photos.length > 0 ? (
-          <TouchableOpacity
+          <AnimatedPressable
+            scaleTo={0.98}
             onPress={() => {
               setGalleryInitialIndex(photoIndex)
               setGalleryVisible(true)
@@ -67,16 +69,16 @@ export default function PlantDetailScreen() {
                 </Text>
               </View>
             )}
-          </TouchableOpacity>
+          </AnimatedPressable>
         ) : (
           <View style={styles.heroPlaceholder}>
             <Text style={styles.heroEmoji}>🪴</Text>
           </View>
         )}
 
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <AnimatedPressable style={styles.backButton} onPress={() => router.back()} scaleTo={0.88}>
           <Text style={styles.backButtonText}>←</Text>
-        </TouchableOpacity>
+        </AnimatedPressable>
 
         <View style={styles.content}>
           {/* Name & status */}
