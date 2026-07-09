@@ -20,11 +20,12 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
 - `src/types/careLog.ts` – CareAction, CareActionType
 - `src/constants/defaultPlants.ts` – 3 vorinstallierte Musterpflanzen
 - `src/i18n/translations.ts` – DE/EN-Strings
-- `src/components/HeaderMenu.tsx` – ⋮-Menü oben rechts (add-plant / manage-plants / stats / settings)
+- `src/components/HeaderMenu.tsx` – ⋮-Menü oben rechts (add-plant / manage-plants / stats / settings), Trigger + Einträge über `AnimatedPressable` (seit PR #83)
 - `src/components/PlantCard.tsx` – Karte mit Inline-Buttons „💧 Gegossen" / „🌿 Gedüngt", Press-Scale + gestaffelte Eintritts-Animation (Reanimated)
 - `src/components/QuickActionBar.tsx` – Aktionsleiste im Plant-Detail (water/fertilize/repot/prune/note), Press-Scale-Buttons, `onWater`/`onFertilize`-Callbacks
 - `src/components/WaterDropAnimation.tsx`, `src/components/CareConfetti.tsx` – Reanimated-Effekte, ausgelöst über `QuickActionBar`-Callbacks im Plant-Detail-Screen (seit PR #82)
 - `src/components/EmptyState.tsx` – wiederverwendbarer Leerzustand mit Fade-/Zoom-Eintrittsanimation, genutzt in `index.tsx` und `manage-plants.tsx`
+- `src/components/AnimatedPressable.tsx` – wiederverwendbarer Press-Scale-Wrapper (Reanimated `withTiming`, `Pressable`-basiert, optionaler `hitSlop`); genutzt in `HeaderMenu` und `app/plant/[id].tsx` (Header-Foto, Zurück-Button). `PlantCard`/`QuickActionBar` nutzen weiterhin ihre eigene inline `useSharedValue`-Variante aus PR #82 (nicht rückwirkend migriert, kein funktionaler Unterschied)
 
 ## Entscheidungen & Einschränkungen
 
@@ -107,6 +108,13 @@ PR #82 (gemerged in `testing`) hat einen ersten Schub Micro-Animationen umgesetz
 
 **Noch offen für #77 / als Backlog notiert:** `app/plant/[id].tsx`, `app/settings.tsx`, `app/stats.tsx` nutzen weiterhin hardcodierte Hex-Farben statt `theme.ts`-Tokens (kein Dark-Mode dort) – bewusst nicht in PR #82 angefasst, eigenes Aufräum-Thema.
 
+PR #83 hat die restlichen statischen Touch-Ziele ergänzt (⋮-Menü-Trigger/-Einträge, Plant-Detail Header-Foto + Zurück-Button) über die neue `AnimatedPressable`-Komponente. Damit sind alle primären Touch-Ziele in Haupt- und Detail-Screen mit Press-Feedback versehen – Issue #77 ist inhaltlich erledigt, muss aber noch manuell auf GitHub geschlossen werden.
+
+## Issue #52 – npm audit fix (erledigt, PR #83)
+
+`npm audit` zeigte 12 moderate Vulnerabilities, alle über `@expo/cli` → `xcode` (uuid <11.1.1) bzw. `@expo/xcpretty` (js-yaml 4.0.0–4.1.1) – reine Build-Tooling-Deps (Xcode-Projektgenerierung), keine App-Laufzeit-Abhängigkeiten. Die in der Advisory vorgeschlagenen "fixes" (Downgrade auf expo 46 / expo-sharing 14) waren Fehlinterpretationen von `npm audit --force` auf bereits sehr viel neueren Versionen.
+**Lösung:** `overrides` in `package.json` (`uuid: ^11.1.1`, `js-yaml: ^4.2.0`) statt SDK-Downgrade. Kein App-Code importiert `uuid` direkt. `npm audit` → 0 Vulnerabilities, `npx tsc --noEmit` und `npx expo export -p web` weiterhin grün.
+
 ## Aktuelle Abhängigkeiten (Stand 2026-07)
 
 - expo ~56.0.8
@@ -115,3 +123,4 @@ PR #82 (gemerged in `testing`) hat einen ersten Schub Micro-Animationen umgesetz
 - typescript ~6.0.3
 - react-native-reanimated ~4.4.1 + react-native-worklets ~0.9.1 (Babel-Plugin `react-native-reanimated/plugin` muss letztes Plugin in `babel.config.js` sein)
 - expo-haptics ~56.0.3
+- `overrides`: `uuid@^11.1.1`, `js-yaml@^4.2.0` (patcht transitive Build-Tooling-Deps von `@expo/cli`, seit PR #83)
