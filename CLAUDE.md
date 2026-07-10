@@ -24,6 +24,14 @@ Das Repository ist öffentlich. Keine vollständigen Implementierungsdetails (Sc
 - AsyncStorage (lokale Datenpersistenz)
 - expo-image-picker (Fotos)
 - expo-linear-gradient (Header-Design)
+- react-native-reanimated (Micro-Animationen: Karten-Eintritt, Press-Feedback via `AnimatedPressable`)
+
+## Dependency-Pflege
+
+- `npm audit` regelmäßig prüfen. Wenn Vulnerabilities nur in transitiven Build-Tooling-Deps
+  stecken (z. B. `@expo/cli` → `xcode`/`@expo/xcpretty`), **kein** SDK-Downgrade – stattdessen
+  `overrides` in `package.json` auf die gepatchte Version pinnen (siehe `uuid`, `js-yaml`).
+  Vor dem Pinnen prüfen, ob App-Code das Paket direkt importiert.
 
 ## Projektstruktur
 
@@ -188,6 +196,13 @@ Vollständige Planung: Issue #16 (Tracking-Issue)
 |-------|---------|--------|
 | #14 | Push-Notifications (expo-notifications) | 🔜 |
 | #15 | JSON-Export / Import (expo-sharing) | 🔜 |
+
+### Ad-hoc / Maintenance
+
+| Issue | Feature | Status |
+|-------|---------|--------|
+| #52 | npm audit fix (uuid/js-yaml via `overrides`, kein SDK-Downgrade) | ✅ merged (PR #83) |
+| #77 | UI-Verbesserung / Micro-Animationen (Karten-Eintritt, Press-Feedback, `AnimatedPressable`) | ✅ merged (PR #82, #83) |
 
 ## Spätere Zusammenführung mit Pflanzkalender
 
