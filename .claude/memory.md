@@ -12,7 +12,7 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
   - `add-plant.tsx` – Pflanze hinzufügen (Template-Suche + Raum, kein PIN)
   - `manage-plants.tsx` – Pflanzenliste bearbeiten/löschen (kein PIN)
   - `admin.tsx` – Legacy-Admin mit PinGuard (bleibt erhalten, aber nicht im Hauptpfad)
-  - `settings.tsx`, `stats.tsx`, `plant/[id].tsx` – unverändert
+  - `settings.tsx`, `stats.tsx`, `plant/[id].tsx` – seit PR #87 über `useThemeColors()` (Dark-Mode-fähig, siehe Issue #85 Block C)
 - `src/contexts/PlantContext.tsx` – zentraler State + AsyncStorage-Persistenz + CareLog-Writes
 - `src/hooks/useCareStatus.ts` – Ampel-Berechnung (ok / soon / overdue)
 - `src/hooks/useCareLog.ts` – CareLog CRUD
@@ -106,9 +106,16 @@ PR #82 (gemerged in `testing`) hat einen ersten Schub Micro-Animationen umgesetz
 
 **Wichtige Lektion:** Reanimated wirft eine Warnung, wenn ein `entering`-Layout-Animation und ein manueller `useAnimatedStyle`-Transform (z. B. Press-Scale) auf demselben `Animated.View`-Node liegen – beide konkurrieren um `transform`. Lösung: zwei verschachtelte `Animated.View`s (äußere für `entering`, innere für den manuellen Transform).
 
-**Noch offen für #77 / als Backlog notiert:** `app/plant/[id].tsx`, `app/settings.tsx`, `app/stats.tsx` nutzen weiterhin hardcodierte Hex-Farben statt `theme.ts`-Tokens (kein Dark-Mode dort) – bewusst nicht in PR #82 angefasst, eigenes Aufräum-Thema.
-
 PR #83 hat die restlichen statischen Touch-Ziele ergänzt (⋮-Menü-Trigger/-Einträge, Plant-Detail Header-Foto + Zurück-Button) über die neue `AnimatedPressable`-Komponente. Damit sind alle primären Touch-Ziele in Haupt- und Detail-Screen mit Press-Feedback versehen – Issue #77 ist inhaltlich erledigt, muss aber noch manuell auf GitHub geschlossen werden.
+
+Der zuvor hier notierte Dark-Mode-Rückstand (`app/plant/[id].tsx`, `app/settings.tsx`, `app/stats.tsx` mit hardcodierten Hex-Farben) ist über PR #87 (Issue #85 Block C) behoben, siehe unten.
+
+## Issue #85 – Play-Store-Launch-Plan, Block C „Optische Verbesserungen" (PR #87, gemerged)
+
+- **Dark-Mode-Audit abgeschlossen**: `app/plant/[id].tsx`, `app/settings.tsx`, `app/stats.tsx` nutzen jetzt `useThemeColors()` statt hardcodierter Hex-Farben; wiederkehrende Card-Schatten auf `Shadow.cardSm`/`Shadow.menu` konsolidiert.
+- **Splash-Screen**: `expo-splash-screen` als Dependency ergänzt, als Config-Plugin in `app.json` verdrahtet (`backgroundColor: #2D6A4F`, Dark-Variante `#0D1F17`, Bild `assets/splash-icon.png`). Vorher war kein Splash-Screen konfiguriert.
+- **App-Icon/Adaptive-Icon**: geprüft, bereits store-tauglich (1024×1024 / 512×512 / 432×432, Markenfarbe als Adaptive-Icon-Hintergrund) – kein Änderungsbedarf.
+- **Nicht Teil von PR #87** (bleibt offen unter Issue #85 Block C): Screenshot-Politur fürs Store-Listing – erfordert reale Gerätescreenshots, kein Code-Task.
 
 ## Issue #52 – npm audit fix (erledigt, PR #83)
 
@@ -123,4 +130,5 @@ PR #83 hat die restlichen statischen Touch-Ziele ergänzt (⋮-Menü-Trigger/-Ei
 - typescript ~6.0.3
 - react-native-reanimated ~4.4.1 + react-native-worklets ~0.9.1 (Babel-Plugin `react-native-reanimated/plugin` muss letztes Plugin in `babel.config.js` sein)
 - expo-haptics ~56.0.3
+- expo-splash-screen ~56.0.12 (seit PR #87, Config-Plugin in `app.json`)
 - `overrides`: `uuid@^11.1.1`, `js-yaml@^4.2.0` (patcht transitive Build-Tooling-Deps von `@expo/cli`, seit PR #83)
