@@ -1,13 +1,16 @@
 import React, { useMemo } from 'react'
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Shadow } from '../src/constants/theme'
 import { useCareLog } from '../src/hooks/useCareLog'
 import { usePlants } from '../src/contexts/PlantContext'
 import { usePreferences } from '../src/hooks/usePreferences'
 import { useStreak } from '../src/hooks/useStreak'
+import { useThemeColors } from '../src/hooks/useThemeColors'
 import { t } from '../src/i18n/translations'
 
 export default function StatsScreen() {
   const { language } = usePreferences()
+  const colors = useThemeColors()
   const { current, longest } = useStreak()
   const { getRecentActions } = useCareLog()
   const { plants } = usePlants()
@@ -42,95 +45,110 @@ export default function StatsScreen() {
   }, [monthActions, plants])
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.header}>{t(language, 'stats_title')}</Text>
+        <Text style={[styles.header, { color: colors.primary }]}>{t(language, 'stats_title')}</Text>
 
         {/* Streak */}
-        <View style={styles.streakCard}>
+        <View style={[styles.streakCard, { backgroundColor: colors.primary }, Shadow.menu]}>
           <Text style={styles.streakEmoji}>🔥</Text>
-          <Text style={styles.streakNumber}>{current}</Text>
-          <Text style={styles.streakLabel}>{t(language, 'stats_streak_current')}</Text>
-          <Text style={styles.streakRecord}>
+          <Text style={[styles.streakNumber, { color: colors.accent }]}>{current}</Text>
+          <Text style={[styles.streakLabel, { color: colors.accentSurface }]}>
+            {t(language, 'stats_streak_current')}
+          </Text>
+          <Text style={[styles.streakRecord, { color: colors.primaryLight }]}>
             {t(language, 'stats_streak_longest')}: {longest} {t(language, 'stats_streak_days')}
           </Text>
         </View>
 
         {/* This month */}
-        <Text style={styles.sectionTitle}>{t(language, 'stats_this_month')}</Text>
+        <Text style={[styles.sectionTitle, { color: colors.primary }]}>{t(language, 'stats_this_month')}</Text>
         <View style={styles.monthGrid}>
-          <StatTile icon="💧" count={waterCount} label={t(language, 'stats_actions_water')} />
-          <StatTile icon="🌿" count={fertilizeCount} label={t(language, 'stats_actions_fertilize')} />
-          <StatTile icon="✂️" count={otherCount} label={t(language, 'stats_actions_other')} />
+          <StatTile icon="💧" count={waterCount} label={t(language, 'stats_actions_water')} colors={colors} />
+          <StatTile icon="🌿" count={fertilizeCount} label={t(language, 'stats_actions_fertilize')} colors={colors} />
+          <StatTile icon="✂️" count={otherCount} label={t(language, 'stats_actions_other')} colors={colors} />
         </View>
 
         {/* Plant highlights */}
-        <Text style={styles.sectionTitle}>{t(language, 'stats_highlights')}</Text>
+        <Text style={[styles.sectionTitle, { color: colors.primary }]}>{t(language, 'stats_highlights')}</Text>
         <View style={styles.highlightCards}>
-          <HighlightCard icon="💧" title={t(language, 'stats_thirstiest')} plantName={thirstiestPlant?.name} />
-          <HighlightCard icon="⭐" title={t(language, 'stats_most_active')} plantName={mostActivePlant?.name} />
+          <HighlightCard
+            icon="💧"
+            title={t(language, 'stats_thirstiest')}
+            plantName={thirstiestPlant?.name}
+            colors={colors}
+          />
+          <HighlightCard
+            icon="⭐"
+            title={t(language, 'stats_most_active')}
+            plantName={mostActivePlant?.name}
+            colors={colors}
+          />
         </View>
       </ScrollView>
     </SafeAreaView>
   )
 }
 
-function StatTile({ icon, count, label }: { icon: string; count: number; label: string }) {
+type ThemeColors = ReturnType<typeof useThemeColors>
+
+function StatTile({ icon, count, label, colors }: { icon: string; count: number; label: string; colors: ThemeColors }) {
   return (
-    <View style={styles.statTile}>
+    <View style={[styles.statTile, { backgroundColor: colors.surface }, Shadow.cardSm]}>
       <Text style={styles.statTileIcon}>{icon}</Text>
-      <Text style={styles.statTileCount}>{count}</Text>
-      <Text style={styles.statTileLabel}>{label}</Text>
+      <Text style={[styles.statTileCount, { color: colors.primary }]}>{count}</Text>
+      <Text style={[styles.statTileLabel, { color: colors.textMuted }]}>{label}</Text>
     </View>
   )
 }
 
-function HighlightCard({ icon, title, plantName }: { icon: string; title: string; plantName?: string }) {
+function HighlightCard({
+  icon,
+  title,
+  plantName,
+  colors,
+}: {
+  icon: string
+  title: string
+  plantName?: string
+  colors: ThemeColors
+}) {
   return (
-    <View style={styles.highlightCard}>
+    <View style={[styles.highlightCard, { backgroundColor: colors.surface }, Shadow.cardSm]}>
       <Text style={styles.highlightIcon}>{icon}</Text>
       <View style={styles.highlightContent}>
-        <Text style={styles.highlightTitle}>{title}</Text>
-        <Text style={styles.highlightName}>{plantName ?? '–'}</Text>
+        <Text style={[styles.highlightTitle, { color: colors.textMuted }]}>{title}</Text>
+        <Text style={[styles.highlightName, { color: colors.primary }]}>{plantName ?? '–'}</Text>
       </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F0FFF4' },
+  container: { flex: 1 },
   scroll: { padding: 16, paddingBottom: 40 },
   header: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#1B4332',
     marginBottom: 20,
   },
   streakCard: {
-    backgroundColor: '#1B4332',
     borderRadius: 20,
     padding: 28,
     alignItems: 'center',
     marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
   },
   streakEmoji: { fontSize: 48, marginBottom: 4 },
   streakNumber: {
     fontSize: 64,
     fontWeight: '900',
-    color: '#74C69D',
     lineHeight: 70,
   },
-  streakLabel: { fontSize: 16, color: '#D8F3DC', fontWeight: '600', marginTop: 4 },
-  streakRecord: { fontSize: 13, color: '#52B788', marginTop: 8 },
+  streakLabel: { fontSize: 16, fontWeight: '600', marginTop: 4 },
+  streakRecord: { fontSize: 13, marginTop: 8 },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1B4332',
     marginBottom: 12,
     marginTop: 4,
   },
@@ -141,35 +159,23 @@ const styles = StyleSheet.create({
   },
   statTile: {
     flex: 1,
-    backgroundColor: '#fff',
     borderRadius: 16,
     padding: 16,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.07,
-    shadowRadius: 4,
-    elevation: 2,
   },
   statTileIcon: { fontSize: 28, marginBottom: 6 },
-  statTileCount: { fontSize: 28, fontWeight: '800', color: '#1B4332' },
-  statTileLabel: { fontSize: 11, color: '#6B7280', textAlign: 'center', marginTop: 2 },
+  statTileCount: { fontSize: 28, fontWeight: '800' },
+  statTileLabel: { fontSize: 11, textAlign: 'center', marginTop: 2 },
   highlightCards: { gap: 10, marginBottom: 24 },
   highlightCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    backgroundColor: '#fff',
     borderRadius: 14,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.07,
-    shadowRadius: 4,
-    elevation: 2,
   },
   highlightIcon: { fontSize: 28 },
   highlightContent: { flex: 1 },
-  highlightTitle: { fontSize: 12, color: '#6B7280', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.4 },
-  highlightName: { fontSize: 16, fontWeight: '700', color: '#1B4332', marginTop: 2 },
+  highlightTitle: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.4 },
+  highlightName: { fontSize: 16, fontWeight: '700', marginTop: 2 },
 })
