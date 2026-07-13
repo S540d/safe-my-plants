@@ -106,7 +106,7 @@ PR #82 (gemerged in `testing`) hat einen ersten Schub Micro-Animationen umgesetz
 
 **Wichtige Lektion:** Reanimated wirft eine Warnung, wenn ein `entering`-Layout-Animation und ein manueller `useAnimatedStyle`-Transform (z. B. Press-Scale) auf demselben `Animated.View`-Node liegen – beide konkurrieren um `transform`. Lösung: zwei verschachtelte `Animated.View`s (äußere für `entering`, innere für den manuellen Transform).
 
-PR #83 hat die restlichen statischen Touch-Ziele ergänzt (⋮-Menü-Trigger/-Einträge, Plant-Detail Header-Foto + Zurück-Button) über die neue `AnimatedPressable`-Komponente. Damit sind alle primären Touch-Ziele in Haupt- und Detail-Screen mit Press-Feedback versehen – Issue #77 ist inhaltlich erledigt, muss aber noch manuell auf GitHub geschlossen werden.
+PR #83 hat die restlichen statischen Touch-Ziele ergänzt (⋮-Menü-Trigger/-Einträge, Plant-Detail Header-Foto + Zurück-Button) über die neue `AnimatedPressable`-Komponente. Damit sind alle primären Touch-Ziele in Haupt- und Detail-Screen mit Press-Feedback versehen – Issue #77 ist inhaltlich erledigt und wurde auf GitHub geschlossen.
 
 Der zuvor hier notierte Dark-Mode-Rückstand (`app/plant/[id].tsx`, `app/settings.tsx`, `app/stats.tsx` mit hardcodierten Hex-Farben) ist über PR #87 (Issue #85 Block C) behoben, siehe unten.
 
