@@ -12,7 +12,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { Shadow } from '../src/constants/theme'
 import { usePreferences } from '../src/hooks/usePreferences'
+import { useThemeColors } from '../src/hooks/useThemeColors'
 import {
   cancelAll,
   getReminderSettings,
@@ -28,6 +30,7 @@ type ThemeMode = 'light' | 'dark' | 'system'
 
 export default function SettingsScreen() {
   const { language, theme, adminPin, setLanguage, setTheme, setAdminPin } = usePreferences()
+  const colors = useThemeColors()
   const router = useRouter()
   const canGoBack = router.canGoBack()
   const [showPinChange, setShowPinChange] = useState(false)
@@ -129,12 +132,14 @@ export default function SettingsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <LinearGradient colors={['#1B4332', '#2D6A4F']} style={styles.header}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
         <View style={styles.headerRow}>
           {canGoBack && (
             <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-              <Text style={styles.backBtnText}>← {lang === 'de' ? 'Zurück' : 'Back'}</Text>
+              <Text style={[styles.backBtnText, { color: colors.gradientText }]}>
+                ← {lang === 'de' ? 'Zurück' : 'Back'}
+              </Text>
             </TouchableOpacity>
           )}
           <Text style={styles.headerTitle}>{lang === 'de' ? 'Einstellungen' : 'Settings'}</Text>
@@ -142,34 +147,57 @@ export default function SettingsScreen() {
       </LinearGradient>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Language */}
-        <Text style={styles.sectionLabel}>{lang === 'de' ? 'Sprache' : 'Language'}</Text>
+        <Text style={[styles.sectionLabel, { color: colors.primaryLight }]}>
+          {lang === 'de' ? 'Sprache' : 'Language'}
+        </Text>
         <View style={styles.chipRow}>
-          <Chip label="Deutsch" active={language === 'de'} onPress={() => setLanguage('de')} />
-          <Chip label="English" active={language === 'en'} onPress={() => setLanguage('en')} />
+          <Chip label="Deutsch" active={language === 'de'} onPress={() => setLanguage('de')} colors={colors} />
+          <Chip label="English" active={language === 'en'} onPress={() => setLanguage('en')} colors={colors} />
         </View>
 
         {/* Theme */}
-        <Text style={styles.sectionLabel}>{lang === 'de' ? 'Erscheinungsbild' : 'Appearance'}</Text>
+        <Text style={[styles.sectionLabel, { color: colors.primaryLight }]}>
+          {lang === 'de' ? 'Erscheinungsbild' : 'Appearance'}
+        </Text>
         <View style={styles.chipRow}>
-          <Chip label={lang === 'de' ? 'Hell' : 'Light'} active={theme === 'light'} onPress={() => setTheme('light')} />
-          <Chip label={lang === 'de' ? 'Dunkel' : 'Dark'} active={theme === 'dark'} onPress={() => setTheme('dark')} />
-          <Chip label="System" active={theme === 'system'} onPress={() => setTheme('system')} />
+          <Chip
+            label={lang === 'de' ? 'Hell' : 'Light'}
+            active={theme === 'light'}
+            onPress={() => setTheme('light')}
+            colors={colors}
+          />
+          <Chip
+            label={lang === 'de' ? 'Dunkel' : 'Dark'}
+            active={theme === 'dark'}
+            onPress={() => setTheme('dark')}
+            colors={colors}
+          />
+          <Chip label="System" active={theme === 'system'} onPress={() => setTheme('system')} colors={colors} />
         </View>
 
         {/* Admin */}
-        <Text style={styles.sectionLabel}>{lang === 'de' ? 'Admin-Bereich' : 'Admin Area'}</Text>
-        <TouchableOpacity style={styles.listItem} onPress={() => setShowPinChange(!showPinChange)}>
-          <Text style={styles.listItemText}>
+        <Text style={[styles.sectionLabel, { color: colors.primaryLight }]}>
+          {lang === 'de' ? 'Admin-Bereich' : 'Admin Area'}
+        </Text>
+        <TouchableOpacity
+          style={[styles.listItem, { backgroundColor: colors.surface }, Shadow.cardSm]}
+          onPress={() => setShowPinChange(!showPinChange)}
+        >
+          <Text style={[styles.listItemText, { color: colors.primary }]}>
             {lang === 'de' ? 'Admin-PIN' : 'Admin PIN'} {adminPin ? '✓' : '(nicht gesetzt)'}
           </Text>
-          <Text style={styles.chevron}>›</Text>
+          <Text style={[styles.chevron, { color: colors.accent }]}>›</Text>
         </TouchableOpacity>
 
         {showPinChange && (
-          <View style={styles.pinForm}>
+          <View style={[styles.pinForm, { backgroundColor: colors.surface }, Shadow.cardSm]}>
             <TextInput
-              style={styles.pinInput}
+              style={[
+                styles.pinInput,
+                { borderColor: colors.border, backgroundColor: colors.surfaceAlt, color: colors.text },
+              ]}
               placeholder={lang === 'de' ? 'Neue PIN (4 Ziffern)' : 'New PIN (4 digits)'}
+              placeholderTextColor={colors.textSubtle}
               keyboardType="number-pad"
               maxLength={4}
               secureTextEntry
@@ -177,57 +205,79 @@ export default function SettingsScreen() {
               onChangeText={setNewPin}
             />
             <TextInput
-              style={styles.pinInput}
+              style={[
+                styles.pinInput,
+                { borderColor: colors.border, backgroundColor: colors.surfaceAlt, color: colors.text },
+              ]}
               placeholder={lang === 'de' ? 'PIN bestätigen' : 'Confirm PIN'}
+              placeholderTextColor={colors.textSubtle}
               keyboardType="number-pad"
               maxLength={4}
               secureTextEntry
               value={confirmPin}
               onChangeText={setConfirmPin}
             />
-            <TouchableOpacity style={styles.saveBtn} onPress={handleSavePin}>
-              <Text style={styles.saveBtnText}>{lang === 'de' ? 'Speichern' : 'Save'}</Text>
+            <TouchableOpacity style={[styles.saveBtn, { backgroundColor: colors.primaryMid }]} onPress={handleSavePin}>
+              <Text style={[styles.saveBtnText, { color: colors.textOnPrimary }]}>
+                {lang === 'de' ? 'Speichern' : 'Save'}
+              </Text>
             </TouchableOpacity>
           </View>
         )}
 
         {/* Notifications */}
         <View style={styles.sectionLabelRow}>
-          <Text style={[styles.sectionLabel, { marginTop: 0, marginBottom: 0 }]}>
+          <Text style={[styles.sectionLabel, { color: colors.primaryLight, marginTop: 0, marginBottom: 0 }]}>
             {t(lang, 'settings_notifications')}
           </Text>
-          <View style={styles.betaBadge}>
-            <Text style={styles.betaBadgeText}>Beta</Text>
+          <View style={[styles.betaBadge, { backgroundColor: colors.statusSoon }]}>
+            <Text style={[styles.betaBadgeText, { color: colors.textOnPrimary }]}>Beta</Text>
           </View>
         </View>
-        <View style={styles.notifCard}>
+        <View style={[styles.notifCard, { backgroundColor: colors.surface }, Shadow.cardSm]}>
           <View style={styles.notifRow}>
-            <Text style={styles.notifLabel}>{t(lang, 'settings_notifications_enable')}</Text>
+            <Text style={[styles.notifLabel, { color: colors.primary }]}>
+              {t(lang, 'settings_notifications_enable')}
+            </Text>
             <Switch
               value={reminder.enabled}
               onValueChange={handleToggleReminder}
-              trackColor={{ true: '#2D6A4F', false: '#B7E4C7' }}
-              thumbColor="#fff"
+              trackColor={{ true: colors.primaryMid, false: colors.border }}
+              thumbColor={colors.surface}
             />
           </View>
           {reminder.enabled && (
             <View style={[styles.notifRow, { marginTop: 12 }]}>
-              <Text style={styles.notifLabel}>{t(lang, 'settings_notifications_time')}</Text>
+              <Text style={[styles.notifLabel, { color: colors.primary }]}>
+                {t(lang, 'settings_notifications_time')}
+              </Text>
               <View style={styles.timePicker}>
-                <TouchableOpacity style={styles.timeBtn} onPress={() => adjustTime(-1, 0)}>
-                  <Text style={styles.timeBtnText}>−</Text>
+                <TouchableOpacity
+                  style={[styles.timeBtn, { backgroundColor: colors.accentSurface }]}
+                  onPress={() => adjustTime(-1, 0)}
+                >
+                  <Text style={[styles.timeBtnText, { color: colors.primaryMid }]}>−</Text>
                 </TouchableOpacity>
-                <Text style={styles.timeDisplay}>{reminder.time.split(':')[0]}</Text>
-                <TouchableOpacity style={styles.timeBtn} onPress={() => adjustTime(1, 0)}>
-                  <Text style={styles.timeBtnText}>+</Text>
+                <Text style={[styles.timeDisplay, { color: colors.primary }]}>{reminder.time.split(':')[0]}</Text>
+                <TouchableOpacity
+                  style={[styles.timeBtn, { backgroundColor: colors.accentSurface }]}
+                  onPress={() => adjustTime(1, 0)}
+                >
+                  <Text style={[styles.timeBtnText, { color: colors.primaryMid }]}>+</Text>
                 </TouchableOpacity>
-                <Text style={styles.timeSep}>:</Text>
-                <TouchableOpacity style={styles.timeBtn} onPress={() => adjustTime(0, -15)}>
-                  <Text style={styles.timeBtnText}>−</Text>
+                <Text style={[styles.timeSep, { color: colors.primary }]}>:</Text>
+                <TouchableOpacity
+                  style={[styles.timeBtn, { backgroundColor: colors.accentSurface }]}
+                  onPress={() => adjustTime(0, -15)}
+                >
+                  <Text style={[styles.timeBtnText, { color: colors.primaryMid }]}>−</Text>
                 </TouchableOpacity>
-                <Text style={styles.timeDisplay}>{reminder.time.split(':')[1]}</Text>
-                <TouchableOpacity style={styles.timeBtn} onPress={() => adjustTime(0, 15)}>
-                  <Text style={styles.timeBtnText}>+</Text>
+                <Text style={[styles.timeDisplay, { color: colors.primary }]}>{reminder.time.split(':')[1]}</Text>
+                <TouchableOpacity
+                  style={[styles.timeBtn, { backgroundColor: colors.accentSurface }]}
+                  onPress={() => adjustTime(0, 15)}
+                >
+                  <Text style={[styles.timeBtnText, { color: colors.primaryMid }]}>+</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -235,22 +285,34 @@ export default function SettingsScreen() {
         </View>
 
         {/* Data */}
-        <Text style={styles.sectionLabel}>{t(lang, 'settings_data')}</Text>
+        <Text style={[styles.sectionLabel, { color: colors.primaryLight }]}>{t(lang, 'settings_data')}</Text>
         <View style={styles.dataRow}>
-          <TouchableOpacity style={[styles.dataBtn, styles.dataBtnExport]} onPress={handleExport}>
-            <Text style={[styles.dataBtnText, { color: '#fff' }]}>📤 {t(lang, 'settings_export')}</Text>
+          <TouchableOpacity
+            style={[styles.dataBtn, { backgroundColor: colors.primaryMid }, Shadow.cardSm]}
+            onPress={handleExport}
+          >
+            <Text style={[styles.dataBtnText, { color: colors.textOnPrimary }]}>📤 {t(lang, 'settings_export')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.dataBtn, styles.dataBtnImport]} onPress={handleImport}>
-            <Text style={[styles.dataBtnText, { color: '#2D6A4F' }]}>📥 {t(lang, 'settings_import')}</Text>
+          <TouchableOpacity
+            style={[
+              styles.dataBtn,
+              { backgroundColor: colors.surface, borderWidth: 1.5, borderColor: colors.border },
+              Shadow.cardSm,
+            ]}
+            onPress={handleImport}
+          >
+            <Text style={[styles.dataBtnText, { color: colors.primaryMid }]}>📥 {t(lang, 'settings_import')}</Text>
           </TouchableOpacity>
         </View>
 
         {/* About */}
-        <Text style={styles.sectionLabel}>{lang === 'de' ? 'Über die App' : 'About'}</Text>
-        <View style={styles.aboutCard}>
-          <Text style={styles.aboutTitle}>🪴 Safe My Plants</Text>
-          <Text style={styles.aboutVersion}>Version 1.0.0</Text>
-          <Text style={styles.aboutText}>
+        <Text style={[styles.sectionLabel, { color: colors.primaryLight }]}>
+          {lang === 'de' ? 'Über die App' : 'About'}
+        </Text>
+        <View style={[styles.aboutCard, { backgroundColor: colors.surface }, Shadow.cardSm]}>
+          <Text style={[styles.aboutTitle, { color: colors.primary }]}>🪴 Safe My Plants</Text>
+          <Text style={[styles.aboutVersion, { color: colors.accent }]}>Version 1.0.0</Text>
+          <Text style={[styles.aboutText, { color: colors.text }]}>
             {lang === 'de'
               ? 'Verwalte deine Topfpflanzen, behalte Pflege-Termine im Blick und erkenne Krankheiten frühzeitig.'
               : 'Manage your houseplants, track care schedules, and identify diseases early.'}
@@ -263,34 +325,57 @@ export default function SettingsScreen() {
   )
 }
 
-function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
+function Chip({
+  label,
+  active,
+  onPress,
+  colors,
+}: {
+  label: string
+  active: boolean
+  onPress: () => void
+  colors: ReturnType<typeof useThemeColors>
+}) {
   return (
-    <TouchableOpacity style={[styles.chip, active && styles.chipActive]} onPress={onPress}>
-      <Text style={[styles.chipText, active && styles.chipTextActive]}>{label}</Text>
+    <TouchableOpacity
+      style={[
+        styles.chip,
+        { borderColor: colors.border, backgroundColor: colors.surface },
+        active && { backgroundColor: colors.primaryMid, borderColor: colors.primaryMid },
+      ]}
+      onPress={onPress}
+    >
+      <Text
+        style={[
+          styles.chipText,
+          { color: colors.primaryMid },
+          active && { color: colors.textOnPrimary, fontWeight: '600' },
+        ]}
+      >
+        {label}
+      </Text>
     </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F0FFF4' },
+  container: { flex: 1 },
   header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 20 },
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   backBtn: { paddingVertical: 4, paddingRight: 8 },
-  backBtnText: { fontSize: 15, color: '#B7E4C7', fontWeight: '500' },
+  backBtnText: { fontSize: 15, fontWeight: '500' },
   headerTitle: { fontSize: 28, fontWeight: '700', color: '#fff', flex: 1 },
   scroll: { padding: 16 },
   sectionLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 20, marginBottom: 8 },
   betaBadge: {
-    backgroundColor: '#F4A261',
     borderRadius: 8,
     paddingHorizontal: 6,
     paddingVertical: 2,
   },
-  betaBadgeText: { fontSize: 10, fontWeight: '700', color: '#fff', textTransform: 'uppercase', letterSpacing: 0.5 },
+  betaBadgeText: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
   sectionLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#52B788',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
     marginTop: 20,
@@ -302,103 +387,64 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1.5,
-    borderColor: '#B7E4C7',
-    backgroundColor: '#fff',
   },
-  chipActive: { backgroundColor: '#2D6A4F', borderColor: '#2D6A4F' },
-  chipText: { fontSize: 14, color: '#2D6A4F' },
-  chipTextActive: { color: '#fff', fontWeight: '600' },
+  chipText: { fontSize: 14 },
   listItem: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
   },
-  listItemText: { flex: 1, fontSize: 15, color: '#1B4332' },
-  chevron: { fontSize: 20, color: '#74C69D' },
+  listItemText: { flex: 1, fontSize: 15 },
+  chevron: { fontSize: 20 },
   pinForm: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginTop: 8,
     gap: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
   },
   pinInput: {
     borderWidth: 1.5,
-    borderColor: '#B7E4C7',
     borderRadius: 8,
     padding: 10,
     fontSize: 16,
-    backgroundColor: '#F0FFF4',
   },
   saveBtn: {
-    backgroundColor: '#2D6A4F',
     borderRadius: 8,
     padding: 12,
     alignItems: 'center',
   },
-  saveBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  saveBtnText: { fontSize: 15, fontWeight: '600' },
   notifCard: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 14,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
   },
   notifRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  notifLabel: { fontSize: 15, color: '#1B4332', flex: 1 },
+  notifLabel: { fontSize: 15, flex: 1 },
   timePicker: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   timeBtn: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#D8F3DC',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  timeBtnText: { fontSize: 16, color: '#2D6A4F', fontWeight: '700', lineHeight: 20 },
-  timeDisplay: { fontSize: 18, fontWeight: '700', color: '#1B4332', minWidth: 28, textAlign: 'center' },
-  timeSep: { fontSize: 18, fontWeight: '700', color: '#1B4332', marginHorizontal: 2 },
+  timeBtnText: { fontSize: 16, fontWeight: '700', lineHeight: 20 },
+  timeDisplay: { fontSize: 18, fontWeight: '700', minWidth: 28, textAlign: 'center' },
+  timeSep: { fontSize: 18, fontWeight: '700', marginHorizontal: 2 },
   dataRow: { flexDirection: 'row', gap: 10 },
   dataBtn: {
     flex: 1,
     padding: 14,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
   },
-  dataBtnExport: { backgroundColor: '#2D6A4F' },
-  dataBtnImport: { backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#B7E4C7' },
-  dataBtnText: { fontSize: 13, fontWeight: '600', color: '#fff' },
+  dataBtnText: { fontSize: 13, fontWeight: '600' },
   aboutCard: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
   },
-  aboutTitle: { fontSize: 18, fontWeight: '700', color: '#1B4332', marginBottom: 4 },
-  aboutVersion: { fontSize: 13, color: '#74C69D', marginBottom: 8 },
-  aboutText: { fontSize: 14, color: '#444', lineHeight: 20 },
+  aboutTitle: { fontSize: 18, fontWeight: '700', marginBottom: 4 },
+  aboutVersion: { fontSize: 13, marginBottom: 8 },
+  aboutText: { fontSize: 14, lineHeight: 20 },
 })

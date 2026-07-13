@@ -44,7 +44,19 @@
           "cameraPermission": "Safe My Plants möchte deine Kamera nutzen, um Pflanzenfotos aufzunehmen."
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#2D6A4F",
+          "dark": {
+            "backgroundColor": "#0D1F17"
+          }
+        }
+      ]
     ],
     "scheme": "safemyplants"
   }

@@ -10,9 +10,11 @@ import { PhotoGalleryModal } from '../../src/components/PhotoGalleryModal'
 import { QuickActionBar } from '../../src/components/QuickActionBar'
 import { TrafficLight } from '../../src/components/TrafficLight'
 import { WaterDropAnimation } from '../../src/components/WaterDropAnimation'
+import { Shadow } from '../../src/constants/theme'
 import { usePlants } from '../../src/contexts/PlantContext'
 import { formatLastDate, formatNextDate, useCareStatus } from '../../src/hooks/useCareStatus'
 import { usePreferences } from '../../src/hooks/usePreferences'
+import { useThemeColors } from '../../src/hooks/useThemeColors'
 import { t } from '../../src/i18n/translations'
 
 const LOCATION_LABELS: Record<string, Record<string, string>> = {
@@ -29,6 +31,7 @@ export default function PlantDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const { plants } = usePlants()
   const { language } = usePreferences()
+  const colors = useThemeColors()
   const router = useRouter()
   const [photoIndex, setPhotoIndex] = useState(0)
   const [galleryVisible, setGalleryVisible] = useState(false)
@@ -40,8 +43,8 @@ export default function PlantDetailScreen() {
 
   if (!plant) {
     return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.notFound}>Pflanze nicht gefunden</Text>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <Text style={[styles.notFound, { color: colors.textMuted }]}>Pflanze nicht gefunden</Text>
       </SafeAreaView>
     )
   }
@@ -50,7 +53,7 @@ export default function PlantDetailScreen() {
   const lang = language
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header photo */}
         {plant.photos.length > 0 ? (
@@ -71,7 +74,7 @@ export default function PlantDetailScreen() {
             )}
           </AnimatedPressable>
         ) : (
-          <View style={styles.heroPlaceholder}>
+          <View style={[styles.heroPlaceholder, { backgroundColor: colors.primaryMid }]}>
             <Text style={styles.heroEmoji}>🪴</Text>
           </View>
         )}
@@ -84,16 +87,18 @@ export default function PlantDetailScreen() {
           {/* Name & status */}
           <View style={styles.nameRow}>
             <View style={styles.nameBlock}>
-              <Text style={styles.name}>{plant.name}</Text>
-              {plant.scientificName && <Text style={styles.scientificName}>{plant.scientificName}</Text>}
+              <Text style={[styles.name, { color: colors.primary }]}>{plant.name}</Text>
+              {plant.scientificName && (
+                <Text style={[styles.scientificName, { color: colors.accent }]}>{plant.scientificName}</Text>
+              )}
             </View>
             <TrafficLight status={careStatus.overall} size={20} />
           </View>
 
-          <Text style={styles.description}>{plant.description}</Text>
+          <Text style={[styles.description, { color: colors.text }]}>{plant.description}</Text>
 
           {/* Quick action bar (replaces individual water/fertilize buttons) */}
-          <Text style={styles.sectionTitle}>{t(lang, 'detail_quick_actions')}</Text>
+          <Text style={[styles.sectionTitle, { color: colors.primary }]}>{t(lang, 'detail_quick_actions')}</Text>
           <QuickActionBar
             plantId={plant.id}
             onWater={() => setShowWaterDrop(true)}
@@ -102,16 +107,16 @@ export default function PlantDetailScreen() {
 
           {/* Next care dates */}
           <View style={styles.nextCareRow}>
-            <View style={styles.nextCareItem}>
-              <Text style={styles.nextCareLabel}>💧 {t(lang, 'detail_watering')}</Text>
-              <Text style={styles.nextCareValue}>
+            <View style={[styles.nextCareItem, { backgroundColor: colors.accentSurface }]}>
+              <Text style={[styles.nextCareLabel, { color: colors.primary }]}>💧 {t(lang, 'detail_watering')}</Text>
+              <Text style={[styles.nextCareValue, { color: colors.primaryMid }]}>
                 {formatNextDate(plant.lastWatered, plant.careInfo.wateringFrequencyDays, lang)}
               </Text>
               <TrafficLight status={careStatus.watering} size={8} />
             </View>
-            <View style={styles.nextCareItem}>
-              <Text style={styles.nextCareLabel}>🌿 {t(lang, 'detail_fertilizing')}</Text>
-              <Text style={styles.nextCareValue}>
+            <View style={[styles.nextCareItem, { backgroundColor: colors.accentSurface }]}>
+              <Text style={[styles.nextCareLabel, { color: colors.primary }]}>🌿 {t(lang, 'detail_fertilizing')}</Text>
+              <Text style={[styles.nextCareValue, { color: colors.primaryMid }]}>
                 {formatNextDate(plant.lastFertilized, plant.careInfo.fertilizingFrequencyDays, lang)}
               </Text>
               <TrafficLight status={careStatus.fertilizing} size={8} />
@@ -119,29 +124,38 @@ export default function PlantDetailScreen() {
           </View>
 
           {/* Care info */}
-          <Text style={styles.sectionTitle}>{t(lang, 'detail_care_info')}</Text>
+          <Text style={[styles.sectionTitle, { color: colors.primary }]}>{t(lang, 'detail_care_info')}</Text>
 
-          <View style={styles.infoGrid}>
-            <InfoRow icon="📍" label={t(lang, 'detail_location')} value={LOCATION_LABELS[lang][plant.location]} />
+          <View style={[styles.infoGrid, { backgroundColor: colors.surface }, Shadow.cardSm]}>
+            <InfoRow
+              icon="📍"
+              label={t(lang, 'detail_location')}
+              value={LOCATION_LABELS[lang][plant.location]}
+              colors={colors}
+            />
             <InfoRow
               icon="🌡️"
               label={t(lang, 'detail_temperature')}
               value={`${plant.careInfo.temperature.min}–${plant.careInfo.temperature.max} °C`}
+              colors={colors}
             />
             <InfoRow
               icon="💦"
               label={t(lang, 'detail_humidity')}
               value={HUMIDITY_LABELS[lang][plant.careInfo.humidity]}
+              colors={colors}
             />
             <InfoRow
               icon="💧"
               label={lang === 'de' ? 'Gießintervall' : 'Watering interval'}
               value={`${plant.careInfo.wateringFrequencyDays} ${t(lang, 'days')}`}
+              colors={colors}
             />
             <InfoRow
               icon="🌿"
               label={lang === 'de' ? 'Düngintervall' : 'Fertilizing interval'}
               value={`${plant.careInfo.fertilizingFrequencyDays} ${t(lang, 'days')}`}
+              colors={colors}
             />
           </View>
 
@@ -150,6 +164,7 @@ export default function PlantDetailScreen() {
               icon="📍"
               title={lang === 'de' ? 'Standorttipps' : 'Location tips'}
               text={plant.careInfo.locationTips}
+              colors={colors}
             />
           ) : null}
           {plant.careInfo.wateringTips ? (
@@ -157,6 +172,7 @@ export default function PlantDetailScreen() {
               icon="💧"
               title={lang === 'de' ? 'Gießtipps' : 'Watering tips'}
               text={plant.careInfo.wateringTips}
+              colors={colors}
             />
           ) : null}
           {plant.careInfo.fertilizingTips ? (
@@ -164,15 +180,16 @@ export default function PlantDetailScreen() {
               icon="🌿"
               title={lang === 'de' ? 'Düngetipps' : 'Fertilizing tips'}
               text={plant.careInfo.fertilizingTips}
+              colors={colors}
             />
           ) : null}
 
           {/* Last care dates */}
           <View style={styles.lastDatesRow}>
-            <Text style={styles.lastDate}>
+            <Text style={[styles.lastDate, { color: colors.accent }]}>
               {t(lang, 'detail_last_watered')}: {formatLastDate(plant.lastWatered, lang)}
             </Text>
-            <Text style={styles.lastDate}>
+            <Text style={[styles.lastDate, { color: colors.accent }]}>
               {t(lang, 'detail_last_fertilized')}: {formatLastDate(plant.lastFertilized, lang)}
             </Text>
           </View>
@@ -180,7 +197,7 @@ export default function PlantDetailScreen() {
           {/* Diseases */}
           {plant.diseases.length > 0 && (
             <>
-              <Text style={styles.sectionTitle}>{t(lang, 'detail_diseases')}</Text>
+              <Text style={[styles.sectionTitle, { color: colors.primary }]}>{t(lang, 'detail_diseases')}</Text>
               {plant.diseases.map((d) => (
                 <DiseaseCard key={d.id} disease={d} lang={lang} />
               ))}
@@ -211,35 +228,36 @@ export default function PlantDetailScreen() {
   )
 }
 
-function InfoRow({ icon, label, value }: { icon: string; label: string; value: string }) {
+type ThemeColors = ReturnType<typeof useThemeColors>
+
+function InfoRow({ icon, label, value, colors }: { icon: string; label: string; value: string; colors: ThemeColors }) {
   return (
-    <View style={styles.infoRow}>
+    <View style={[styles.infoRow, { borderBottomColor: colors.background }]}>
       <Text style={styles.infoIcon}>{icon}</Text>
-      <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={styles.infoValue}>{value}</Text>
+      <Text style={[styles.infoLabel, { color: colors.textMuted }]}>{label}</Text>
+      <Text style={[styles.infoValue, { color: colors.primary }]}>{value}</Text>
     </View>
   )
 }
 
-function InfoBlock({ icon, title, text }: { icon: string; title: string; text: string }) {
+function InfoBlock({ icon, title, text, colors }: { icon: string; title: string; text: string; colors: ThemeColors }) {
   return (
-    <View style={styles.infoBlock}>
-      <Text style={styles.infoBlockTitle}>
+    <View style={[styles.infoBlock, { backgroundColor: colors.surface }, Shadow.cardSm]}>
+      <Text style={[styles.infoBlockTitle, { color: colors.primaryLight }]}>
         {icon} {title}
       </Text>
-      <Text style={styles.infoBlockText}>{text}</Text>
+      <Text style={[styles.infoBlockText, { color: colors.text }]}>{text}</Text>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F0FFF4' },
-  notFound: { padding: 24, fontSize: 16, color: '#666' },
+  container: { flex: 1 },
+  notFound: { padding: 24, fontSize: 16 },
   heroPhoto: { width: '100%', height: 240 },
   heroPlaceholder: {
     width: '100%',
     height: 200,
-    backgroundColor: '#2D6A4F',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -269,9 +287,9 @@ const styles = StyleSheet.create({
   content: { padding: 16 },
   nameRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 },
   nameBlock: { flex: 1, marginRight: 8 },
-  name: { fontSize: 26, fontWeight: '700', color: '#1B4332' },
-  scientificName: { fontSize: 14, color: '#74C69D', fontStyle: 'italic', marginTop: 2 },
-  description: { fontSize: 15, color: '#444', lineHeight: 22, marginBottom: 16 },
+  name: { fontSize: 26, fontWeight: '700' },
+  scientificName: { fontSize: 14, fontStyle: 'italic', marginTop: 2 },
+  description: { fontSize: 15, lineHeight: 22, marginBottom: 16 },
   nextCareRow: {
     flexDirection: 'row',
     gap: 10,
@@ -280,7 +298,6 @@ const styles = StyleSheet.create({
   },
   nextCareItem: {
     flex: 1,
-    backgroundColor: '#D8F3DC',
     borderRadius: 12,
     padding: 12,
     flexDirection: 'row',
@@ -288,25 +305,18 @@ const styles = StyleSheet.create({
     gap: 6,
     flexWrap: 'wrap',
   },
-  nextCareLabel: { fontSize: 12, color: '#1B4332', fontWeight: '600' },
-  nextCareValue: { fontSize: 11, color: '#2D6A4F', flex: 1 },
+  nextCareLabel: { fontSize: 12, fontWeight: '600' },
+  nextCareValue: { fontSize: 11, flex: 1 },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1B4332',
     marginTop: 4,
     marginBottom: 10,
   },
   infoGrid: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
   },
   infoRow: {
     flexDirection: 'row',
@@ -314,32 +324,24 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0FFF4',
   },
   infoIcon: { fontSize: 16, width: 24 },
-  infoLabel: { flex: 1, fontSize: 14, color: '#666' },
-  infoValue: { fontSize: 14, fontWeight: '600', color: '#1B4332' },
+  infoLabel: { flex: 1, fontSize: 14 },
+  infoValue: { fontSize: 14, fontWeight: '600' },
   infoBlock: {
-    backgroundColor: '#fff',
     borderRadius: 12,
     padding: 14,
     marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
   },
   infoBlockTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#52B788',
     marginBottom: 4,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  infoBlockText: { fontSize: 14, color: '#444', lineHeight: 20 },
+  infoBlockText: { fontSize: 14, lineHeight: 20 },
   lastDatesRow: { flexDirection: 'row', gap: 16, marginBottom: 20 },
-  lastDate: { fontSize: 12, color: '#74C69D' },
+  lastDate: { fontSize: 12 },
   bottomSpacer: { height: 40 },
 })
