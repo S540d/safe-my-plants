@@ -10,9 +10,9 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native'
+import { AnimatedPressable } from '../src/components/AnimatedPressable'
 import { PLANT_TEMPLATES, PlantTemplate } from '../src/constants/plantTemplates'
 import { Radius, Shadow, Spacing, Typography } from '../src/constants/theme'
 import { usePlants } from '../src/contexts/PlantContext'
@@ -110,9 +110,9 @@ export default function AddPlantScreen() {
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
           <View style={styles.headerRow}>
-            <TouchableOpacity onPress={() => setStep('search')} style={styles.backBtn}>
+            <AnimatedPressable onPress={() => setStep('search')} style={styles.backBtn} scaleTo={0.88}>
               <Text style={[styles.backBtnText, { color: colors.gradientText }]}>←</Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
             <Text style={styles.headerTitle}>{t(lang, 'add_plant_title')}</Text>
           </View>
         </LinearGradient>
@@ -158,7 +158,7 @@ export default function AddPlantScreen() {
             {showRoomSuggestions && roomSuggestions.length > 0 && (
               <View style={[styles.suggestions, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                 {roomSuggestions.map((r) => (
-                  <TouchableOpacity
+                  <AnimatedPressable
                     key={r}
                     style={[styles.suggestionItem, { borderBottomColor: colors.background }]}
                     onPress={() => {
@@ -167,7 +167,7 @@ export default function AddPlantScreen() {
                     }}
                   >
                     <Text style={[styles.suggestionText, { color: colors.primaryMid }]}>{r}</Text>
-                  </TouchableOpacity>
+                  </AnimatedPressable>
                 ))}
               </View>
             )}
@@ -190,7 +190,7 @@ export default function AddPlantScreen() {
 
             <Text style={[styles.hint, { color: colors.textSubtle }]}>{t(lang, 'add_plant_hint')}</Text>
 
-            <TouchableOpacity
+            <AnimatedPressable
               style={[
                 styles.saveBtn,
                 { backgroundColor: colors.primaryMid },
@@ -200,7 +200,7 @@ export default function AddPlantScreen() {
               disabled={!name.trim()}
             >
               <Text style={styles.saveBtnText}>{t(lang, 'add_plant_save')} ✓</Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
@@ -211,9 +211,9 @@ export default function AddPlantScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
         <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <AnimatedPressable onPress={() => router.back()} style={styles.backBtn} scaleTo={0.88}>
             <Text style={[styles.backBtnText, { color: colors.gradientText }]}>←</Text>
-          </TouchableOpacity>
+          </AnimatedPressable>
           <Text style={styles.headerTitle}>{t(lang, 'add_plant_title')}</Text>
         </View>
       </LinearGradient>
@@ -238,7 +238,7 @@ export default function AddPlantScreen() {
         contentContainerStyle={styles.templateList}
         ListHeaderComponent={
           query.trim() ? (
-            <TouchableOpacity
+            <AnimatedPressable
               style={[styles.customRow, { backgroundColor: colors.accentSurface, borderColor: colors.primaryLight }]}
               onPress={handleCustomPlant}
             >
@@ -251,11 +251,11 @@ export default function AddPlantScreen() {
                 </Text>
               </View>
               <Text style={[styles.rowArrow, { color: colors.primaryLight }]}>→</Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           ) : null
         }
         renderItem={({ item }) => (
-          <TouchableOpacity
+          <AnimatedPressable
             style={[styles.templateRow, { backgroundColor: colors.surface }, Shadow.cardSm]}
             onPress={() => handleSelectTemplate(item)}
           >
@@ -274,7 +274,7 @@ export default function AddPlantScreen() {
               </Text>
             </View>
             <Text style={[styles.rowArrow, { color: colors.primaryLight }]}>→</Text>
-          </TouchableOpacity>
+          </AnimatedPressable>
         )}
         ListEmptyComponent={
           query.trim() ? null : (
