@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import { Shadow } from '../src/constants/theme'
+import { Shadow, Typography } from '../src/constants/theme'
 import { usePreferences } from '../src/hooks/usePreferences'
 import { useThemeColors } from '../src/hooks/useThemeColors'
 import {
@@ -106,7 +106,9 @@ export default function SettingsScreen() {
             Alert.alert('', lines.join('\n'))
           } catch (e) {
             const msg = (e as Error).message
-            if (msg !== 'cancelled') {
+            if (msg === 'unsupported_version') {
+              Alert.alert('', t(lang, 'settings_import_error_version'))
+            } else if (msg !== 'cancelled') {
               Alert.alert('', t(lang, 'settings_import_error'))
             }
           }
@@ -364,7 +366,7 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   backBtn: { paddingVertical: 4, paddingRight: 8 },
   backBtnText: { fontSize: 15, fontWeight: '500' },
-  headerTitle: { fontSize: 28, fontWeight: '700', color: '#fff', flex: 1 },
+  headerTitle: { ...Typography.headerTitle, color: '#fff', flex: 1 },
   scroll: { padding: 16 },
   sectionLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 20, marginBottom: 8 },
   betaBadge: {

@@ -140,6 +140,7 @@ const translations = {
     settings_import_skipped: '{{n}} bereits vorhanden (übersprungen)',
     settings_import_confirm: 'Bestehende Daten werden ergänzt, nicht ersetzt.',
     settings_import_error: 'Ungültige Backup-Datei.',
+    settings_import_error_version: 'Backup stammt von einer neueren App-Version. Bitte App aktualisieren.',
 
     // Stats Screen
     stats_title: 'Statistiken',
@@ -411,6 +412,7 @@ const translations = {
     settings_import_skipped: '{{n}} already present (skipped)',
     settings_import_confirm: 'Existing data will be supplemented, not replaced.',
     settings_import_error: 'Invalid backup file.',
+    settings_import_error_version: 'Backup was created with a newer app version. Please update the app.',
 
     // Stats Screen
     stats_title: 'Statistics',

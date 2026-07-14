@@ -65,6 +65,14 @@ export async function importData(): Promise<ImportResult> {
     throw new Error('invalid_format')
   }
 
+  if (typeof payload.smpSchemaVersion !== 'number' || !Number.isFinite(payload.smpSchemaVersion)) {
+    throw new Error('invalid_format')
+  }
+
+  if (payload.smpSchemaVersion > SCHEMA_VERSION) {
+    throw new Error('unsupported_version')
+  }
+
   const existingPlants = await getPlants()
   const existingIds = new Set(existingPlants.map((p) => p.id))
 

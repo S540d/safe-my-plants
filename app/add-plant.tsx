@@ -14,7 +14,7 @@ import {
   View,
 } from 'react-native'
 import { PLANT_TEMPLATES, PlantTemplate } from '../src/constants/plantTemplates'
-import { Radius, Shadow, Spacing } from '../src/constants/theme'
+import { Radius, Shadow, Spacing, Typography } from '../src/constants/theme'
 import { usePlants } from '../src/contexts/PlantContext'
 import { usePreferences } from '../src/hooks/usePreferences'
 import { useThemeColors } from '../src/hooks/useThemeColors'
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   backBtn: { paddingVertical: Spacing.xs, paddingRight: Spacing.sm },
   backBtnText: { fontSize: 20, fontWeight: '600' },
-  headerTitle: { fontSize: 22, fontWeight: '700', color: '#fff', flex: 1 },
+  headerTitle: { ...Typography.headerTitleSm, color: '#fff', flex: 1 },
   searchContainer: { padding: Spacing.md },
   searchInput: {
     borderWidth: 1.5,

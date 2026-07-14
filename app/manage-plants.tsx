@@ -15,7 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import { Radius, Shadow, Spacing, ThemeColors } from '../src/constants/theme'
+import { Radius, Shadow, Spacing, ThemeColors, Typography } from '../src/constants/theme'
 import { usePlants } from '../src/contexts/PlantContext'
 import { usePreferences } from '../src/hooks/usePreferences'
 import { useThemeColors } from '../src/hooks/useThemeColors'
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   backBtn: { paddingVertical: Spacing.xs },
   backBtnText: { fontSize: 15 },
-  headerTitle: { fontSize: 22, fontWeight: '700', color: '#fff', flex: 1 },
+  headerTitle: { ...Typography.headerTitleSm, color: '#fff', flex: 1 },
   scroll: { padding: Spacing.lg },
   addBtn: {
     borderRadius: Radius.lg,
