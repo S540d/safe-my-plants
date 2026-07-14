@@ -12,10 +12,10 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
   View,
 } from 'react-native'
-import { Radius, Shadow, Spacing, ThemeColors } from '../src/constants/theme'
+import { AnimatedPressable } from '../src/components/AnimatedPressable'
+import { Radius, Shadow, Spacing, ThemeColors, Typography } from '../src/constants/theme'
 import { usePlants } from '../src/contexts/PlantContext'
 import { usePreferences } from '../src/hooks/usePreferences'
 import { useThemeColors } from '../src/hooks/useThemeColors'
@@ -158,7 +158,7 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
         {showRoomSuggestions && roomSuggestions.length > 0 && (
           <View style={[formStyles.suggestions, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             {roomSuggestions.map((r) => (
-              <TouchableOpacity
+              <AnimatedPressable
                 key={r}
                 style={[formStyles.suggestionItem, { borderBottomColor: colors.background }]}
                 onPress={() => {
@@ -167,7 +167,7 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
                 }}
               >
                 <Text style={[formStyles.suggestionText, { color: colors.primaryMid }]}>{r}</Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             ))}
           </View>
         )}
@@ -186,7 +186,7 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
         <Text style={sectionLabelStyle}>{t(lang, 'form_section_sun')}</Text>
         <View style={formStyles.chipRow}>
           {LOCATIONS.map((loc) => (
-            <TouchableOpacity
+            <AnimatedPressable
               key={loc}
               style={[
                 formStyles.chip,
@@ -204,7 +204,7 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
               >
                 {LOCATION_LABELS[lang][loc]}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           ))}
         </View>
 
@@ -265,7 +265,7 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
         <Text style={labelStyle}>{t(lang, 'form_humidity')}</Text>
         <View style={formStyles.chipRow}>
           {(['low', 'medium', 'high'] as const).map((h) => (
-            <TouchableOpacity
+            <AnimatedPressable
               key={h}
               style={[
                 formStyles.chip,
@@ -283,7 +283,7 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
               >
                 {t(lang, h === 'low' ? 'humidity_low' : h === 'medium' ? 'humidity_medium' : 'humidity_high')}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           ))}
         </View>
 
@@ -292,17 +292,17 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
           {plant.photos.map((photo) => (
             <View key={photo.uri} style={formStyles.photoWrapper}>
               <Image source={{ uri: photo.uri }} style={formStyles.photo} />
-              <TouchableOpacity style={formStyles.removePhoto} onPress={() => removePhoto(photo.uri)}>
+              <AnimatedPressable style={formStyles.removePhoto} onPress={() => removePhoto(photo.uri)}>
                 <Text style={formStyles.removePhotoText}>✕</Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             </View>
           ))}
-          <TouchableOpacity
+          <AnimatedPressable
             style={[formStyles.addPhotoBtn, { borderColor: colors.border, backgroundColor: colors.surfaceAlt }]}
             onPress={addPhoto}
           >
             <Text style={[formStyles.addPhotoText, { color: colors.primaryLight }]}>+</Text>
-          </TouchableOpacity>
+          </AnimatedPressable>
         </View>
 
         <Text style={sectionLabelStyle}>{t(lang, 'form_section_diseases')}</Text>
@@ -315,9 +315,9 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
             ]}
           >
             <Text style={[formStyles.diseaseChipText, { color: colors.primary }]}>🦠 {d.name}</Text>
-            <TouchableOpacity onPress={() => removeDisease(d.id)}>
+            <AnimatedPressable onPress={() => removeDisease(d.id)}>
               <Text style={formStyles.removePhotoText}>✕</Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
         ))}
         {newDisease ? (
@@ -345,44 +345,44 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
               numberOfLines={2}
             />
             <View style={formStyles.row}>
-              <TouchableOpacity
+              <AnimatedPressable
                 style={[formStyles.btn, formStyles.btnSecondary, { borderColor: colors.border }]}
                 onPress={() => setNewDisease(null)}
               >
                 <Text style={[formStyles.btnSecondaryText, { color: colors.primaryMid }]}>{t(lang, 'cancel')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+              </AnimatedPressable>
+              <AnimatedPressable
                 style={[formStyles.btn, formStyles.btnPrimary, { backgroundColor: colors.primaryMid }]}
                 onPress={saveDisease}
               >
                 <Text style={formStyles.btnPrimaryText}>{t(lang, 'form_add')}</Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             </View>
           </View>
         ) : (
-          <TouchableOpacity
+          <AnimatedPressable
             style={[formStyles.addDiseaseBtn, { borderColor: colors.border }]}
             onPress={() => setNewDisease(emptyDisease())}
           >
             <Text style={[formStyles.addDiseaseBtnText, { color: colors.primaryLight }]}>
               + {t(lang, 'form_disease_add')}
             </Text>
-          </TouchableOpacity>
+          </AnimatedPressable>
         )}
 
         <View style={formStyles.actions}>
-          <TouchableOpacity
+          <AnimatedPressable
             style={[formStyles.btn, formStyles.btnSecondary, { borderColor: colors.border }]}
             onPress={onCancel}
           >
             <Text style={[formStyles.btnSecondaryText, { color: colors.primaryMid }]}>{t(lang, 'cancel')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </AnimatedPressable>
+          <AnimatedPressable
             style={[formStyles.btn, formStyles.btnPrimary, { backgroundColor: colors.primaryMid }]}
             onPress={handleSave}
           >
             <Text style={formStyles.btnPrimaryText}>{t(lang, 'save')}</Text>
-          </TouchableOpacity>
+          </AnimatedPressable>
         </View>
         <View style={{ height: 40 }} />
       </ScrollView>
@@ -415,9 +415,9 @@ export default function ManagePlantsScreen() {
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
           <View style={styles.headerRow}>
-            <TouchableOpacity onPress={() => setEditing(null)} style={styles.backBtn}>
+            <AnimatedPressable onPress={() => setEditing(null)} style={styles.backBtn} scaleTo={0.9}>
               <Text style={[styles.backBtnText, { color: colors.gradientText }]}>← {t(lang, 'back')}</Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
             <Text style={styles.headerTitle}>{t(lang, 'manage_plants_edit_title')}</Text>
           </View>
         </LinearGradient>
@@ -440,19 +440,19 @@ export default function ManagePlantsScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
         <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <AnimatedPressable onPress={() => router.back()} style={styles.backBtn} scaleTo={0.9}>
             <Text style={[styles.backBtnText, { color: colors.gradientText }]}>← {t(lang, 'back')}</Text>
-          </TouchableOpacity>
+          </AnimatedPressable>
           <Text style={styles.headerTitle}>{t(lang, 'manage_plants_title')}</Text>
         </View>
       </LinearGradient>
       <ScrollView contentContainerStyle={styles.scroll}>
-        <TouchableOpacity
+        <AnimatedPressable
           style={[styles.addBtn, { backgroundColor: colors.primaryMid }]}
           onPress={() => router.push('/add-plant')}
         >
           <Text style={styles.addBtnText}>+ {lang === 'de' ? 'Pflanze hinzufügen' : 'Add plant'}</Text>
-        </TouchableOpacity>
+        </AnimatedPressable>
         {plants.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyEmoji}>🪴</Text>
@@ -475,20 +475,20 @@ export default function ManagePlantsScreen() {
                   ) : null}
                 </View>
                 <View style={styles.plantActions}>
-                  <TouchableOpacity
+                  <AnimatedPressable
                     style={styles.editBtn}
                     onPress={() => setEditing(plant)}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   >
                     <Text style={styles.editBtnText}>✏️</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
+                  </AnimatedPressable>
+                  <AnimatedPressable
                     style={styles.deleteBtn}
                     onPress={() => handleDelete(plant)}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   >
                     <Text style={styles.deleteBtnText}>🗑️</Text>
-                  </TouchableOpacity>
+                  </AnimatedPressable>
                 </View>
               </View>
             )
@@ -506,7 +506,7 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
   backBtn: { paddingVertical: Spacing.xs },
   backBtnText: { fontSize: 15 },
-  headerTitle: { fontSize: 22, fontWeight: '700', color: '#fff', flex: 1 },
+  headerTitle: { ...Typography.headerTitleSm, color: '#fff', flex: 1 },
   scroll: { padding: Spacing.lg },
   addBtn: {
     borderRadius: Radius.lg,

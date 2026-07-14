@@ -73,7 +73,7 @@ TODO: Übersetzung analog zur DE-Fassung.
 
 | Asset | Format / Größe | Status |
 |-------|----------------|--------|
-| App-Icon | 512 × 512 px, 32-bit PNG | ⚠️ aus `assets/icon.png` ableiten |
+| App-Icon | 512 × 512 px, 32-bit PNG | ✅ `docs/store-assets/icon-512.png` (aus `assets/icon.png` abgeleitet) |
 | Feature-Grafik | 1024 × 500 px | TODO |
 | Smartphone-Screenshots | 2–8 Stück, min. 1080 px Kante | TODO |
 | 7"-Tablet-Screenshots (optional) | min. 1080 px | TODO |

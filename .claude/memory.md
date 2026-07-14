@@ -25,7 +25,10 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
 - `src/components/QuickActionBar.tsx` – Aktionsleiste im Plant-Detail (water/fertilize/repot/prune/note), Press-Scale-Buttons, `onWater`/`onFertilize`-Callbacks
 - `src/components/WaterDropAnimation.tsx`, `src/components/CareConfetti.tsx` – Reanimated-Effekte, ausgelöst über `QuickActionBar`-Callbacks im Plant-Detail-Screen (seit PR #82)
 - `src/components/EmptyState.tsx` – wiederverwendbarer Leerzustand mit Fade-/Zoom-Eintrittsanimation, genutzt in `index.tsx` und `manage-plants.tsx`
-- `src/components/AnimatedPressable.tsx` – wiederverwendbarer Press-Scale-Wrapper (Reanimated `withTiming`, `Pressable`-basiert, optionaler `hitSlop`); genutzt in `HeaderMenu` und `app/plant/[id].tsx` (Header-Foto, Zurück-Button). `PlantCard`/`QuickActionBar` nutzen weiterhin ihre eigene inline `useSharedValue`-Variante aus PR #82 (nicht rückwirkend migriert, kein funktionaler Unterschied)
+- `src/components/AnimatedPressable.tsx` – wiederverwendbarer Press-Scale-Wrapper (Reanimated `withTiming`, `Pressable`-basiert, optionaler `hitSlop`); genutzt in `HeaderMenu` und `app/plant/[id].tsx` (Header-Foto, Zurück-Button). `PlantCard`/`QuickActionBar` nutzen weiterhin ihre eigene inline `useSharedValue`-Variante aus PR #82 (nicht rückwirkend migriert, kein funktionaler Unterschied). **Noch nicht migriert** (Issue #85 Block C, offen): `settings.tsx`, `manage-plants.tsx`, `add-plant.tsx`, `HeroPlantCard`, `DashboardSummary` nutzen weiterhin reines `TouchableOpacity`.
+- `src/constants/theme.ts` – seit PR #90 zusätzlich `Typography`-Tokens (`headerTitle` 28/700, `headerTitleSm` 22/700), genutzt für die Header-Titel in `index.tsx`/`settings.tsx`/`add-plant.tsx`/`manage-plants.tsx`. Kein Typografie-Token für Body-/Label-Text (nur Header bisher konsolidiert).
+- `src/services/exportImport.ts` – Export/Import (Issue #15) via `expo-sharing`/`expo-document-picker`; seit PR #90 prüft `importData()` `smpSchemaVersion` im Backup (fehlend/ungültig → `invalid_format`, höher als lokale `SCHEMA_VERSION` → `unsupported_version`, eigene Fehlermeldung in `settings.tsx`)
+- `docs/store-assets/icon-512.png` – 512×512-Play-Store-Icon, aus `assets/icon.png` (1024×1024) abgeleitet (seit PR #90); referenziert in `docs/store-listing.md`
 
 ## Entscheidungen & Einschränkungen
 
@@ -116,6 +119,22 @@ Der zuvor hier notierte Dark-Mode-Rückstand (`app/plant/[id].tsx`, `app/setting
 - **Splash-Screen**: `expo-splash-screen` als Dependency ergänzt, als Config-Plugin in `app.json` verdrahtet (`backgroundColor: #2D6A4F`, Dark-Variante `#0D1F17`, Bild `assets/splash-icon.png`). Vorher war kein Splash-Screen konfiguriert.
 - **App-Icon/Adaptive-Icon**: geprüft, bereits store-tauglich (1024×1024 / 512×512 / 432×432, Markenfarbe als Adaptive-Icon-Hintergrund) – kein Änderungsbedarf.
 - **Nicht Teil von PR #87** (bleibt offen unter Issue #85 Block C): Screenshot-Politur fürs Store-Listing – erfordert reale Gerätescreenshots, kein Code-Task.
+
+## Issue #85 – Block C/B1 Quick-Wins (PR #90, gemerged)
+
+Erste Teil-Umsetzung der übrigen Block-C- und B1-Punkte (nach PR #87):
+- **Typography-Tokens**: neues `Typography`-Objekt in `theme.ts`, 4 duplizierte `headerTitle`-Styles darauf umgestellt (siehe Dateipfade oben).
+- **Hex-Farben-Prüfung**: die vermuteten „hardcodierten Hex-Farben" in `plant/[id].tsx` (Foto-Overlay-Text) und den Header-Titeln (`#fff` auf Gradient) sind **bewusst korrekt** – Overlay sitzt auf fixem `rgba(0,0,0,x)`-Scrim, Gradient-Hintergründe (`gradientStart`/`gradientEnd`) sind in beiden Themes dunkel genug für weißen Text. Kein Fix nötig, keine weitere Aktion hier offen.
+- **512×512-Store-Icon** (Play-Console-Listing-Icon, nicht zu verwechseln mit den Adaptive-Icon-Assets aus PR #87): erstellt unter `docs/store-assets/icon-512.png`, `docs/store-listing.md`-Statustabelle aktualisiert.
+- **Backup-Robustheit** (B1): Schema-Versions-Check beim Import, siehe `exportImport.ts` oben.
+
+**Noch offen unter Issue #85** (bewusst zurückgestellt, siehe PR-#90-Beschreibung):
+- Block C: Hero-Bereich-Politur (Iconografie-Konsistenz-Audit); Screenshot-Politur (Doku, kein Code)
+- Block B1: Widget/Quick-Glance (großer Aufwand, natives Android-Package nötig); Erinnerungen pro Pflanze + Snooze (aktuell nur ein globaler Reminder in `useNotificationScheduler.ts`/`ReminderSettings`, kein Plant-Bezug); Onboarding-Sample-Daten-Auswahl (Grundgerüst existiert, Choice-Dialog fehlt noch)
+
+## Issue #85 – Block C Micro-Animationen ausgerollt (PR #91, gemerged)
+
+Alle verbleibenden `TouchableOpacity`-Stellen auf `AnimatedPressable` umgestellt: `app/settings.tsx`, `app/manage-plants.tsx`, `app/add-plant.tsx`, `src/components/HeroPlantCard.tsx`, `src/components/DashboardSummary.tsx`. `activeOpacity`-Props entfallen (Press-Scale ersetzt das Feedback). Damit haben **alle** primären Touch-Ziele der App konsistentes Press-Feedback – der entsprechende Checklistenpunkt in Issue #85 Block C ist abgehakt.
 
 ## Issue #52 – npm audit fix (erledigt, PR #83)
 
