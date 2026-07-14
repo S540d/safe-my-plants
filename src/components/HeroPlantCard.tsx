@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import React from 'react'
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
+import { AnimatedPressable } from './AnimatedPressable'
 import { Language, t } from '../i18n/translations'
 import { Plant } from '../types/plant'
 
@@ -16,7 +17,7 @@ export function HeroPlantCard({ plant, lang, onPress, onWater, onFertilize }: Pr
   const hasPhoto = plant.photos.length > 0
 
   return (
-    <TouchableOpacity style={styles.hero} onPress={onPress} activeOpacity={0.92}>
+    <AnimatedPressable style={styles.hero} onPress={onPress} scaleTo={0.97}>
       {hasPhoto ? (
         <Image source={{ uri: plant.photos[0].uri }} style={styles.image} resizeMode="cover" />
       ) : (
@@ -36,30 +37,28 @@ export function HeroPlantCard({ plant, lang, onPress, onWater, onFertilize }: Pr
             </Text>
           ) : null}
           <View style={styles.actions}>
-            <TouchableOpacity
+            <AnimatedPressable
               style={[styles.btn, styles.btnWater]}
               onPress={(e) => {
                 e.stopPropagation()
                 onWater()
               }}
-              activeOpacity={0.8}
             >
               <Text style={styles.btnText}>💧 {t(lang, 'hero_water')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </AnimatedPressable>
+            <AnimatedPressable
               style={[styles.btn, styles.btnFertilize]}
               onPress={(e) => {
                 e.stopPropagation()
                 onFertilize()
               }}
-              activeOpacity={0.8}
             >
               <Text style={styles.btnText}>🌿 {t(lang, 'hero_fertilize')}</Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
         </View>
       </LinearGradient>
-    </TouchableOpacity>
+    </AnimatedPressable>
   )
 }
 

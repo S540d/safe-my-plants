@@ -1,17 +1,8 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import {
-  Alert,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Alert, SafeAreaView, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
+import { AnimatedPressable } from '../src/components/AnimatedPressable'
 import { Shadow, Typography } from '../src/constants/theme'
 import { usePreferences } from '../src/hooks/usePreferences'
 import { useThemeColors } from '../src/hooks/useThemeColors'
@@ -138,11 +129,11 @@ export default function SettingsScreen() {
       <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
         <View style={styles.headerRow}>
           {canGoBack && (
-            <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+            <AnimatedPressable onPress={() => router.back()} style={styles.backBtn} scaleTo={0.9}>
               <Text style={[styles.backBtnText, { color: colors.gradientText }]}>
                 ← {lang === 'de' ? 'Zurück' : 'Back'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           )}
           <Text style={styles.headerTitle}>{lang === 'de' ? 'Einstellungen' : 'Settings'}</Text>
         </View>
@@ -181,7 +172,7 @@ export default function SettingsScreen() {
         <Text style={[styles.sectionLabel, { color: colors.primaryLight }]}>
           {lang === 'de' ? 'Admin-Bereich' : 'Admin Area'}
         </Text>
-        <TouchableOpacity
+        <AnimatedPressable
           style={[styles.listItem, { backgroundColor: colors.surface }, Shadow.cardSm]}
           onPress={() => setShowPinChange(!showPinChange)}
         >
@@ -189,7 +180,7 @@ export default function SettingsScreen() {
             {lang === 'de' ? 'Admin-PIN' : 'Admin PIN'} {adminPin ? '✓' : '(nicht gesetzt)'}
           </Text>
           <Text style={[styles.chevron, { color: colors.accent }]}>›</Text>
-        </TouchableOpacity>
+        </AnimatedPressable>
 
         {showPinChange && (
           <View style={[styles.pinForm, { backgroundColor: colors.surface }, Shadow.cardSm]}>
@@ -219,11 +210,11 @@ export default function SettingsScreen() {
               value={confirmPin}
               onChangeText={setConfirmPin}
             />
-            <TouchableOpacity style={[styles.saveBtn, { backgroundColor: colors.primaryMid }]} onPress={handleSavePin}>
+            <AnimatedPressable style={[styles.saveBtn, { backgroundColor: colors.primaryMid }]} onPress={handleSavePin}>
               <Text style={[styles.saveBtnText, { color: colors.textOnPrimary }]}>
                 {lang === 'de' ? 'Speichern' : 'Save'}
               </Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
         )}
 
@@ -254,33 +245,33 @@ export default function SettingsScreen() {
                 {t(lang, 'settings_notifications_time')}
               </Text>
               <View style={styles.timePicker}>
-                <TouchableOpacity
+                <AnimatedPressable
                   style={[styles.timeBtn, { backgroundColor: colors.accentSurface }]}
                   onPress={() => adjustTime(-1, 0)}
                 >
                   <Text style={[styles.timeBtnText, { color: colors.primaryMid }]}>−</Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
                 <Text style={[styles.timeDisplay, { color: colors.primary }]}>{reminder.time.split(':')[0]}</Text>
-                <TouchableOpacity
+                <AnimatedPressable
                   style={[styles.timeBtn, { backgroundColor: colors.accentSurface }]}
                   onPress={() => adjustTime(1, 0)}
                 >
                   <Text style={[styles.timeBtnText, { color: colors.primaryMid }]}>+</Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
                 <Text style={[styles.timeSep, { color: colors.primary }]}>:</Text>
-                <TouchableOpacity
+                <AnimatedPressable
                   style={[styles.timeBtn, { backgroundColor: colors.accentSurface }]}
                   onPress={() => adjustTime(0, -15)}
                 >
                   <Text style={[styles.timeBtnText, { color: colors.primaryMid }]}>−</Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
                 <Text style={[styles.timeDisplay, { color: colors.primary }]}>{reminder.time.split(':')[1]}</Text>
-                <TouchableOpacity
+                <AnimatedPressable
                   style={[styles.timeBtn, { backgroundColor: colors.accentSurface }]}
                   onPress={() => adjustTime(0, 15)}
                 >
                   <Text style={[styles.timeBtnText, { color: colors.primaryMid }]}>+</Text>
-                </TouchableOpacity>
+                </AnimatedPressable>
               </View>
             </View>
           )}
@@ -289,13 +280,13 @@ export default function SettingsScreen() {
         {/* Data */}
         <Text style={[styles.sectionLabel, { color: colors.primaryLight }]}>{t(lang, 'settings_data')}</Text>
         <View style={styles.dataRow}>
-          <TouchableOpacity
+          <AnimatedPressable
             style={[styles.dataBtn, { backgroundColor: colors.primaryMid }, Shadow.cardSm]}
             onPress={handleExport}
           >
             <Text style={[styles.dataBtnText, { color: colors.textOnPrimary }]}>📤 {t(lang, 'settings_export')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </AnimatedPressable>
+          <AnimatedPressable
             style={[
               styles.dataBtn,
               { backgroundColor: colors.surface, borderWidth: 1.5, borderColor: colors.border },
@@ -304,7 +295,7 @@ export default function SettingsScreen() {
             onPress={handleImport}
           >
             <Text style={[styles.dataBtnText, { color: colors.primaryMid }]}>📥 {t(lang, 'settings_import')}</Text>
-          </TouchableOpacity>
+          </AnimatedPressable>
         </View>
 
         {/* About */}
@@ -339,7 +330,7 @@ function Chip({
   colors: ReturnType<typeof useThemeColors>
 }) {
   return (
-    <TouchableOpacity
+    <AnimatedPressable
       style={[
         styles.chip,
         { borderColor: colors.border, backgroundColor: colors.surface },
@@ -356,7 +347,7 @@ function Chip({
       >
         {label}
       </Text>
-    </TouchableOpacity>
+    </AnimatedPressable>
   )
 }
 

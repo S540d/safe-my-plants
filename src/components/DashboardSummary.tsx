@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
-import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { ScrollView, StyleSheet, Text } from 'react-native'
+import { AnimatedPressable } from './AnimatedPressable'
 import { getCareStatus } from '../hooks/useCareStatus'
 import { Language, t } from '../i18n/translations'
 import { Plant } from '../types/plant'
@@ -56,15 +57,14 @@ export function DashboardSummary({ plants, lang, activeFilter, onFilterChange }:
         const isActive = activeFilter === card.key
         const count = counts[card.key]
         return (
-          <TouchableOpacity
+          <AnimatedPressable
             key={card.key}
             style={[styles.card, { backgroundColor: isActive ? card.activeBg : card.bg }]}
             onPress={() => onFilterChange(isActive ? null : card.key)}
-            activeOpacity={0.75}
           >
             <Text style={[styles.count, { color: isActive ? '#fff' : card.color }]}>{count}</Text>
             <Text style={[styles.label, { color: isActive ? '#fff' : '#555' }]}>{t(lang, card.labelKey)}</Text>
-          </TouchableOpacity>
+          </AnimatedPressable>
         )
       })}
     </ScrollView>
