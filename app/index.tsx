@@ -5,7 +5,7 @@ import { SafeAreaView, SectionList, StyleSheet, Text, View } from 'react-native'
 import { EmptyState } from '../src/components/EmptyState'
 import { HeaderMenu } from '../src/components/HeaderMenu'
 import { PlantCard } from '../src/components/PlantCard'
-import { Radius, Spacing } from '../src/constants/theme'
+import { Radius, Spacing, Typography } from '../src/constants/theme'
 import { usePlants } from '../src/contexts/PlantContext'
 import { usePreferences } from '../src/hooks/usePreferences'
 import { useThemeColors } from '../src/hooks/useThemeColors'
@@ -115,8 +115,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: '700',
+    ...Typography.headerTitle,
     color: '#fff',
   },
   headerCount: {

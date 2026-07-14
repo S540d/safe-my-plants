@@ -73,6 +73,11 @@ export const Radius = {
   full: 999,
 }
 
+export const Typography = {
+  headerTitle: { fontSize: 28, fontWeight: '700' as const },
+  headerTitleSm: { fontSize: 22, fontWeight: '700' as const },
+}
+
 export const Shadow = {
   card: {
     shadowColor: '#000',
