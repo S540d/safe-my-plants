@@ -129,8 +129,12 @@ Erste Teil-Umsetzung der übrigen Block-C- und B1-Punkte (nach PR #87):
 - **Backup-Robustheit** (B1): Schema-Versions-Check beim Import, siehe `exportImport.ts` oben.
 
 **Noch offen unter Issue #85** (bewusst zurückgestellt, siehe PR-#90-Beschreibung):
-- Block C: Micro-Animationen konsequent auf alle verbleibenden `TouchableOpacity`-Stellen (`settings.tsx`, `manage-plants.tsx`, `add-plant.tsx`, `HeroPlantCard`, `DashboardSummary`) ausrollen; Hero-Bereich-Politur; Screenshot-Politur (Doku, kein Code)
-- Block B1: Widget/Quick-Glance (großer Aufwand, natives Android-Package nötig); Erinnerungen pro Pflanze + Snooze (aktuell nur ein globaler Reminder in `useNotificationScheduler.ts`/`ReminderSettings`, kein Plant-Bezug)
+- Block C: Hero-Bereich-Politur (Iconografie-Konsistenz-Audit); Screenshot-Politur (Doku, kein Code)
+- Block B1: Widget/Quick-Glance (großer Aufwand, natives Android-Package nötig); Erinnerungen pro Pflanze + Snooze (aktuell nur ein globaler Reminder in `useNotificationScheduler.ts`/`ReminderSettings`, kein Plant-Bezug); Onboarding-Sample-Daten-Auswahl (Grundgerüst existiert, Choice-Dialog fehlt noch)
+
+## Issue #85 – Block C Micro-Animationen ausgerollt (PR #91, gemerged)
+
+Alle verbleibenden `TouchableOpacity`-Stellen auf `AnimatedPressable` umgestellt: `app/settings.tsx`, `app/manage-plants.tsx`, `app/add-plant.tsx`, `src/components/HeroPlantCard.tsx`, `src/components/DashboardSummary.tsx`. `activeOpacity`-Props entfallen (Press-Scale ersetzt das Feedback). Damit haben **alle** primären Touch-Ziele der App konsistentes Press-Feedback – der entsprechende Checklistenpunkt in Issue #85 Block C ist abgehakt.
 
 ## Issue #52 – npm audit fix (erledigt, PR #83)
 
