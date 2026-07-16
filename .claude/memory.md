@@ -151,3 +151,15 @@ Alle verbleibenden `TouchableOpacity`-Stellen auf `AnimatedPressable` umgestellt
 - expo-haptics ~56.0.3
 - expo-splash-screen ~56.0.12 (seit PR #87, Config-Plugin in `app.json`)
 - `overrides`: `uuid@^11.1.1`, `js-yaml@^4.2.0` (patcht transitive Build-Tooling-Deps von `@expo/cli`, seit PR #83)
+- `jest` + `ts-jest` + `@types/jest` als devDependencies (seit PR #94, Testing-Setup)
+
+## Issue #85 – Block A Launch-Blocker, Teil 1 (PR #94, gemerged)
+
+- **`app.json` Android-Permissions bereinigt**: `READ_EXTERNAL_STORAGE`/`WRITE_EXTERNAL_STORAGE` entfernt (veraltet seit Android 13, `expo-image-picker` nutzt den System-Photo-Picker; unnötige Permissions hätten in der Play-Console-Review Rückfragen ausgelöst). Nur noch `android.permission.CAMERA` deklariert.
+- **`expo-notifications` als Config-Plugin registriert** (`app.json` → `plugins`, `color: #2D6A4F`). Vorher fehlte der Eintrag, wodurch beim `expo prebuild` die `POST_NOTIFICATIONS`-Permission (Pflicht ab Android 13) nicht ins Manifest kam – die Erinnerungsfunktion (`useNotificationScheduler.ts`) wäre auf aktuellen Android-Versionen nicht zuverlässig nutzbar gewesen.
+- **LICENSE korrigiert**: enthielt noch den Copyright-Vermerk der Expo-Boilerplate (650 Industries, Inc.) statt des tatsächlichen Rechteinhabers.
+- **Datenschutzerklärung gehostet**: `scripts/build-privacy-page.js` rendert `PRIVACY_POLICY.md` bei jedem GitHub-Pages-Deploy (`deploy.yml`) nach `dist/privacy.html`. Öffentliche URL: `https://s540d.github.io/safe-my-plants/privacy.html`. `docs/store-listing.md` entsprechend aktualisiert, inkl. bisher fehlender EN-Vollbeschreibung.
+- **Test-Setup**: `jest.config.js` (Preset `ts-jest`, `testEnvironment: node`), erster Test `src/hooks/useCareStatus.test.ts` (Ampel-Logik, 9 Fälle). `package.json` → `"test": "jest"`. CI (`ci.yml`) führt `npm test -- --ci` jetzt nach dem Typecheck mit aus.
+- **Bekannte Lücke**: `ci.yml` triggert nur auf `push`/`pull_request` gegen `main` (`branches: [main]`), läuft also NICHT für PRs gegen `testing` – der Typecheck/Test-Schritt griff bei PR #94 selbst nicht (Merge erfolgte über `mergeability`/`standards-audit`, die auf beide Branches laufen). Nicht in PR #94 behoben, da eigenständige CI-Architektur-Entscheidung.
+
+**Weiterhin offen unter Issue #85 Block A** (siehe Issue für Details): Target-SDK/16-KB-Page-Size-Verifikation nach `expo prebuild`, signierte AAB + Play App Signing, `versionCode`-Strategie, Crash-/Fehler-Robustheit-Smoke-Test, interner Test-Track. Block D (Store-Listing): Feature-Grafik, Screenshots, Data-Safety-Formular, Content-Rating-Fragebogen – reine Play-Console-/Grafik-Aufgaben, kein Code.
