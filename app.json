@@ -20,11 +20,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE"
-      ]
+      "permissions": ["android.permission.CAMERA"]
     },
     "web": {
       "favicon": "./assets/favicon.png",
@@ -55,6 +51,12 @@
           "dark": {
             "backgroundColor": "#0D1F17"
           }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#2D6A4F"
         }
       ]
     ],
