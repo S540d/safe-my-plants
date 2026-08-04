@@ -65,3 +65,6 @@ credentials.json
 *.keystore
 docs/private/
 
+# Release AABs (nie in Git-History, siehe CLAUDE.md Android-Build-Regeln)
+/aab-archive/
+
