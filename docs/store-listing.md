@@ -16,7 +16,7 @@
 | Tags | Pflanzenpflege, Zimmerpflanzen, Gießerinnerung, Offline |
 | Kontakt-E-Mail | `DevSven@posteo.de` |
 | Website | `https://s540d.github.io/safe-my-plants` |
-| Datenschutzerklärung (URL) | TODO: gehostete URL der `PRIVACY_POLICY.md` (z. B. GitHub Pages) |
+| Datenschutzerklärung (URL) | `https://s540d.github.io/safe-my-plants/privacy.html` |
 
 ## 2. Kurzbeschreibung (max. 80 Zeichen)
 
@@ -66,7 +66,39 @@ Die App funktioniert vollständig ohne Internetverbindung.
 ### EN
 
 ```
-TODO: Übersetzung analog zur DE-Fassung.
+Safe My Plants is your personal companion for healthy houseplants –
+fully offline, no account, no ads.
+
+🚦 TRAFFIC-LIGHT SYSTEM
+See at a glance which plant needs water or fertilizer.
+Green = all good, yellow = due soon, red = overdue.
+
+🪴 YOUR PLANTS, YOUR DATA
+Add plants with photos, location, climate requirements, and care tips.
+Everything stays local on your device.
+
+📊 CARE HISTORY & STATS
+Every watering and fertilizing action is logged. Keep track of your
+streak and see how reliably you care for your plants.
+
+🔔 REMINDERS
+Optional, local notifications when a plant is due.
+
+🦠 DISEASE TRACKING
+Save symptoms and treatment notes for each plant.
+
+✨ MORE FEATURES
+• Photo gallery per plant
+• Notes
+• Search, filters & sorting
+• Templates for common houseplants
+• Export & import your data (JSON)
+• German & English
+• Light & dark mode
+
+🔒 PRIVACY FIRST
+No accounts. No cloud. No ads. No tracking.
+The app works fully without an internet connection.
 ```
 
 ## 4. Grafische Assets (Anforderungen)

@@ -26,6 +26,7 @@ jobs:
           cache: 'npm'
       - run: npm ci --legacy-peer-deps
       - run: npx expo export -p web
+      - run: node scripts/build-privacy-page.js
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
