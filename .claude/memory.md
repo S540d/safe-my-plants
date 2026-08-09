@@ -153,6 +153,22 @@ Alle verbleibenden `TouchableOpacity`-Stellen auf `AnimatedPressable` umgestellt
 - `overrides`: `uuid@^11.1.1`, `js-yaml@^4.2.0` (patcht transitive Build-Tooling-Deps von `@expo/cli`, seit PR #83)
 - `jest` + `ts-jest` + `@types/jest` als devDependencies (seit PR #94, Testing-Setup)
 
+## Dependabot-Merges 2026-08-09 (PR #98–#106, direkt gegen main)
+
+Alle offenen Dependabot-PRs gemerged, Reihenfolge: erst CI/Actions (unabhängig von npm), dann npm-Gruppe, dann npm-Einzel-Major-Bumps (letztere hatten nach der npm-Gruppe Merge-Konflikte in `package-lock.json` – via `@dependabot rebase`-Kommentar aufgelöst, danach konfliktfrei gemergt):
+
+- #98 `deploy-pages` Action 4 → 5
+- #99 `reusable-dev-standards-audit.yml` v1 → v2
+- #100 `reusable-security-scan.yml` v1 → v2
+- #101 `reusable-gitignore-audit.yml` v1 → v2
+- #102 npm minor/patch-Gruppe (10 Updates)
+- #103 `expo-notifications` 56.0.15 → 57.0.8
+- #104 `@react-native-async-storage/async-storage` 2.2.0 → 3.1.1
+- #105 `expo-splash-screen` 56.0.12 → 57.0.5
+- #106 `expo-image-picker` 56.0.15 → 57.0.7
+
+**Wichtig:** Diese PRs zielten direkt auf `main` (Dependabot-Branches sind laut `Block feature branches → main`-CI-Check davon ausgenommen, anders als reguläre Feature-Branches). `testing` hat diese Bumps noch **nicht** – beim nächsten `main` → `testing`-Sync bzw. Feature-PR-Rebase auf aktuelle Major-Versionen (Expo 57 statt 56 bei den drei Paketen) achten, ggf. Breaking Changes in `expo-notifications`/`expo-splash-screen`/`expo-image-picker` prüfen.
+
 ## Issue #85 – Block A Launch-Blocker, Teil 1 (PR #94, gemerged)
 
 - **`app.json` Android-Permissions bereinigt**: `READ_EXTERNAL_STORAGE`/`WRITE_EXTERNAL_STORAGE` entfernt (veraltet seit Android 13, `expo-image-picker` nutzt den System-Photo-Picker; unnötige Permissions hätten in der Play-Console-Review Rückfragen ausgelöst). Nur noch `android.permission.CAMERA` deklariert.
