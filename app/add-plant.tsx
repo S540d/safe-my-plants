@@ -252,7 +252,7 @@ export default function AddPlantScreen() {
               </View>
               <Text style={[styles.rowArrow, { color: colors.primaryLight }]}>→</Text>
             </AnimatedPressable>
-          ) : null
+          ) : undefined
         }
         renderItem={({ item }) => (
           <AnimatedPressable
@@ -277,7 +277,7 @@ export default function AddPlantScreen() {
           </AnimatedPressable>
         )}
         ListEmptyComponent={
-          query.trim() ? null : (
+          query.trim() ? undefined : (
             <View style={styles.emptyHint}>
               <Text style={[styles.emptyHintText, { color: colors.accent }]}>{t(lang, 'add_plant_empty_hint')}</Text>
             </View>

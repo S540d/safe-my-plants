@@ -151,7 +151,23 @@ Alle verbleibenden `TouchableOpacity`-Stellen auf `AnimatedPressable` umgestellt
 - expo-haptics ~56.0.3
 - expo-splash-screen ~56.0.12 (seit PR #87, Config-Plugin in `app.json`)
 - `overrides`: `uuid@^11.1.1`, `js-yaml@^4.2.0` (patcht transitive Build-Tooling-Deps von `@expo/cli`, seit PR #83)
-- `jest` + `ts-jest` + `@types/jest` als devDependencies (seit PR #94, Testing-Setup)
+- `jest` + `@types/jest` als devDependencies (seit PR #94, Testing-Setup); `ts-jest` seit PR #118 entfernt (siehe unten)
+
+## Dependabot-Merges 2026-08-09 (PR #98–#106, direkt gegen main)
+
+Alle offenen Dependabot-PRs gemerged, Reihenfolge: erst CI/Actions (unabhängig von npm), dann npm-Gruppe, dann npm-Einzel-Major-Bumps (letztere hatten nach der npm-Gruppe Merge-Konflikte in `package-lock.json` – via `@dependabot rebase`-Kommentar aufgelöst, danach konfliktfrei gemergt):
+
+- #98 `deploy-pages` Action 4 → 5
+- #99 `reusable-dev-standards-audit.yml` v1 → v2
+- #100 `reusable-security-scan.yml` v1 → v2
+- #101 `reusable-gitignore-audit.yml` v1 → v2
+- #102 npm minor/patch-Gruppe (10 Updates)
+- #103 `expo-notifications` 56.0.15 → 57.0.8
+- #104 `@react-native-async-storage/async-storage` 2.2.0 → 3.1.1
+- #105 `expo-splash-screen` 56.0.12 → 57.0.5
+- #106 `expo-image-picker` 56.0.15 → 57.0.7
+
+**Wichtig:** Diese PRs zielten direkt auf `main` (Dependabot-Branches sind laut `Block feature branches → main`-CI-Check davon ausgenommen, anders als reguläre Feature-Branches). `testing` hat diese Bumps noch **nicht** – beim nächsten `main` → `testing`-Sync bzw. Feature-PR-Rebase auf aktuelle Major-Versionen (Expo 57 statt 56 bei den drei Paketen) achten, ggf. Breaking Changes in `expo-notifications`/`expo-splash-screen`/`expo-image-picker` prüfen.
 
 ## Issue #85 – Block A Launch-Blocker, Teil 1 (PR #94, gemerged)
 
@@ -159,7 +175,30 @@ Alle verbleibenden `TouchableOpacity`-Stellen auf `AnimatedPressable` umgestellt
 - **`expo-notifications` als Config-Plugin registriert** (`app.json` → `plugins`, `color: #2D6A4F`). Vorher fehlte der Eintrag, wodurch beim `expo prebuild` die `POST_NOTIFICATIONS`-Permission (Pflicht ab Android 13) nicht ins Manifest kam – die Erinnerungsfunktion (`useNotificationScheduler.ts`) wäre auf aktuellen Android-Versionen nicht zuverlässig nutzbar gewesen.
 - **LICENSE korrigiert**: enthielt noch den Copyright-Vermerk der Expo-Boilerplate (650 Industries, Inc.) statt des tatsächlichen Rechteinhabers.
 - **Datenschutzerklärung gehostet**: `scripts/build-privacy-page.js` rendert `PRIVACY_POLICY.md` bei jedem GitHub-Pages-Deploy (`deploy.yml`) nach `dist/privacy.html`. Öffentliche URL: `https://s540d.github.io/safe-my-plants/privacy.html`. `docs/store-listing.md` entsprechend aktualisiert, inkl. bisher fehlender EN-Vollbeschreibung.
-- **Test-Setup**: `jest.config.js` (Preset `ts-jest`, `testEnvironment: node`), erster Test `src/hooks/useCareStatus.test.ts` (Ampel-Logik, 9 Fälle). `package.json` → `"test": "jest"`. CI (`ci.yml`) führt `npm test -- --ci` jetzt nach dem Typecheck mit aus.
+- **Test-Setup**: `jest.config.js` (ursprünglich Preset `ts-jest`, `testEnvironment: node`), erster Test `src/hooks/useCareStatus.test.ts` (Ampel-Logik, 9 Fälle). `package.json` → `"test": "jest"`. CI (`ci.yml`) führt `npm test -- --ci` jetzt nach dem Typecheck mit aus.
 - **Bekannte Lücke**: `ci.yml` triggert nur auf `push`/`pull_request` gegen `main` (`branches: [main]`), läuft also NICHT für PRs gegen `testing` – der Typecheck/Test-Schritt griff bei PR #94 selbst nicht (Merge erfolgte über `mergeability`/`standards-audit`, die auf beide Branches laufen). Nicht in PR #94 behoben, da eigenständige CI-Architektur-Entscheidung.
 
 **Weiterhin offen unter Issue #85 Block A** (siehe Issue für Details): Target-SDK/16-KB-Page-Size-Verifikation nach `expo prebuild`, signierte AAB + Play App Signing, `versionCode`-Strategie, Crash-/Fehler-Robustheit-Smoke-Test, interner Test-Track. Block D (Store-Listing): Feature-Grafik, Screenshots, Data-Safety-Formular, Content-Rating-Fragebogen – reine Play-Console-/Grafik-Aufgaben, kein Code.
+
+## Dependabot-Batch 2026-08-12: TS7-Regression + Fix (PR #116, #118, #106/#108–#115)
+
+Alle 8 zu dem Zeitpunkt offenen Dependabot-PRs (#106, #108–#115: `expo-image-picker`, `expo-splash-screen`, `@react-native-async-storage/async-storage`, `expo-notifications`-Gruppe, `expo-linear-gradient`, `expo-document-picker`, `typescript`, `@expo/cli`, `actions/checkout`, `actions/upload-pages-artifact`, `actions/setup-node`) wurden geprüft und gemerged. Dabei aufgefallen und behoben:
+
+- **PR #113 (`typescript` 6.0.3 → 7.0.2) hat `main` gebrochen**: TS7 ist der neue native (Go-basierte) Compiler und exponiert die alte JS-Compiler-API nicht mehr, auf der `ts-jest` aufbaut → `npm test` schlug fehl (`ts-jest` konnte keine Config erstellen), obwohl `npx tsc --noEmit` selbst weiterhin grün lief. Das blockierte in der Folge auch alle nachfolgenden Dependabot-PRs (geerbter roter `lint-and-typecheck`-Check gegen die kaputte `main`-Basis).
+- **Sofort-Fix (PR #116, `hotfix/revert-typescript7`)**: `typescript` zurück auf `~6.0.3` gepinnt, um `main` grün zu bekommen.
+- **Struktureller Fix (PR #118, `hotfix/jest-babel-transform`)**: `ts-jest` komplett entfernt. `jest.config.js` nutzt jetzt den eingebauten Babel-Transform (greift auf die vorhandene `babel-preset-expo`-Config zurück, dieselbe wie fürs App-Bundling). Type-Safety bleibt weiterhin über den separaten `npx tsc --noEmit`-Schritt abgedeckt. Verifiziert: `npm test` läuft jetzt sowohl mit `typescript@6.0.3` als auch testweise mit `typescript@7.0.2` grün durch – ein künftiger TS7-Wiederholungsversuch sollte `npm test` nicht mehr brechen.
+- **Branch-Namenskonvention gelernt**: Das CI-Gate „Block feature branches → main" blockt Branch-Präfixe `feature/*`, `fix/*`, `claude/*`, `chore/*`, `docs/*` von PRs gegen `main` (müssen gegen `testing`). Einzige Ausnahme: `hotfix/*` darf direkt gegen `main` – dafür wurden #116 und #118 unter `hotfix/…` angelegt (PR #117 unter `fix/…` musste deshalb geschlossen und durch #118 ersetzt werden).
+- Dependabot-PRs, die während der Hotfix-Fenster auf einer inzwischen überholten `main`-Basis standen, mussten per `@dependabot rebase`-Kommentar manuell nachgezogen werden, bevor sie mergebar wurden.
+
+## Issue #52 geschlossen (2026-08-12)
+
+Als erledigt geschlossen mit Verweis auf die bereits in PR #83 umgesetzte Lösung (`overrides` für `uuid`/`js-yaml` statt Expo-SDK-Downgrade, siehe oben) – der im Issue vorgeschlagene Lösungsweg (Expo-SDK-Upgrade) wurde nicht gebraucht.
+
+## `testing`/`main`-Divergenz behoben + PR #125 gemerged (2026-08-26)
+
+`testing` war hinter `main` zurückgefallen: mehrere Dependabot-PRs (u. a. #113/#116/#118, der TS7→ts-jest-Fix) waren zwischenzeitlich direkt gegen `main` gemerged worden, ohne zurück nach `testing` zu fließen. `testing` lief dadurch noch mit der alten `ts-jest`-Config.
+
+- **Fix**: `origin/main` in `testing` gemerged (konfliktfrei, reiner Fast-Forward-Content), dadurch `jest.config.js`-Babel-Transform-Fix und alle vorher auf `main` verifizierten Dependency-Bumps auch auf `testing` verfügbar.
+- **PR #125** (`typescript` 6.0.3 → 7.0.2 erneut, plus 8 weitere Minor/Patch-Bumps) zielte ursprünglich auf `main` – gegen Workflow-Regel umgebogen auf `testing`. Nach Rebase auf aktualisiertes `testing` blieben 2 TS-Fehler durch geänderte RN/Expo-Typings: `FlatList`'s `ListHeaderComponent`/`ListEmptyComponent` akzeptieren jetzt kein `null` mehr (nur `undefined`), `ViewToken.index` ist jetzt `number | undefined` statt `number | null`. Beide lokal in `app/add-plant.tsx` und `src/components/PhotoGalleryModal.tsx` behoben, dann gemerged.
+- **Bekannte CI-Lücke bestätigt** (siehe oben, PR #94): `pull_request`-Trigger in `ci.yml` läuft nur gegen `main`, nicht gegen `testing` – bei PR #125 mussten Typecheck/Tests/Prettier deshalb lokal verifiziert werden, da GitHub für den `testing`-Zielbranch keinen `lint-and-typecheck`-Check erzeugt hat. Weiterhin nicht behoben, eigenständige CI-Architektur-Entscheidung.
+- **Lektion**: Vor jedem Merge eines an `main` hängenden Dependabot-PRs erst prüfen, ob `testing` überhaupt aktuell ist (`git log testing..main`) – sonst drohen stille Regressionen wie die TS7/ts-jest-Inkompatibilität erneut unbemerkt via `testing` reinzukommen.
