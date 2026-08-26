@@ -14,4 +14,4 @@ permissions:
 
 jobs:
   gitignore-audit:
-    uses: S540d/project-templates/.github/workflows/reusable-gitignore-audit.yml@v1
+    uses: S540d/project-templates/.github/workflows/reusable-gitignore-audit.yml@v2
