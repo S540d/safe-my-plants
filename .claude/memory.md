@@ -193,3 +193,12 @@ Alle 8 zu dem Zeitpunkt offenen Dependabot-PRs (#106, #108–#115: `expo-image-p
 ## Issue #52 geschlossen (2026-08-12)
 
 Als erledigt geschlossen mit Verweis auf die bereits in PR #83 umgesetzte Lösung (`overrides` für `uuid`/`js-yaml` statt Expo-SDK-Downgrade, siehe oben) – der im Issue vorgeschlagene Lösungsweg (Expo-SDK-Upgrade) wurde nicht gebraucht.
+
+## `testing`/`main`-Divergenz behoben + PR #125 gemerged (2026-08-26)
+
+`testing` war hinter `main` zurückgefallen: mehrere Dependabot-PRs (u. a. #113/#116/#118, der TS7→ts-jest-Fix) waren zwischenzeitlich direkt gegen `main` gemerged worden, ohne zurück nach `testing` zu fließen. `testing` lief dadurch noch mit der alten `ts-jest`-Config.
+
+- **Fix**: `origin/main` in `testing` gemerged (konfliktfrei, reiner Fast-Forward-Content), dadurch `jest.config.js`-Babel-Transform-Fix und alle vorher auf `main` verifizierten Dependency-Bumps auch auf `testing` verfügbar.
+- **PR #125** (`typescript` 6.0.3 → 7.0.2 erneut, plus 8 weitere Minor/Patch-Bumps) zielte ursprünglich auf `main` – gegen Workflow-Regel umgebogen auf `testing`. Nach Rebase auf aktualisiertes `testing` blieben 2 TS-Fehler durch geänderte RN/Expo-Typings: `FlatList`'s `ListHeaderComponent`/`ListEmptyComponent` akzeptieren jetzt kein `null` mehr (nur `undefined`), `ViewToken.index` ist jetzt `number | undefined` statt `number | null`. Beide lokal in `app/add-plant.tsx` und `src/components/PhotoGalleryModal.tsx` behoben, dann gemerged.
+- **Bekannte CI-Lücke bestätigt** (siehe oben, PR #94): `pull_request`-Trigger in `ci.yml` läuft nur gegen `main`, nicht gegen `testing` – bei PR #125 mussten Typecheck/Tests/Prettier deshalb lokal verifiziert werden, da GitHub für den `testing`-Zielbranch keinen `lint-and-typecheck`-Check erzeugt hat. Weiterhin nicht behoben, eigenständige CI-Architektur-Entscheidung.
+- **Lektion**: Vor jedem Merge eines an `main` hängenden Dependabot-PRs erst prüfen, ob `testing` überhaupt aktuell ist (`git log testing..main`) – sonst drohen stille Regressionen wie die TS7/ts-jest-Inkompatibilität erneut unbemerkt via `testing` reinzukommen.
