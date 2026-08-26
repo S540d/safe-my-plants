@@ -27,7 +27,7 @@ export function PhotoGalleryModal({ photos, initialIndex = 0, visible, onClose, 
   const showCompare = photos.length >= 2
   const [compareMode, setCompareMode] = useState(false)
 
-  const handleViewableChange = ({ viewableItems }: { viewableItems: Array<{ index: number | null }> }) => {
+  const handleViewableChange = ({ viewableItems }: { viewableItems: Array<{ index: number | null | undefined }> }) => {
     const idx = viewableItems[0]?.index
     if (idx != null) setCurrentIndex(idx)
   }
