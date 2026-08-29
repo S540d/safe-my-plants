@@ -12,7 +12,7 @@ import { TrafficLight } from '../../src/components/TrafficLight'
 import { WaterDropAnimation } from '../../src/components/WaterDropAnimation'
 import { Shadow } from '../../src/constants/theme'
 import { usePlants } from '../../src/contexts/PlantContext'
-import { formatLastDate, formatNextDate, useCareStatus } from '../../src/hooks/useCareStatus'
+import { formatLastDate, formatNextDate, getCareStatus } from '../../src/hooks/useCareStatus'
 import { usePreferences } from '../../src/hooks/usePreferences'
 import { useThemeColors } from '../../src/hooks/useThemeColors'
 import { t } from '../../src/i18n/translations'
@@ -49,7 +49,7 @@ export default function PlantDetailScreen() {
     )
   }
 
-  const careStatus = useCareStatus(plant)
+  const careStatus = getCareStatus(plant)
   const lang = language
 
   return (
