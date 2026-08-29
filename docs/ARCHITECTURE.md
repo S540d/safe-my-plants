@@ -68,8 +68,10 @@ The plant's overall status is the _worst_ of the two (`worstStatus`). If you
 change the 20 % threshold, the dashboard, the badge counts and the notification
 timing all shift together — it is the single tuning knob for the whole UX.
 
-Note that `useCareStatus` (hook) and `getCareStatus` (plain function) contain the
-same logic for use inside and outside React; keep them in sync.
+`getCareStatus` is a pure computation — no state, no React hooks — so it works
+inside components, in list callbacks and in plain helpers alike. The file is
+still named `useCareStatus.ts` for historical reasons and exports a deprecated
+`useCareStatus` alias; prefer `getCareStatus` in new code.
 
 ### No backend, no account
 

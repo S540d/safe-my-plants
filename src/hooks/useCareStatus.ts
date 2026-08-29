@@ -18,19 +18,27 @@ function worstStatus(a: CareStatus, b: CareStatus): CareStatus {
   return order.indexOf(a) <= order.indexOf(b) ? a : b
 }
 
-export function useCareStatus(plant: Plant): PlantCareStatus {
-  const watering = computeStatus(plant.lastWatered, plant.careInfo.wateringFrequencyDays)
-  const fertilizing = computeStatus(plant.lastFertilized, plant.careInfo.fertilizingFrequencyDays)
-  const overall = worstStatus(watering, fertilizing)
-  return { watering, fertilizing, overall }
-}
-
+/**
+ * Care status for one plant: the watering and fertilizing traffic lights plus
+ * the overall (worst of the two) status.
+ *
+ * This is a pure computation over the plant's own fields — it holds no state and
+ * calls no React hooks, so it works inside components, in list callbacks and in
+ * plain helpers alike.
+ */
 export function getCareStatus(plant: Plant): PlantCareStatus {
   const watering = computeStatus(plant.lastWatered, plant.careInfo.wateringFrequencyDays)
   const fertilizing = computeStatus(plant.lastFertilized, plant.careInfo.fertilizingFrequencyDays)
   const overall = worstStatus(watering, fertilizing)
   return { watering, fertilizing, overall }
 }
+
+/**
+ * @deprecated Use {@link getCareStatus}. Despite the `use` prefix this never was
+ * a React hook — it calls no hooks and holds no state. Kept as a thin alias so
+ * existing call sites keep working; prefer `getCareStatus` in new code.
+ */
+export const useCareStatus = getCareStatus
 
 export function formatLastDate(isoDate: string | undefined, lang: 'de' | 'en'): string {
   if (!isoDate) return lang === 'de' ? 'Noch nie' : 'Never'
