@@ -65,3 +65,7 @@ credentials.json
 *.keystore
 docs/private/
 
+
+# Lokale Build-/Store-Artefakte (Tagesabschluss 2026-08-30)
+aab-archive/
+docs/store-assets/*.png
