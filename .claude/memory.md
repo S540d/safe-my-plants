@@ -219,3 +219,10 @@ Dependabot-Alarm gemeldet, aber trotz bestehendem `overrides`-Eintrag (`^4.2.0` 
 - **Fix**: `overrides.js-yaml` auf `^4.3.1` angehoben, Lockfile neu aufgelöst → jetzt **4.3.2**. Kein direkter Import im App-Code (transitive Dependency von Build-Tooling wie `@expo/xcpretty`/`xcode`), daher weiterhin kein SDK-Downgrade nötig.
 - **Lektion**: Ein `^`-Override allein garantiert keine gepatchte Version – das Lockfile kann trotzdem auf einer älteren, im Range liegenden aber verwundbaren Version einfrieren, wenn seit dem letzten `npm install` keine neuere Version aufgelöst wurde. Bei sicherheitsrelevanten Overrides regelmäßig prüfen, welche Version das Lockfile tatsächlich zieht (`grep -A2 '"node_modules/<pkg>"' package-lock.json`), nicht nur den Override-Range.
 - **testing→main-Sync (PR #141, gemerged 2026-08-30)**: `origin/main` (shell-quote/brace-expansion-Bumps aus #134/#135) vorab konfliktfrei in `testing` gemerged, dann regulärer `testing`→`main`-PR – kein History-Divergenz-Problem diesmal (siehe Lehre bei Issue #127 oben), da `main` zu diesem Zeitpunkt noch Vorfahre von `testing` war. `npm audit` danach: **0 Vulnerabilities** (js-yaml-, shell-quote- und brace-expansion-Fixes gemeinsam auf `main`).
+
+## Issue #142 – Sprach-Sync zwischen Screens (PR #143, gemerged 2026-08-31)
+
+Nutzer-Feedback: Sprachumschaltung "funktioniert nicht richtig". Ursache: `usePreferences()` (`src/hooks/usePreferences.ts`) wurde in ~8 Screens jeweils unabhängig instanziiert, ohne Sync-Mechanismus – im Gegensatz zu `useCareLog`, das bewusst ein Module-Level-Subscriber-Pattern nutzt (siehe oben). Änderte man die Sprache in `settings.tsx`, blieben bereits gemountete Screens (Index, Plant-Detail, …) auf der alten Sprache, bis sie neu gemountet wurden.
+
+- **Fix**: `usePreferences` um dasselbe Module-Level-Subscriber-Pattern wie `useCareLog` erweitert (`sharedLanguage`/`sharedTheme` + `listeners`-Set), damit alle Instanzen bei `setLanguage`/`setTheme` synchron aktualisiert werden.
+- Betrifft auch `theme` (gleiches Symptom wäre dort ebenso aufgetreten, obwohl nicht explizit gemeldet).
