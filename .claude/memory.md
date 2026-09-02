@@ -244,3 +244,22 @@ Der Dependabot-Lauf auf `main` (Run 33674650883) brach mit `update_files`-Fehler
 - `npm audit`: 4 → 3 moderate, 0 high/critical. Checks: `tsc` sauber, 22/22 Tests, `expo export -p web` erfolgreich (Regressionscheck aus #153).
 - **Aufgeräumt**: Issue #142 geschlossen (war seit PR #143/#151 längst gefixt, nur nie zugemacht). Lokale Karteileichen-Branches `feature/issue-136`, `feature/issue-138`, `chore/gitignore-store-assets` gelöscht (Inhalt via `git cherry` als in `main` bestätigt).
 - **Versionierung geklärt (Nutzerangabe)**: Im Play Store liegt für **geschlossene Tests** `version 1.0.0` / `versionCode 1` – deckt sich mit `app.json`. Der Git-Tag `v1.6.1` ist der Ausreißer und **nicht** der Store-Stand; für #85 ist `app.json` die Wahrheit.
+
+## Play-Store-Release v1.0.0 / versionCode 2 (2026-09-03)
+
+Zweiter Upload (geschlossene Tests). Reiner Bugfix-Build – `version` blieb **1.0.0**, nur `versionCode` 1 → 2, weil vc1 im Store bereits verbraucht ist und Play einen Re-Upload derselben versionCode ablehnt.
+
+- **Vorbereitung**: PR #157 (`main`→`testing`-Rückführung + versionCode-Bump), danach PR #158 (`testing`→`main`, mit Nutzer-Freigabe). Tag `v1.0.0-vc2` auf `efe622e`.
+- **Zwingender Zwischenschritt**: `git merge-base --is-ancestor origin/main origin/testing` war **nein** – `main` hatte 8 Commits, die `testing` inhaltlich fehlten (per `git cherry` geprüft), u. a. den RN-Downgrade #153, der `expo export -p web` repariert. Ein direkter `testing`→`main`-PR hätte den regressiert. Bestätigt die Lehre aus #127: **vor jedem `testing`→`main`-PR die Ancestry prüfen**, bei Divergenz erst `main` in `testing` zurückführen. Danach war der Release-PR ein sauberer Fast-Forward.
+- **Tag-Schema-Ausnahme**: `v1.0.0-vc2` statt `vX.Y.Z`, weil `v1.0.0` schon den vc1-Upload markiert und sich `version` nicht änderte. **Vom Nutzer ausdrücklich als einmalige Ausnahme freigegeben – künftige Releases wieder nach dem gewohnten Schema `vX.Y.Z`.**
+- **Der Tag `v1.6.1` ist ein Ausreißer** ohne Store-Entsprechung (kein Upload). Beim Ermitteln der Release-Baseline nicht darauf verlassen; Kandidat zum Löschen (noch nicht entschieden).
+
+### Build-Wissen (safe_my_plants ist NICHT in der `/build-android`-Skill abgedeckt)
+
+Die Skill bricht in Schritt 1 ab („Nicht in einem bekannten Android-Projektverzeichnis"). Prozedur manuell nach Projekt-CLAUDE.md, Schritt 5 (Version-Bump) der Skill **überspringen**, wenn der Bump schon im Repo liegt.
+
+- Signing-Credentials liegen in **`docs/private/CLAUDE.md`** (gitignored): Keystore `/Projects/Keystore/safe_my_plants.jks`, Alias `safemyplants`.
+- **Fallstrick**: `npx expo prebuild` generiert nur `signingConfigs.debug` und setzt den **release**-BuildType ebenfalls darauf. Ohne Eingriff entsteht ein mit dem Debug-Key signierter AAB, den Play ablehnt. Nötig: `signingConfigs.release`-Block ergänzen, `release { signingConfig signingConfigs.release }` setzen, Werte über `android/gradle.properties` (`MYAPP_UPLOAD_*`) reinreichen. `android/` ist gitignored, die Secrets bleiben also außerhalb von Git.
+- Build: `JAVA_HOME=/Applications/Android Studio.app/Contents/jbr/Contents/Home`, `ANDROID_HOME=~/Library/Android/sdk`, dann `./gradlew bundleRelease --no-daemon` (~6 min).
+- **Pflicht-Check vor dem Upload**: Signer-Fingerprint des neuen AAB gegen den vorherigen vergleichen – `unzip -p <aab> META-INF/*.RSA | keytool -printcert | grep SHA256`. Bei Abweichung würde Play den Upload ablehnen. Hier identisch (`CN=Safe My Plants`).
+- **Sicherheitsvorfall (klein)**: Beim Auslesen von `docs/private/CLAUDE.md` griff die Redaction-Regex nicht, das Keystore-Passwort landete im Klartext im Konversationsverlauf. Getrackte Dateien blieben sauber. **Künftig Secrets nie im Klartext ausgeben** – Werte direkt per Skript in `gradle.properties` schreiben, ohne sie vorher anzuzeigen. Passwort-Rotation dem Nutzer vorgeschlagen, noch offen.
