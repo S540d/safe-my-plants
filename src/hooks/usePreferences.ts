@@ -21,17 +21,45 @@ function getDeviceLanguage(): Language {
   return locale === 'en' ? 'en' : 'de'
 }
 
+// Module-level subscribers so every usePreferences instance stays in sync
+// when language/theme changes in one screen (e.g. settings).
+type PreferenceListener = (lang: Language, th: ThemeMode) => void
+const listeners = new Set<PreferenceListener>()
+let sharedLanguage: Language | null = null
+let sharedTheme: ThemeMode | null = null
+
+function notifyPreferenceListeners() {
+  if (sharedLanguage === null || sharedTheme === null) return
+  listeners.forEach((fn) => fn(sharedLanguage as Language, sharedTheme as ThemeMode))
+}
+
 export function usePreferences(): Preferences {
-  const [language, setLanguageState] = useState<Language>(getDeviceLanguage())
-  const [theme, setThemeState] = useState<ThemeMode>('system')
+  const [language, setLanguageState] = useState<Language>(sharedLanguage ?? getDeviceLanguage())
+  const [theme, setThemeState] = useState<ThemeMode>(sharedTheme ?? 'system')
   const [adminPin, setAdminPinState] = useState<string | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
+    const listener: PreferenceListener = (lang, th) => {
+      setLanguageState(lang)
+      setThemeState(th)
+    }
+    listeners.add(listener)
+    return () => {
+      listeners.delete(listener)
+    }
+  }, [])
+
+  useEffect(() => {
     const load = async () => {
-      const [lang, th, pin] = await Promise.all([getLanguage(), getTheme(), getAdminPin()])
-      if (lang) setLanguageState(lang)
-      if (th) setThemeState(th)
+      if (sharedLanguage === null || sharedTheme === null) {
+        const [lang, th] = await Promise.all([getLanguage(), getTheme()])
+        sharedLanguage = lang ?? getDeviceLanguage()
+        sharedTheme = th ?? 'system'
+      }
+      setLanguageState(sharedLanguage)
+      setThemeState(sharedTheme)
+      const pin = await getAdminPin()
       setAdminPinState(pin)
       setIsLoaded(true)
     }
@@ -39,13 +67,17 @@ export function usePreferences(): Preferences {
   }, [])
 
   const setLanguage = useCallback((lang: Language) => {
+    sharedLanguage = lang
     setLanguageState(lang)
     saveLanguage(lang)
+    notifyPreferenceListeners()
   }, [])
 
   const setTheme = useCallback((th: ThemeMode) => {
+    sharedTheme = th
     setThemeState(th)
     saveTheme(th)
+    notifyPreferenceListeners()
   }, [])
 
   const setAdminPin = useCallback(async (pin: string) => {
