@@ -226,3 +226,9 @@ Nutzer-Feedback: Sprachumschaltung "funktioniert nicht richtig". Ursache: `usePr
 
 - **Fix**: `usePreferences` um dasselbe Module-Level-Subscriber-Pattern wie `useCareLog` erweitert (`sharedLanguage`/`sharedTheme` + `listeners`-Set), damit alle Instanzen bei `setLanguage`/`setTheme` synchron aktualisiert werden.
 - Betrifft auch `theme` (gleiches Symptom wäre dort ebenso aufgetreten, obwohl nicht explizit gemeldet).
+
+## Dependabot-PR #147 + testing→main-Sync (PR #151, gemerged 2026-09-02)
+
+- **PR #147** (Dependabot, 19 Minor/Patch-Bumps in einer Gruppe) zielte wie üblich direkt gegen `main` (Dependabot-Default, kein `target-branch` in `.github/dependabot.yml` konfiguriert). GitHub meldete kurzzeitig `mergeable_state: dirty` (stale Cache) – lokaler Merge-Check zeigte `main` bereits als Vorfahre des Dependabot-Branches, also konfliktfrei. Gemergt (squash).
+- Issue #142 (Sprach-/Theme-Sync) war bereits seit PR #143 auf `testing`, aber noch nicht in `main` – **PR #151** (`testing`→`main`) erstellt und nach grüner CI gemergt (schriftliche Freigabe des Nutzers lag für diese Session vor).
+- Keine weiteren offenen PRs zu diesem Zeitpunkt.
