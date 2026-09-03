@@ -263,3 +263,10 @@ Die Skill bricht in Schritt 1 ab („Nicht in einem bekannten Android-Projektver
 - Build: `JAVA_HOME=/Applications/Android Studio.app/Contents/jbr/Contents/Home`, `ANDROID_HOME=~/Library/Android/sdk`, dann `./gradlew bundleRelease --no-daemon` (~6 min).
 - **Pflicht-Check vor dem Upload**: Signer-Fingerprint des neuen AAB gegen den vorherigen vergleichen – `unzip -p <aab> META-INF/*.RSA | keytool -printcert | grep SHA256`. Bei Abweichung würde Play den Upload ablehnen. Hier identisch (`CN=Safe My Plants`).
 - **Sicherheitsvorfall (klein)**: Beim Auslesen von `docs/private/CLAUDE.md` griff die Redaction-Regex nicht, das Keystore-Passwort landete im Klartext im Konversationsverlauf. Getrackte Dateien blieben sauber. **Künftig Secrets nie im Klartext ausgeben** – Werte direkt per Skript in `gradle.properties` schreiben, ohne sie vorher anzuzeigen. Passwort-Rotation dem Nutzer vorgeschlagen, noch offen.
+
+## Regression: `decode-uri-component`-Override erneut versucht und zurückgenommen (PR #160 → Revert PR #161, 2026-09-03)
+
+In einer neuen Session (Issue #85, Unterpunkt „#52 gegenprüfen") wurde `decode-uri-component` per `overrides` auf `^0.5.0` gepinnt, **ohne vorher dieses `memory.md` zu konsultieren** – obwohl der exakt gleiche Fix bereits weiter oben (Abschnitt „Dependabot-Fehlschlag @xmldom/xmldom") als **bewusst nicht gemacht** dokumentiert war, samt Begründung. PR #160 wurde gemerged, brach dadurch `query-string.parse()` (ESM/CJS-Mismatch, siehe oben) und wurde als PR #161 sofort wieder revertiert, nachdem der Fehler beim routinemäßigen Abgleich mit `memory.md` auffiel.
+
+- **Lektion**: Vor jeder Dependency-/Override-Änderung `.claude/memory.md` nach dem betroffenen Paketnamen durchsuchen – nicht nur beim Anlegen neuer Einträge, sondern auch beim Prüfen/Wiederholen bereits behandelter Themen (hier: „npm audit gegenprüfen" klang nach Routine, war aber ein bekannter Sonderfall).
+- **Stand danach**: `npm audit` zeigt wieder 3 moderate Vulnerabilities (`decode-uri-component` <=0.4.2 via `expo-router`→`query-string`). Bleibt **bewusst offen**, bis `expo-router` auf `query-string >= 10` (CJS-kompatible Version) aktualisiert.
