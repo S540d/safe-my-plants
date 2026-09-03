@@ -252,17 +252,20 @@ Zweiter Upload (geschlossene Tests). Reiner Bugfix-Build – `version` blieb **1
 - **Vorbereitung**: PR #157 (`main`→`testing`-Rückführung + versionCode-Bump), danach PR #158 (`testing`→`main`, mit Nutzer-Freigabe). Tag `v1.0.0-vc2` auf `efe622e`.
 - **Zwingender Zwischenschritt**: `git merge-base --is-ancestor origin/main origin/testing` war **nein** – `main` hatte 8 Commits, die `testing` inhaltlich fehlten (per `git cherry` geprüft), u. a. den RN-Downgrade #153, der `expo export -p web` repariert. Ein direkter `testing`→`main`-PR hätte den regressiert. Bestätigt die Lehre aus #127: **vor jedem `testing`→`main`-PR die Ancestry prüfen**, bei Divergenz erst `main` in `testing` zurückführen. Danach war der Release-PR ein sauberer Fast-Forward.
 - **Tag-Schema-Ausnahme**: `v1.0.0-vc2` statt `vX.Y.Z`, weil `v1.0.0` schon den vc1-Upload markiert und sich `version` nicht änderte. **Vom Nutzer ausdrücklich als einmalige Ausnahme freigegeben – künftige Releases wieder nach dem gewohnten Schema `vX.Y.Z`.**
-- **Der Tag `v1.6.1` ist ein Ausreißer** ohne Store-Entsprechung (kein Upload). Beim Ermitteln der Release-Baseline nicht darauf verlassen; Kandidat zum Löschen (noch nicht entschieden).
+- **Tag `v1.6.1` wurde am 2026-09-03 gelöscht** (lokal + `origin`). Er zeigte auf denselben Commit wie `v1.0.0` (`c1f47fd`) und war von `main` nicht mehr erreichbar – ohne Store-Entsprechung. Aktuelle Tags: `v1.0.0` (vc1), `v1.0.0-vc2` (vc2).
 
-### Build-Wissen (safe_my_plants ist NICHT in der `/build-android`-Skill abgedeckt)
+### Build-Wissen → nach `CLAUDE.md` hochgestuft (Issue #163, PR #165)
 
-Die Skill bricht in Schritt 1 ab („Nicht in einem bekannten Android-Projektverzeichnis"). Prozedur manuell nach Projekt-CLAUDE.md, Schritt 5 (Version-Bump) der Skill **überspringen**, wenn der Bump schon im Repo liegt.
+Der frühere Inhalt dieses Blocks (Signing-Fallstrick bei `expo prebuild`, `MYAPP_UPLOAD_*` via
+`gradle.properties`, Fingerprint-Pflichtcheck, Build-Env, versionCode-Regel) steht jetzt in
+**`CLAUDE.md` → „Android-Build"**. Dort nachschlagen, nicht hier – kein Duplikat pflegen.
+Ebenso: Override-Checkliste in `CLAUDE.md` → „Dependency-Pflege", plus `overridesComment`
+in `package.json`.
 
-- Signing-Credentials liegen in **`docs/private/CLAUDE.md`** (gitignored): Keystore `/Projects/Keystore/safe_my_plants.jks`, Alias `safemyplants`.
-- **Fallstrick**: `npx expo prebuild` generiert nur `signingConfigs.debug` und setzt den **release**-BuildType ebenfalls darauf. Ohne Eingriff entsteht ein mit dem Debug-Key signierter AAB, den Play ablehnt. Nötig: `signingConfigs.release`-Block ergänzen, `release { signingConfig signingConfigs.release }` setzen, Werte über `android/gradle.properties` (`MYAPP_UPLOAD_*`) reinreichen. `android/` ist gitignored, die Secrets bleiben also außerhalb von Git.
-- Build: `JAVA_HOME=/Applications/Android Studio.app/Contents/jbr/Contents/Home`, `ANDROID_HOME=~/Library/Android/sdk`, dann `./gradlew bundleRelease --no-daemon` (~6 min).
-- **Pflicht-Check vor dem Upload**: Signer-Fingerprint des neuen AAB gegen den vorherigen vergleichen – `unzip -p <aab> META-INF/*.RSA | keytool -printcert | grep SHA256`. Bei Abweichung würde Play den Upload ablehnen. Hier identisch (`CN=Safe My Plants`).
-- **Sicherheitsvorfall (klein)**: Beim Auslesen von `docs/private/CLAUDE.md` griff die Redaction-Regex nicht, das Keystore-Passwort landete im Klartext im Konversationsverlauf. Getrackte Dateien blieben sauber. **Künftig Secrets nie im Klartext ausgeben** – Werte direkt per Skript in `gradle.properties` schreiben, ohne sie vorher anzuzeigen. Passwort-Rotation dem Nutzer vorgeschlagen, noch offen.
+Offen geblieben (**Issue #164**): Beim Auslesen von `docs/private/CLAUDE.md` griff die
+Redaction-Regex nicht – das Keystore-Passwort landete im Klartext im Konversationsverlauf.
+Getrackte Dateien blieben sauber. Passwort-Rotation ändert den Fingerprint **nicht** (gleiches
+Schlüsselpaar), Play-Updates bleiben also möglich.
 
 ## Regression: `decode-uri-component`-Override erneut versucht und zurückgenommen (PR #160 → Revert PR #161, 2026-09-03)
 
@@ -270,3 +273,21 @@ In einer neuen Session (Issue #85, Unterpunkt „#52 gegenprüfen") wurde `decod
 
 - **Lektion**: Vor jeder Dependency-/Override-Änderung `.claude/memory.md` nach dem betroffenen Paketnamen durchsuchen – nicht nur beim Anlegen neuer Einträge, sondern auch beim Prüfen/Wiederholen bereits behandelter Themen (hier: „npm audit gegenprüfen" klang nach Routine, war aber ein bekannter Sonderfall).
 - **Stand danach**: `npm audit` zeigt wieder 3 moderate Vulnerabilities (`decode-uri-component` <=0.4.2 via `expo-router`→`query-string`). Bleibt **bewusst offen**, bis `expo-router` auf `query-string >= 10` (CJS-kompatible Version) aktualisiert.
+
+## Session-Ergebnis 2026-09-03: Lehren in CLAUDE.md hochgestuft
+
+Nach dem Release wurden die wiederkehrenden Fallstricke aus Memory in dauerhafte Doku überführt
+(Regel aus der globalen Policy: ab 2× relevant gehört ein Fallstrick ins projekteigene CLAUDE.md,
+Memory-Eintrag danach entfernen).
+
+- **#163 erledigt** (PR #165): Android-Build-Abschnitt in `CLAUDE.md` neu strukturiert, Override-
+  Checkliste unter „Dependency-Pflege" ergänzt, `overridesComment` in `package.json`.
+- **#162 offen, wird zentral gelöst**: Dependabot ohne `target-branch` zielt auf den Default-Branch
+  `main` – Ursache der Branch-Divergenz, die bisher **viermal** Handarbeit erzwang (#125, #127,
+  #141, Release vc2). Nutzer löst das projektübergreifend, vermutlich via `project-templates`.
+  Prüfkriterium: erster Dependabot-PR, der auf `testing` zielt.
+- **#164 offen**: Keystore-Passwort rotieren (siehe oben).
+
+**Nicht umgesetzt, bewusst**: `/build-android`-Skill um `PROJECT=safemyplants` erweitern. Die Skill
+liegt außerhalb dieses Repos und ist projektübergreifend – separat zu entscheiden. `CLAUDE.md`
+hält stattdessen fest, dass die Skill dieses Projekt nicht abdeckt.
