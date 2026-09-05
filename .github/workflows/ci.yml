@@ -7,6 +7,10 @@ on:
     branches: [main]
 
 jobs:
+  actionlint:
+    name: ⚙️ Workflow Linting
+    uses: S540d/project-templates/.github/workflows/reusable-actionlint.yml@v2
+
   lint-and-typecheck:
     name: lint-and-typecheck
     runs-on: ubuntu-latest
