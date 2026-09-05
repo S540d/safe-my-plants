@@ -286,7 +286,18 @@ Memory-Eintrag danach entfernen).
   `main` – Ursache der Branch-Divergenz, die bisher **viermal** Handarbeit erzwang (#125, #127,
   #141, Release vc2). Nutzer löst das projektübergreifend, vermutlich via `project-templates`.
   Prüfkriterium: erster Dependabot-PR, der auf `testing` zielt.
-- **#164 offen**: Keystore-Passwort rotieren (siehe oben).
+- **#164 – Doku-Teil erledigt** (PR #167): CLAUDE.md-Regel geschärft – nicht nur die Weitergabe,
+  auch das reine *Auslesen* von `docs/private/CLAUDE.md` per `cat`/`Read` ist tabu, da
+  formatabhängige Redaction nicht zuverlässig greift. Passwort-Rotation selbst am 2026-09-03
+  durch den Nutzer manuell erledigt (`keytool -storepasswd`) – **Lektion**: Der Keystore ist
+  vom Typ **PKCS12** (Java-Default seit 8u60 bei `keytool -genkey` ohne `-storetype`), dort
+  existiert kein separates Key-Passwort mehr – `keytool -keypasswd` schlägt mit
+  `UnsupportedOperationException` fehl. Store- und Key-Passwort sind bei PKCS12 identisch;
+  `-storepasswd` allein rotiert beide effektiv. `docs/private/CLAUDE.md` und
+  `MYAPP_UPLOAD_KEY_PASSWORD`/`MYAPP_UPLOAD_STORE_PASSWORD` in `gradle.properties` entsprechend
+  auf denselben neuen Wert setzen. Fingerprint bleibt unverändert (gleiches Schlüsselpaar).
+  **Noch offen**: Play-App-Signing-Status in Issue #85 verifizieren/dokumentieren (Punkt 3 aus
+  #164, erfordert Play-Console-Zugriff).
 
 **Nicht umgesetzt, bewusst**: `/build-android`-Skill um `PROJECT=safemyplants` erweitern. Die Skill
 liegt außerhalb dieses Repos und ist projektübergreifend – separat zu entscheiden. `CLAUDE.md`

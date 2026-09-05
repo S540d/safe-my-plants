@@ -167,6 +167,15 @@ MYAPP_UPLOAD_KEY_PASSWORD=…
 > **Secrets nie ausgeben.** Werte per Skript direkt aus `docs/private/CLAUDE.md` nach
 > `gradle.properties` schreiben, ohne sie vorher anzuzeigen – kein `cat` der Datei. Passwörter
 > auch nie als CLI-Argument übergeben (landen in Shell-History und Prozessliste).
+>
+> **Auch das Auslesen selbst ist tabu**, nicht nur die Weitergabe. Ein Vorfall am 2026-09-03
+> (Issue #164) zeigte: Eine Redaction, die auf ein bestimmtes Zeilenformat wartet (z. B.
+> `- Store-Passwort: <wert>`), greift nicht zuverlässig bei jeder Formatierung – das Passwort
+> landete im Klartext im Konversationsverlauf. Deshalb: `docs/private/CLAUDE.md` niemals per
+> `cat`/`Read`/Editor-Anzeige öffnen, wenn Secrets nur *verwendet* werden sollen. Stattdessen
+> Werte gezielt per Skript (`grep`/`sed`/Shell-Parsing) direkt in die Zieldatei
+> (`gradle.properties`) übertragen, ohne dass der Wert je im sichtbaren Tool-Output oder in der
+> Konversation erscheint.
 
 ### 4. Build
 
