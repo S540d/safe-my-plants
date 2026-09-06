@@ -20,10 +20,7 @@ import { usePreferences } from '../src/hooks/usePreferences'
 import { useThemeColors } from '../src/hooks/useThemeColors'
 import { t } from '../src/i18n/translations'
 import { Plant } from '../src/types/plant'
-
-function generateId() {
-  return `plant-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
-}
+import { generateId } from '../src/utils/id'
 
 type Step = 'search' | 'details'
 
@@ -91,7 +88,7 @@ export default function AddPlantScreen() {
 
     const newPlant: Plant = {
       ...base,
-      id: generateId(),
+      id: generateId('plant'),
       name: plantName,
       room: room.trim() || undefined,
       photos: templatePhoto,

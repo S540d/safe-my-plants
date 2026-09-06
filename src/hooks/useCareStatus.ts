@@ -33,13 +33,6 @@ export function getCareStatus(plant: Plant): PlantCareStatus {
   return { watering, fertilizing, overall }
 }
 
-/**
- * @deprecated Use {@link getCareStatus}. Despite the `use` prefix this never was
- * a React hook — it calls no hooks and holds no state. Kept as a thin alias so
- * existing call sites keep working; prefer `getCareStatus` in new code.
- */
-export const useCareStatus = getCareStatus
-
 export function formatLastDate(isoDate: string | undefined, lang: 'de' | 'en'): string {
   if (!isoDate) return lang === 'de' ? 'Noch nie' : 'Never'
   const d = new Date(isoDate)

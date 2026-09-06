@@ -226,8 +226,9 @@ main (production) ← testing ← feature/issue-XXX
 ```typescript
 Plant {
   id, name, scientificName?, description
-  photos: string[]           // lokale URIs
+  photos: PlantPhoto[]       // { uri, takenAt } (seit Schema v3, davor: string[])
   location: 'sun' | 'partial-shade' | 'shade' | 'indoor'
+  room?: string               // freier Text, seit Schema v4
   careInfo: {
     wateringFrequencyDays, wateringTips
     fertilizingFrequencyDays, fertilizingTips
@@ -240,7 +241,7 @@ Plant {
   createdAt, updatedAt
 }
 
-// Neu (Schema v2):
+// Seit Schema v2:
 CareAction {
   id: string
   plantId: string
@@ -258,14 +259,16 @@ CareAction {
 | `smp-admin-pin` | PIN-String |
 | `smp-language` | `'de' \| 'en'` |
 | `smp-theme` | `'light' \| 'dark' \| 'system'` |
-| `smp-carelog` | `CareAction[]` (neu, Schema v2) |
-| `smp-schema-version` | `number` (aktuell: 2) |
+| `smp-carelog` | `CareAction[]` (seit Schema v2) |
+| `smp-schema-version` | `number` (aktuell: 5) |
 
 ## Schema-Migration
 
-`PlantContext` führt beim App-Start eine idempotente Migration durch:
-- v1 → v2: bestehende `lastWatered`/`lastFertilized` werden als initiale CareLog-Einträge übernommen (IDs: `migration-water-{plantId}`, `migration-fertilize-{plantId}`)
-- `smp-schema-version` wird auf `2` gesetzt
+`PlantContext.runMigrations()` führt beim App-Start eine idempotente, schrittweise Migration durch (jeder Schritt hebt `smp-schema-version` einzeln an):
+- v1 → v2: bestehende `lastWatered`/`lastFertilized` werden als initiale CareLog-Einträge übernommen (IDs: `migration-water-{plantId}`, `migration-fertilize-{plantId}`, dedupliziert über vorhandene IDs)
+- v2 → v3: `photos: string[]` → `photos: PlantPhoto[]` (`{ uri, takenAt }`, `takenAt` = `plant.createdAt` als Fallback)
+- v3 → v4: neues optionales `room`-Feld, keine Datentransformation (fehlend = "Ohne Raum")
+- v4 → v5: Pflanzen ohne Foto bekommen das Template-`imageUrl` (per Namensabgleich mit `PLANT_TEMPLATES`) als erstes Foto nachgetragen
 
 ## CareLog-Architektur
 
