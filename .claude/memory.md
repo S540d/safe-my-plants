@@ -26,6 +26,8 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
 - `src/components/WaterDropAnimation.tsx`, `src/components/CareConfetti.tsx` – Reanimated-Effekte, ausgelöst über `QuickActionBar`-Callbacks im Plant-Detail-Screen (seit PR #82)
 - `src/components/EmptyState.tsx` – wiederverwendbarer Leerzustand mit Fade-/Zoom-Eintrittsanimation, genutzt in `index.tsx` und `manage-plants.tsx`
 - `src/components/AnimatedPressable.tsx` – wiederverwendbarer Press-Scale-Wrapper (Reanimated `withTiming`, `Pressable`-basiert, optionaler `hitSlop`); genutzt in `HeaderMenu` und `app/plant/[id].tsx` (Header-Foto, Zurück-Button). `PlantCard`/`QuickActionBar` nutzen weiterhin ihre eigene inline `useSharedValue`-Variante aus PR #82 (nicht rückwirkend migriert, kein funktionaler Unterschied). **Noch nicht migriert** (Issue #85 Block C, offen): `settings.tsx`, `manage-plants.tsx`, `add-plant.tsx`, `HeroPlantCard`, `DashboardSummary` nutzen weiterhin reines `TouchableOpacity`.
+- `src/components/admin/` (seit PR #172, Issue #171) – `PinGuard.tsx`, `PlantForm.tsx`, `TemplatesModal.tsx`: aus dem ehemaligen 801-Zeilen-`admin.tsx` extrahiert. `admin.tsx` ist jetzt nur noch der Screen-Root (~185 Zeilen), importiert alle drei.
+- `src/utils/id.ts` (seit PR #172) – zentrale `generateId(prefix?)`-Utility, ersetzt 7 Kopien des Ad-hoc-Patterns `` `${Date.now()}-${Math.random().toString(36).slice(2)}` `` in `useCareLog`, `PlantContext`, `admin/PlantForm`, `add-plant.tsx`, `manage-plants.tsx`.
 - `src/constants/theme.ts` – seit PR #90 zusätzlich `Typography`-Tokens (`headerTitle` 28/700, `headerTitleSm` 22/700), genutzt für die Header-Titel in `index.tsx`/`settings.tsx`/`add-plant.tsx`/`manage-plants.tsx`. Kein Typografie-Token für Body-/Label-Text (nur Header bisher konsolidiert).
 - `src/services/exportImport.ts` – Export/Import (Issue #15) via `expo-sharing`/`expo-document-picker`; seit PR #90 prüft `importData()` `smpSchemaVersion` im Backup (fehlend/ungültig → `invalid_format`, höher als lokale `SCHEMA_VERSION` → `unsupported_version`, eigene Fehlermeldung in `settings.tsx`)
 - `docs/store-assets/icon-512.png` – 512×512-Play-Store-Icon, aus `assets/icon.png` (1024×1024) abgeleitet (seit PR #90); referenziert in `docs/store-listing.md`
@@ -291,3 +293,15 @@ Memory-Eintrag danach entfernen).
 **Nicht umgesetzt, bewusst**: `/build-android`-Skill um `PROJECT=safemyplants` erweitern. Die Skill
 liegt außerhalb dieses Repos und ist projektübergreifend – separat zu entscheiden. `CLAUDE.md`
 hält stattdessen fest, dass die Skill dieses Projekt nicht abdeckt.
+
+## Issue #171 – Code-Health-Audit (Erstlauf), PR #172 (2026-09-06)
+
+Erster Durchlauf des wiederkehrenden Code-Health-Audit-Standards (project-templates#136). Alle 7 Befunde umgesetzt, reines Cleanup/Doku/CI, kein Verhaltenswechsel:
+
+- **God Component behoben**: `app/admin.tsx` in `src/components/admin/{PinGuard,PlantForm,TemplatesModal}.tsx` aufgeteilt (siehe Dateipfade oben).
+- **CI-Lücke `pull_request` nur gegen `main` endlich geschlossen**: `.github/workflows/ci.yml` `pull_request.branches` jetzt `[main, testing]`. Diese Lücke stand seit PR #94 (2026-08-xx) mehrfach als „bekannt, nicht behoben" in diesem Memory (siehe Einträge zu PR #94 und PR #125 oben) — ab jetzt läuft `lint-and-typecheck` auch für PRs gegen `testing`, die älteren Einträge sind damit erledigt/historisch.
+- **Coverage-Threshold scharf geschaltet**: `npm test -- --ci` läuft jetzt mit `--coverage` in CI; der in `jest.config.js` dokumentierte Threshold (Issue #138) wertet dadurch erstmals real aus. Musste dafür einen Mini-Test für die neue `generateId`-Utility ergänzen (`src/utils/id.test.ts`), sonst wäre der Threshold durch die neuen unget testeten Dateien selbst gerissen worden.
+- **Toter `useCareStatus`-Alias entfernt** (`src/hooks/useCareStatus.ts`) – alle Call-Sites nutzten bereits `getCareStatus` direkt.
+- **`generateId()`-Utility extrahiert** (siehe Dateipfade oben) – IDs sind jetzt etwas länger (kein `.slice(2, 7)`-Cutoff mehr wie zuvor in `admin.tsx`/`add-plant.tsx`/`manage-plants.tsx`), das war die vom Audit gemeldete Divergenzstelle.
+- **`TrafficLight` nutzt jetzt `useThemeColors()`** statt hartkodiertem `Colors.light` – letzte Komponente mit diesem Muster.
+- **CLAUDE.md-Schema-Doku auf v5 nachgezogen** – war seit der v4/v5-Migration (Issue #7/#85-Umfeld) nicht mehr aktualisiert worden, dieses `memory.md` war schon korrekt (siehe „Schema-Migrationen" oben).

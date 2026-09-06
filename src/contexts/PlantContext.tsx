@@ -14,6 +14,7 @@ import {
 import { notifyCareLogUpdate } from '../hooks/useCareLog'
 import { CareAction } from '../types/careLog'
 import { Plant, PlantPhoto } from '../types/plant'
+import { generateId } from '../utils/id'
 
 interface PlantContextValue {
   plants: Plant[]
@@ -144,7 +145,7 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
       const now = new Date().toISOString()
       await persist(plants.map((p) => (p.id === id ? { ...p, lastWatered: now, updatedAt: now } : p)))
       await addCareAction({
-        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        id: generateId(),
         plantId: id,
         type: 'water',
         timestamp: now,
@@ -160,7 +161,7 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
       const now = new Date().toISOString()
       await persist(plants.map((p) => (p.id === id ? { ...p, lastFertilized: now, updatedAt: now } : p)))
       await addCareAction({
-        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        id: generateId(),
         plantId: id,
         type: 'fertilize',
         timestamp: now,
