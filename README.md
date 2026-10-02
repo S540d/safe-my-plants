@@ -1,30 +1,20 @@
 # Safe My Plants
 
-A houseplant companion — care tips, watering and fertilizing indicators, disease images, and photos. Fully offline, no backend required.
+Dein Begleiter für Zimmerpflanzen: Pflegetipps, Gieß- und Düngeerinnerung per Ampel, Krankheitsbilder und Fotos — komplett offline, ohne Konto.
 
-## Live
+## App öffnen
 
-[https://s540d.github.io/safe-my-plants](https://s540d.github.io/safe-my-plants)
+[s540d.github.io/safe-my-plants](https://s540d.github.io/safe-my-plants)
 
-## Tech Stack
+## Was die App kann
 
-| Technology          | Version |
-| ------------------- | ------- |
-| React Native + Expo | 56      |
-| Expo Router         | ~56.2   |
-| TypeScript          | ~6.0    |
-| AsyncStorage        | 2.2     |
+- **Pflanzenübersicht** mit Statusanzeige auf einen Blick
+- **Ampel:** grün = alles gut, gelb = bald fällig, rot = Gießen oder Düngen überfällig
+- **Detailansicht** mit Pflegetipps, Standort- und Klimaansprüchen sowie Fotos
+- **Krankheitsbilder** mit Symptomen und Behandlungshinweisen
+- **Verwaltungsbereich** (PIN-geschützt) zum Anlegen, Bearbeiten und Löschen von Pflanzen
+- Deutsch und Englisch; alle Daten bleiben auf deinem Gerät
 
-## Features
+## Lizenz
 
-- **Plant overview** — all plants at a glance with status indicators
-- **Traffic light system** — shows when watering or fertilizing is due
-- **Detail view** — care tips, photos, location and climate requirements
-- **Disease images** — symptoms and treatment notes per plant
-- **Admin area** — PIN-protected; create, edit, delete plants
-- **Multilingual** — German and English
-- **Offline-first** — all data stored locally, no account required
-
-## License
-
-See [LICENSE](LICENSE).
+Siehe [LICENSE](LICENSE).
