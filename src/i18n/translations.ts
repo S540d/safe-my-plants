@@ -120,6 +120,7 @@ const translations = {
 
     // Quick Actions
     action_water: 'Gießen',
+    action_soil_moist: 'Erde noch feucht',
     action_fertilize: 'Düngen',
     action_repot: 'Umtopfen',
     action_prune: 'Schneiden',
@@ -218,6 +219,7 @@ const translations = {
     // PlantCard
     card_watered: '💧 Gegossen',
     card_fertilized: '🌿 Gedüngt',
+    card_soil_moist: '✋ Erde noch feucht – später prüfen',
 
     // Common
     ok: 'OK',
@@ -353,6 +355,7 @@ const translations = {
 
     // Quick Actions
     action_water: 'Water',
+    action_soil_moist: 'Soil still moist',
     action_fertilize: 'Fertilize',
     action_repot: 'Repot',
     action_prune: 'Prune',
@@ -451,6 +454,7 @@ const translations = {
     // PlantCard
     card_watered: '💧 Watered',
     card_fertilized: '🌿 Fertilized',
+    card_soil_moist: '✋ Soil still moist – check later',
 
     // Common
     ok: 'OK',
