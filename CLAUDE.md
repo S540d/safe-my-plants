@@ -249,6 +249,7 @@ Plant {
   }
   diseases: Disease[]        // { id, name, symptoms, treatment, imageUri? }
   lastWatered?, lastFertilized?   // ISO date strings (bleiben als Schnellzugriff)
+  wateringSnoozedUntil?           // ISO; gesetzt durch Fingertest („Erde noch feucht")
   createdAt, updatedAt
 }
 
@@ -295,6 +296,7 @@ CareAction {
 - **Grün (ok):** > 20% des Intervalls verbleibend
 - **Gelb (soon):** 0–20% verbleibend
 - **Rot (overdue):** Datum überschritten oder noch nie gegossen/gedüngt (`lastWatered`/`lastFertilized` fehlt → direkt `overdue`)
+- **Fingertest:** Fälligkeit Gießen = max(letztes Gießen + Intervall, `wateringSnoozedUntil`). „Erde noch feucht" (`PlantContext.snoozeWatering`) setzt den Snooze auf 25 % des Intervalls, begrenzt 2–7 Tage (`getSnoozeDays`); `markWatered` setzt ihn zurück. Nicht im CareLog protokolliert.
 
 Berechnung in `src/hooks/useCareStatus.ts`.
 
@@ -310,7 +312,7 @@ Die ursprüngliche Roadmap (Issue #16, Features #2–#15: CareLog, Dashboard, Su
 
 Hebel gegen eingehende Pflanzen (Reihenfolge der Umsetzung):
 
-1. **Fingertest** – „Erde noch feucht" verschiebt die Gießerinnerung (statt Rot = „jetzt gießen") → PR #180. Snooze wird bewusst **nicht** im CareLog protokolliert.
+1. **Fingertest** – „Erde noch feucht" verschiebt die Gießerinnerung (statt Rot = „jetzt gießen") → ✅ PR #180. Snooze wird bewusst **nicht** im CareLog protokolliert.
 2. **Pflegedaten der Templates gegen Quellen prüfen** (v. a. Gießintervalle).
 3. **Problem-Ratgeber nach Symptom** (gelbe Blätter, braune Spitzen, Schimmel, …), unabhängig vom pro-Pflanze-Feld `diseases`.
 4. Zurückgestellt: Statistik/Streaks ausbauen, weitere Animationen, Onboarding-Ausbau.
@@ -321,7 +323,7 @@ Hebel gegen eingehende Pflanzen (Reihenfolge der Umsetzung):
 |----------|-------|--------|
 | #52 | npm audit fix (uuid/js-yaml via `overrides`, kein SDK-Downgrade) | ✅ merged (PR #83) |
 | #77 | UI-Verbesserung / Micro-Animationen | ✅ merged (PR #82, #83) |
-| – | Admin-/PIN-Rückbau (`admin.tsx`, `PinGuard`, `smp-admin-pin`) | 🔄 in Arbeit |
+| PR #181 | Admin-/PIN-Rückbau (`admin.tsx`, `PinGuard`, `smp-admin-pin`) | ✅ merged |
 
 ## Spätere Zusammenführung mit Pflanzkalender
 
