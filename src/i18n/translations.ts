@@ -24,6 +24,7 @@ const translations = {
     detail_diseases: 'Krankheiten & Schädlinge',
     detail_photos: 'Fotos',
     detail_quick_actions: 'Schnellaktionen',
+    detail_problem_link: 'Probleme mit der Pflanze? Zum Problem-Ratgeber',
     detail_last_watered: 'Zuletzt gegossen',
     detail_last_fertilized: 'Zuletzt gedüngt',
     detail_mark_watered: 'Jetzt gegossen',
@@ -104,6 +105,15 @@ const translations = {
     settings_import_confirm: 'Bestehende Daten werden ergänzt, nicht ersetzt.',
     settings_import_error: 'Ungültige Backup-Datei.',
     settings_import_error_version: 'Backup stammt von einer neueren App-Version. Bitte App aktualisieren.',
+
+    // Symptom Guide
+    symptom_guide_title: 'Problem-Ratgeber',
+    symptom_guide_intro:
+      'Was fehlt deiner Pflanze? Tippe auf ein Symptom. Die Ursachen stehen nach Häufigkeit geordnet, die häufigste zuerst. Prüfe zuerst die Erde mit dem Finger.',
+    symptom_guide_check: 'So prüfst du es',
+    symptom_guide_fix: 'Das hilft',
+    symptom_guide_disclaimer:
+      'Allgemeine Hinweise für Zimmerpflanzen. Die Ursache kann bei deiner Pflanze abweichen. Beobachte nach einer Änderung ein bis zwei Wochen, bevor du die nächste vornimmst.',
 
     // Stats Screen
     stats_title: 'Statistiken',
@@ -259,6 +269,7 @@ const translations = {
     detail_diseases: 'Diseases & Pests',
     detail_photos: 'Photos',
     detail_quick_actions: 'Quick actions',
+    detail_problem_link: 'Trouble with your plant? Open the problem guide',
     detail_last_watered: 'Last watered',
     detail_last_fertilized: 'Last fertilized',
     detail_mark_watered: 'Watered now',
@@ -339,6 +350,15 @@ const translations = {
     settings_import_confirm: 'Existing data will be supplemented, not replaced.',
     settings_import_error: 'Invalid backup file.',
     settings_import_error_version: 'Backup was created with a newer app version. Please update the app.',
+
+    // Symptom Guide
+    symptom_guide_title: 'Problem guide',
+    symptom_guide_intro:
+      'What is wrong with your plant? Tap a symptom. Causes are ordered by how common they are, most common first. Check the soil with your finger first.',
+    symptom_guide_check: 'How to check',
+    symptom_guide_fix: 'What helps',
+    symptom_guide_disclaimer:
+      'General advice for houseplants. The cause may differ for your plant. After changing something, observe for one to two weeks before making the next change.',
 
     // Stats Screen
     stats_title: 'Statistics',

@@ -15,6 +15,7 @@ type MenuItem = { key: string; labelKey: 'home_title'; route: string }
 const MENU_ITEMS: { key: string; labelKey: Parameters<typeof t>[1]; route: string }[] = [
   { key: 'add-plant', labelKey: 'add_plant_title', route: '/add-plant' },
   { key: 'manage-plants', labelKey: 'manage_plants_title', route: '/manage-plants' },
+  { key: 'symptom-guide', labelKey: 'symptom_guide_title', route: '/symptom-guide' },
   { key: 'stats', labelKey: 'stats_title', route: '/stats' },
   { key: 'settings', labelKey: 'settings_title', route: '/settings' },
 ]
@@ -22,6 +23,7 @@ const MENU_ITEMS: { key: string; labelKey: Parameters<typeof t>[1]; route: strin
 const MENU_ICONS: Record<string, string> = {
   'add-plant': '➕',
   'manage-plants': '🪴',
+  'symptom-guide': '🩺',
   stats: '📊',
   settings: '⚙️',
 }
