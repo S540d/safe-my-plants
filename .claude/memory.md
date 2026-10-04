@@ -78,6 +78,7 @@ Plant {
   careInfo: CareInfo
   diseases: Disease[]
   lastWatered?, lastFertilized?
+  wateringSnoozedUntil?       // ISO, Fingertest (PR #180), optional → keine Migration
   createdAt, updatedAt
 }
 ```
@@ -320,3 +321,10 @@ Erster Durchlauf des wiederkehrenden Code-Health-Audit-Standards (project-templa
 - `usePreferences` ruft beim Start `clearLegacyAdminPin()` auf (löscht `smp-admin-pin` auf Bestandsgeräten, best effort). Kein Schema-Bump nötig.
 - Produktausrichtung: Anfänger. Fingertest („Erde noch feucht", `wateringSnoozedUntil`, PR #180) ist der erste Schritt; Snooze wird bewusst nicht im CareLog protokolliert.
 - Die ursprüngliche Roadmap (#2–#15) ist komplett umgesetzt, auch die tägliche Push-Erinnerung (#14, globale Sammel-Notification ohne Pflanzenbezug).
+
+## Fingertest (PR #180, gemerged 2026-10-04)
+
+- `getDueTime()`/`getSnoozeDays()` in `src/hooks/useCareStatus.ts`; Ampel (`computeStatus`), `formatNextDate` (4. Param `snoozedUntil`) und Sortierung „nächste Pflege" (`plantFilter.ts`) nutzen `getDueTime`. Der Snooze kann die Fälligkeit nur nach hinten schieben, nie vor das reguläre Intervall.
+- UI: Button „✋ Erde noch feucht" in `PlantCard` (`onSnooze`) und als Aktion in `QuickActionBar`, jeweils nur bei Gießstatus ≠ ok.
+- Gilt nur für Gießen (nicht Düngen). Die tägliche Sammel-Notification (`useNotificationScheduler`) kennt den Snooze nicht – sie ist global und nicht fälligkeitsbasiert.
+
