@@ -128,6 +128,16 @@ export default function PlantDetailScreen() {
             </View>
           </View>
 
+          {/* Problem guide */}
+          <AnimatedPressable
+            style={[styles.problemLink, { backgroundColor: colors.surface }, Shadow.cardSm]}
+            onPress={() => router.push('/symptom-guide')}
+            scaleTo={0.98}
+          >
+            <Text style={[styles.problemLinkText, { color: colors.primary }]}>🩺 {t(lang, 'detail_problem_link')}</Text>
+            <Text style={[styles.problemLinkChevron, { color: colors.accent }]}>›</Text>
+          </AnimatedPressable>
+
           {/* Care info */}
           <Text style={[styles.sectionTitle, { color: colors.primary }]}>{t(lang, 'detail_care_info')}</Text>
 
@@ -312,6 +322,15 @@ const styles = StyleSheet.create({
   },
   nextCareLabel: { fontSize: 12, fontWeight: '600' },
   nextCareValue: { fontSize: 11, flex: 1 },
+  problemLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 12,
+    padding: 14,
+    marginTop: 12,
+  },
+  problemLinkText: { flex: 1, fontSize: 15, fontWeight: '600' },
+  problemLinkChevron: { fontSize: 20 },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
