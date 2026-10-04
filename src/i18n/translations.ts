@@ -4,12 +4,10 @@ const translations = {
   de: {
     // Navigation
     nav_home: 'Meine Pflanzen',
-    nav_admin: 'Admin',
     nav_settings: 'Einstellungen',
 
     // Home Screen
     home_title: 'Meine Pflanzen',
-    home_empty: 'Noch keine Pflanzen vorhanden.\nFüge deine erste Pflanze im Admin-Bereich hinzu.',
     home_care_ok: 'Alles gut',
     home_care_soon: 'Bald fällig',
     home_care_overdue: 'Überfällig',
@@ -34,39 +32,6 @@ const translations = {
     detail_symptoms: 'Symptome',
     detail_treatment: 'Behandlung',
 
-    // Admin Screen
-    admin_title: 'Admin',
-    admin_pin_title: 'Admin-PIN',
-    admin_pin_prompt: 'PIN eingeben',
-    admin_pin_wrong: 'Falsche PIN',
-    admin_pin_set: 'PIN festlegen',
-    admin_pin_confirm: 'PIN bestätigen',
-    admin_pin_mismatch: 'PINs stimmen nicht überein',
-    admin_add_plant: 'Pflanze hinzufügen',
-    admin_edit_plant: 'Pflanze bearbeiten',
-    admin_delete_plant: 'Pflanze löschen',
-    admin_delete_confirm: 'Pflanze wirklich löschen?',
-    admin_name: 'Name',
-    admin_scientific_name: 'Wissenschaftlicher Name (optional)',
-    admin_description: 'Beschreibung',
-    admin_location: 'Standort',
-    admin_watering_freq: 'Gießintervall (Tage)',
-    admin_watering_tips: 'Gießtipps',
-    admin_fertilizing_freq: 'Düngintervall (Tage)',
-    admin_fertilizing_tips: 'Düngetipps',
-    admin_location_tips: 'Standorttipps',
-    admin_temp_min: 'Temperatur min (°C)',
-    admin_temp_max: 'Temperatur max (°C)',
-    admin_humidity: 'Luftfeuchtigkeit',
-    admin_add_disease: 'Krankheit hinzufügen',
-    admin_disease_name: 'Krankheitsname',
-    admin_disease_symptoms: 'Symptome',
-    admin_disease_treatment: 'Behandlung',
-    admin_save: 'Speichern',
-    admin_cancel: 'Abbrechen',
-    admin_add_photo: 'Foto hinzufügen',
-    admin_plant_list: 'Pflanzenliste',
-
     // Location
     location_sun: 'Sonne',
     location_partial_shade: 'Halbschatten',
@@ -87,8 +52,6 @@ const translations = {
     settings_language: 'Sprache',
     settings_language_de: 'Deutsch',
     settings_language_en: 'English',
-    settings_admin: 'Admin-Bereich',
-    settings_admin_change_pin: 'PIN ändern',
     settings_about: 'Über die App',
     settings_version: 'Version',
 
@@ -172,8 +135,6 @@ const translations = {
 
     // Empty States
     empty_plants_title: 'Keine Pflanzen',
-    empty_plants_body: 'Füge deine erste Pflanze im Admin-Bereich hinzu.',
-    empty_plants_cta: 'Zum Admin-Bereich',
     empty_history_title: 'Noch keine Einträge',
     empty_diseases_title: 'Keine Krankheiten bekannt',
 
@@ -276,12 +237,10 @@ const translations = {
   en: {
     // Navigation
     nav_home: 'My Plants',
-    nav_admin: 'Admin',
     nav_settings: 'Settings',
 
     // Home Screen
     home_title: 'My Plants',
-    home_empty: 'No plants yet.\nAdd your first plant in the Admin area.',
     home_care_ok: 'All good',
     home_care_soon: 'Due soon',
     home_care_overdue: 'Overdue',
@@ -306,39 +265,6 @@ const translations = {
     detail_symptoms: 'Symptoms',
     detail_treatment: 'Treatment',
 
-    // Admin Screen
-    admin_title: 'Admin',
-    admin_pin_title: 'Admin PIN',
-    admin_pin_prompt: 'Enter PIN',
-    admin_pin_wrong: 'Wrong PIN',
-    admin_pin_set: 'Set PIN',
-    admin_pin_confirm: 'Confirm PIN',
-    admin_pin_mismatch: 'PINs do not match',
-    admin_add_plant: 'Add Plant',
-    admin_edit_plant: 'Edit Plant',
-    admin_delete_plant: 'Delete Plant',
-    admin_delete_confirm: 'Really delete this plant?',
-    admin_name: 'Name',
-    admin_scientific_name: 'Scientific Name (optional)',
-    admin_description: 'Description',
-    admin_location: 'Location',
-    admin_watering_freq: 'Watering interval (days)',
-    admin_watering_tips: 'Watering tips',
-    admin_fertilizing_freq: 'Fertilizing interval (days)',
-    admin_fertilizing_tips: 'Fertilizing tips',
-    admin_location_tips: 'Location tips',
-    admin_temp_min: 'Temperature min (°C)',
-    admin_temp_max: 'Temperature max (°C)',
-    admin_humidity: 'Humidity',
-    admin_add_disease: 'Add Disease',
-    admin_disease_name: 'Disease name',
-    admin_disease_symptoms: 'Symptoms',
-    admin_disease_treatment: 'Treatment',
-    admin_save: 'Save',
-    admin_cancel: 'Cancel',
-    admin_add_photo: 'Add Photo',
-    admin_plant_list: 'Plant List',
-
     // Location
     location_sun: 'Full sun',
     location_partial_shade: 'Partial shade',
@@ -359,8 +285,6 @@ const translations = {
     settings_language: 'Language',
     settings_language_de: 'Deutsch',
     settings_language_en: 'English',
-    settings_admin: 'Admin Area',
-    settings_admin_change_pin: 'Change PIN',
     settings_about: 'About',
     settings_version: 'Version',
 
@@ -444,8 +368,6 @@ const translations = {
 
     // Empty States
     empty_plants_title: 'No Plants',
-    empty_plants_body: 'Add your first plant in the Admin area.',
-    empty_plants_cta: 'Go to Admin',
     empty_history_title: 'No entries yet',
     empty_diseases_title: 'No diseases known',
 

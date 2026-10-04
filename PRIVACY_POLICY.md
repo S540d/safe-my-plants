@@ -42,7 +42,6 @@ All data is stored **only on your device** using local device storage:
 - Plant data you create (names, care notes, photos)
 - Watering and fertilizing schedules
 - App settings (language, theme)
-- Admin PIN (stored locally, never transmitted)
 
 All data remains on your device and is deleted when you uninstall the app.
 
@@ -111,7 +110,6 @@ Alle Daten werden **nur auf Ihrem Gerät** (lokaler Gerätespeicher) gespeichert
 - Von Ihnen angelegte Pflanzendaten (Namen, Pflegenotizen, Fotos)
 - Bewässerungs- und Düngepläne
 - App-Einstellungen (Sprache, Theme)
-- Admin-PIN (lokal gespeichert, wird nie übertragen)
 
 Alle Daten verbleiben auf Ihrem Gerät und werden beim Deinstallieren der App gelöscht.
 
