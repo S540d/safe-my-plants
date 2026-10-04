@@ -1,6 +1,6 @@
 import { getLocales } from 'expo-localization'
 import { useCallback, useEffect, useState } from 'react'
-import { getAdminPin, getLanguage, getTheme, saveAdminPin, saveLanguage, saveTheme } from '../services/storage'
+import { clearLegacyAdminPin, getLanguage, getTheme, saveLanguage, saveTheme } from '../services/storage'
 import { Language } from '../i18n/translations'
 
 type ThemeMode = 'light' | 'dark' | 'system'
@@ -8,12 +8,9 @@ type ThemeMode = 'light' | 'dark' | 'system'
 interface Preferences {
   language: Language
   theme: ThemeMode
-  adminPin: string | null
   isLoaded: boolean
   setLanguage: (lang: Language) => void
   setTheme: (theme: ThemeMode) => void
-  setAdminPin: (pin: string) => Promise<void>
-  verifyAdminPin: (pin: string) => boolean
 }
 
 function getDeviceLanguage(): Language {
@@ -36,7 +33,6 @@ function notifyPreferenceListeners() {
 export function usePreferences(): Preferences {
   const [language, setLanguageState] = useState<Language>(sharedLanguage ?? getDeviceLanguage())
   const [theme, setThemeState] = useState<ThemeMode>(sharedTheme ?? 'system')
-  const [adminPin, setAdminPinState] = useState<string | null>(null)
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
@@ -59,8 +55,7 @@ export function usePreferences(): Preferences {
       }
       setLanguageState(sharedLanguage)
       setThemeState(sharedTheme)
-      const pin = await getAdminPin()
-      setAdminPinState(pin)
+      clearLegacyAdminPin()
       setIsLoaded(true)
     }
     load()
@@ -80,18 +75,5 @@ export function usePreferences(): Preferences {
     notifyPreferenceListeners()
   }, [])
 
-  const setAdminPin = useCallback(async (pin: string) => {
-    await saveAdminPin(pin)
-    setAdminPinState(pin)
-  }, [])
-
-  const verifyAdminPin = useCallback(
-    (pin: string) => {
-      if (!adminPin) return false
-      return adminPin === pin
-    },
-    [adminPin]
-  )
-
-  return { language, theme, adminPin, isLoaded, setLanguage, setTheme, setAdminPin, verifyAdminPin }
+  return { language, theme, isLoaded, setLanguage, setTheme }
 }

@@ -12,7 +12,7 @@ Dein Begleiter für Zimmerpflanzen: Pflegetipps, Gieß- und Düngeerinnerung per
 - **Ampel:** grün = alles gut, gelb = bald fällig, rot = Gießen oder Düngen überfällig
 - **Detailansicht** mit Pflegetipps, Standort- und Klimaansprüchen sowie Fotos
 - **Krankheitsbilder** mit Symptomen und Behandlungshinweisen
-- **Verwaltungsbereich** (PIN-geschützt) zum Anlegen, Bearbeiten und Löschen von Pflanzen
+- **Pflanzen verwalten:** Anlegen aus Vorlagen, Bearbeiten und Löschen
 - Deutsch und Englisch; alle Daten bleiben auf deinem Gerät
 
 ## Lizenz

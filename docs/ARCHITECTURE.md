@@ -32,7 +32,6 @@ implementation lives in `src/`.
 │   ├── plant/             #   plant detail routes
 │   ├── add-plant.tsx, manage-plants.tsx, stats.tsx,
 │   │   settings.tsx, onboarding.tsx
-│   ├── admin.tsx          #   PIN-guarded template editor
 │   └── +html.tsx          #   web-only document head (SEO, meta)
 ├── src/
 │   ├── contexts/PlantContext.tsx   # the app's core store
@@ -91,12 +90,6 @@ existing installs break on upgrade.
 The web build deliberately has no reminders (no reliable background scheduling),
 so the traffic light is the only status signal there. Do not assume notification
 code runs on web.
-
-### Admin area behind a PIN
-
-`app/admin.tsx` edits the built-in plant templates and is guarded by a 4-digit
-PIN stored in `smp-admin-pin`. This is a **UI guard against accidental edits by
-children, not a security boundary** — the PIN sits in plain AsyncStorage.
 
 ### Plant templates as data
 

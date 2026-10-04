@@ -4,7 +4,7 @@ import { Plant } from '../types/plant'
 
 const KEYS = {
   plants: 'smp-plants',
-  adminPinSet: 'smp-admin-pin',
+  legacyAdminPin: 'smp-admin-pin',
   language: 'smp-language',
   theme: 'smp-theme',
   careLog: 'smp-carelog',
@@ -33,12 +33,13 @@ export async function savePlants(plants: Plant[]): Promise<void> {
   await set(KEYS.plants, plants)
 }
 
-export async function getAdminPin(): Promise<string | null> {
-  return get<string>(KEYS.adminPinSet)
-}
-
-export async function saveAdminPin(pin: string): Promise<void> {
-  await set(KEYS.adminPinSet, pin)
+/** The admin PIN was removed; drop the value older installs may still hold. */
+export async function clearLegacyAdminPin(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(KEYS.legacyAdminPin)
+  } catch {
+    // best effort – a leftover key is harmless
+  }
 }
 
 export async function getLanguage(): Promise<'de' | 'en' | null> {

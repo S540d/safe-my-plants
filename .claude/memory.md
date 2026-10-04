@@ -11,7 +11,6 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
   - `index.tsx` – Hauptscreen (SectionList nach Raum)
   - `add-plant.tsx` – Pflanze hinzufügen (Template-Suche + Raum, kein PIN)
   - `manage-plants.tsx` – Pflanzenliste bearbeiten/löschen (kein PIN)
-  - `admin.tsx` – Legacy-Admin mit PinGuard (bleibt erhalten, aber nicht im Hauptpfad)
   - `settings.tsx`, `stats.tsx`, `plant/[id].tsx` – seit PR #87 über `useThemeColors()` (Dark-Mode-fähig, siehe Issue #85 Block C)
 - `src/contexts/PlantContext.tsx` – zentraler State + AsyncStorage-Persistenz + CareLog-Writes
 - `src/hooks/useCareStatus.ts` – Ampel-Berechnung (ok / soon / overdue)
@@ -26,8 +25,8 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
 - `src/components/WaterDropAnimation.tsx`, `src/components/CareConfetti.tsx` – Reanimated-Effekte, ausgelöst über `QuickActionBar`-Callbacks im Plant-Detail-Screen (seit PR #82)
 - `src/components/EmptyState.tsx` – wiederverwendbarer Leerzustand mit Fade-/Zoom-Eintrittsanimation, genutzt in `index.tsx` und `manage-plants.tsx`
 - `src/components/AnimatedPressable.tsx` – wiederverwendbarer Press-Scale-Wrapper (Reanimated `withTiming`, `Pressable`-basiert, optionaler `hitSlop`); genutzt in `HeaderMenu` und `app/plant/[id].tsx` (Header-Foto, Zurück-Button). `PlantCard`/`QuickActionBar` nutzen weiterhin ihre eigene inline `useSharedValue`-Variante aus PR #82 (nicht rückwirkend migriert, kein funktionaler Unterschied). **Noch nicht migriert** (Issue #85 Block C, offen): `settings.tsx`, `manage-plants.tsx`, `add-plant.tsx`, `HeroPlantCard`, `DashboardSummary` nutzen weiterhin reines `TouchableOpacity`.
-- `src/components/admin/` (seit PR #172, Issue #171) – `PinGuard.tsx`, `PlantForm.tsx`, `TemplatesModal.tsx`: aus dem ehemaligen 801-Zeilen-`admin.tsx` extrahiert. `admin.tsx` ist jetzt nur noch der Screen-Root (~185 Zeilen), importiert alle drei.
-- `src/utils/id.ts` (seit PR #172) – zentrale `generateId(prefix?)`-Utility, ersetzt 7 Kopien des Ad-hoc-Patterns `` `${Date.now()}-${Math.random().toString(36).slice(2)}` `` in `useCareLog`, `PlantContext`, `admin/PlantForm`, `add-plant.tsx`, `manage-plants.tsx`.
+- ~~`src/components/admin/`~~ – mit dem Admin-/PIN-Rückbau entfernt (siehe Abschnitt „Admin-/PIN-Rückbau")
+- `src/utils/id.ts` (seit PR #172) – zentrale `generateId(prefix?)`-Utility, ersetzt 7 Kopien des Ad-hoc-Patterns `` `${Date.now()}-${Math.random().toString(36).slice(2)}` `` in `useCareLog`, `PlantContext`, `add-plant.tsx`, `manage-plants.tsx`.
 - `src/constants/theme.ts` – seit PR #90 zusätzlich `Typography`-Tokens (`headerTitle` 28/700, `headerTitleSm` 22/700), genutzt für die Header-Titel in `index.tsx`/`settings.tsx`/`add-plant.tsx`/`manage-plants.tsx`. Kein Typografie-Token für Body-/Label-Text (nur Header bisher konsolidiert).
 - `src/services/exportImport.ts` – Export/Import (Issue #15) via `expo-sharing`/`expo-document-picker`; seit PR #90 prüft `importData()` `smpSchemaVersion` im Backup (fehlend/ungültig → `invalid_format`, höher als lokale `SCHEMA_VERSION` → `unsupported_version`, eigene Fehlermeldung in `settings.tsx`)
 - `docs/store-assets/icon-512.png` – 512×512-Play-Store-Icon, aus `assets/icon.png` (1024×1024) abgeleitet (seit PR #90); referenziert in `docs/store-listing.md`
@@ -40,21 +39,19 @@ Offline-first, kein Backend, kein EAS Cloud-Build.
 - Keystore liegt lokal (außerhalb des Repos), Pfad via `keystore.properties` – niemals einchecken
 - **CareLog** (`smp-carelog`): additiver Store, `lastWatered`/`lastFertilized` bleiben als Schnellzugriff
 - **useCareLog Subscriber-Pattern**: module-level Subscribers, `notifyCareLogUpdate()` nach externen Writes aufrufen
-- **Kein PinGuard im Standardpfad** (seit Phase D, Issue #72): add-plant und manage-plants ohne PIN; admin.tsx bleibt für PIN-Flows erhalten
+- **Kein PIN/Admin mehr**: `app/admin.tsx`, `src/components/admin/*` (PinGuard, PlantForm, TemplatesModal), PIN-Einstellung in `settings.tsx` und `getAdminPin`/`saveAdminPin` wurden entfernt (nirgends mehr verlinkt, Zielgruppe Anfänger). `usePreferences` löscht den Altwert `smp-admin-pin` beim Start (`clearLegacyAdminPin`). Verwaltung nur über `add-plant`/`manage-plants`.
 
 ## Navigation (seit Issue #72 Phase A)
 
 Kein Tab-Footer mehr. Alle Screens über Stack-Navigation:
 - Hauptscreen (`/`) → ⋮-Menü → `/add-plant`, `/manage-plants`, `/stats`, `/settings`
 - Pflanzdetail: `router.push('/plant/<id>')`
-- Admin (Legacy): über `/admin` erreichbar (noch mit PinGuard)
 
 ## AsyncStorage-Keys
 
 | Key | Inhalt |
 |-----|--------|
 | `smp-plants` | `Plant[]` |
-| `smp-admin-pin` | PIN-String |
 | `smp-language` | `'de' \| 'en'` |
 | `smp-theme` | `'light' \| 'dark' \| 'system'` |
 | `smp-carelog` | `CareAction[]` |
@@ -316,3 +313,10 @@ Erster Durchlauf des wiederkehrenden Code-Health-Audit-Standards (project-templa
 - **`generateId()`-Utility extrahiert** (siehe Dateipfade oben) – IDs sind jetzt etwas länger (kein `.slice(2, 7)`-Cutoff mehr wie zuvor in `admin.tsx`/`add-plant.tsx`/`manage-plants.tsx`), das war die vom Audit gemeldete Divergenzstelle.
 - **`TrafficLight` nutzt jetzt `useThemeColors()`** statt hartkodiertem `Colors.light` – letzte Komponente mit diesem Muster.
 - **CLAUDE.md-Schema-Doku auf v5 nachgezogen** – war seit der v4/v5-Migration (Issue #7/#85-Umfeld) nicht mehr aktualisiert worden, dieses `memory.md` war schon korrekt (siehe „Schema-Migrationen" oben).
+
+## Admin-/PIN-Rückbau (2026-10-04)
+
+- Entfernt: `app/admin.tsx`, `src/components/admin/*`, PIN-Bereich in `settings.tsx`, `getAdminPin`/`saveAdminPin`, `adminPin`/`setAdminPin`/`verifyAdminPin` in `usePreferences`, ungenutzte `admin_*`/`settings_admin*`/`empty_plants_*`/`home_empty`/`nav_admin`-Übersetzungen. Grund: nirgends mehr verlinkt, Zielgruppe Anfänger braucht keine PIN. README, `docs/ARCHITECTURE.md` und `PRIVACY_POLICY.md` (PIN-Zeile) angepasst.
+- `usePreferences` ruft beim Start `clearLegacyAdminPin()` auf (löscht `smp-admin-pin` auf Bestandsgeräten, best effort). Kein Schema-Bump nötig.
+- Produktausrichtung: Anfänger. Fingertest („Erde noch feucht", `wateringSnoozedUntil`, PR #180) ist der erste Schritt; Snooze wird bewusst nicht im CareLog protokolliert.
+- Die ursprüngliche Roadmap (#2–#15) ist komplett umgesetzt, auch die tägliche Push-Erinnerung (#14, globale Sammel-Notification ohne Pflanzenbezug).

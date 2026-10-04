@@ -2,7 +2,7 @@
 
 ## Projektbeschreibung
 
-Topfpflanzen-Companion-App für Android. Zeigt Pflegehinweise, Ampel-Status für Gieß-/Düngeintervalle, Krankheitsbilder und Fotos. Inhalte werden manuell als Admin eingepflegt (kein Backend, kein Cloud-Build).
+Topfpflanzen-Companion-App für Android. Zielgruppe: **Anfänger**, deren Pflanzen immer wieder eingehen (meist durch falsches Gießen oder falschen Standort). Zeigt Pflegehinweise, Ampel-Status für Gieß-/Düngeintervalle, Krankheitsbilder und Fotos. Nutzer legen Pflanzen aus ~30 eingebauten Templates an (kein Backend, kein Cloud-Build, kein PIN/Admin-Bereich).
 
 ## Workflow-Regeln (verbindlich)
 
@@ -19,12 +19,13 @@ Das Repository ist öffentlich. Keine vollständigen Implementierungsdetails (Sc
 
 ## Tech Stack
 
-- React Native + Expo 56 (TypeScript)
-- Expo Router (file-based routing, Tab-Navigation)
+- React Native + Expo 57 (TypeScript)
+- Expo Router (file-based routing, reine Stack-Navigation – kein Tab-Footer, Menü über ⋮ im Header)
 - AsyncStorage (lokale Datenpersistenz)
 - expo-image-picker (Fotos)
 - expo-linear-gradient (Header-Design)
 - react-native-reanimated (Micro-Animationen: Karten-Eintritt, Press-Feedback via `AnimatedPressable`)
+- expo-notifications (tägliche Sammel-Erinnerung), expo-sharing + expo-document-picker (JSON-Export/-Import)
 
 ## Dependency-Pflege
 
@@ -65,14 +66,15 @@ Das Repository ist öffentlich. Keine vollständigen Implementierungsdetails (Sc
 ## Projektstruktur
 
 ```
-app/               – Expo Router Screens (Tabs: index, admin, settings; Dynamic: plant/[id])
+app/               – Expo Router Screens: index, add-plant, manage-plants, stats, settings, onboarding; Dynamic: plant/[id]
 src/
-  components/      – TrafficLight, PlantCard, DiseaseCard, DashboardSummary, HeroPlantCard
-  contexts/        – PlantContext (CRUD + Persistenz + CareLog-Writes)
-  hooks/           – useCareStatus, usePreferences, useCareLog
+  components/      – PlantCard, QuickActionBar, ReminderBanner, HeroPlantCard, DashboardSummary, TrafficLight, …
+  contexts/        – PlantContext (CRUD + Persistenz + CareLog-Writes + Migrationen)
+  hooks/           – useCareStatus, usePreferences, useCareLog, useNotificationScheduler, useStreak, …
   types/           – plant.ts, careLog.ts (CareAction, CareActionType)
-  constants/       – defaultPlants.ts (3 Musterpflanzen)
-  services/        – storage.ts (AsyncStorage-Wrapper inkl. CareLog + Schema-Version)
+  constants/       – plantTemplates.ts (~30 Templates), defaultPlants.ts (Musterpflanzen), theme.ts
+  services/        – storage.ts (AsyncStorage-Wrapper), exportImport.ts
+  utils/           – plantFilter.ts, id.ts
   i18n/            – translations.ts (DE/EN)
 ```
 
@@ -265,11 +267,13 @@ CareAction {
 | Key | Inhalt |
 |-----|--------|
 | `smp-plants` | `Plant[]` |
-| `smp-admin-pin` | PIN-String |
 | `smp-language` | `'de' \| 'en'` |
 | `smp-theme` | `'light' \| 'dark' \| 'system'` |
 | `smp-carelog` | `CareAction[]` (seit Schema v2) |
 | `smp-schema-version` | `number` (aktuell: 5) |
+| `smp-reminders` | `ReminderSettings` (`{ enabled, time }`) |
+
+`smp-admin-pin` existiert nicht mehr (PIN-Funktion entfernt); `usePreferences` löscht den Altwert beim Start einmalig.
 
 ## Schema-Migration
 
@@ -294,47 +298,30 @@ CareAction {
 
 Berechnung in `src/hooks/useCareStatus.ts`.
 
-## Admin-Bereich
+## Pflanzen verwalten
 
-PIN-geschützt (4-stellig, in AsyncStorage). Beim ersten Start wird die PIN gesetzt.
-Admin kann: Pflanzen anlegen/bearbeiten/löschen, Fotos hinzufügen, Krankheiten verwalten.
+Kein PIN, kein Admin-Bereich. `add-plant.tsx` legt Pflanzen aus Templates (Suche + Raum) an, `manage-plants.tsx` bearbeitet/löscht sie. Erreichbar über das ⋮-Menü im Header.
 
 ## Feature-Roadmap (GitHub Issues: s540d/safe-my-plants)
 
-Vollständige Planung: Issue #16 (Tracking-Issue)
+Die ursprüngliche Roadmap (Issue #16, Features #2–#15: CareLog, Dashboard, Suche/Filter, Reminder-Banner, Quick-Actions, Foto-Galerie, Theme/Dark-Mode, Animationen, Notizen, Onboarding, Statistik, Templates, Push-Erinnerung, Export/Import) ist **vollständig umgesetzt und geschlossen**. Offen ist nur das Tracking-Issue #85 (Play-Store-Launch).
 
-### Phase 1 – MVP ✅/🔄
-| Issue | Feature | Status |
-|-------|---------|--------|
-| #2 | CareLog-Datenmodell + History-Hook | ✅ merged (PR #17) |
-| #3 | Dashboard-Karten + Hero-Tile am Index | ✅ merged (PR #17) |
-| #4 | Suchleiste + Filter-Chips + Sortierung | 🔜 |
-| #5 | In-App-Reminder-Banner + Tab-Badge | 🔜 |
-| #6 | Plant-Detail: History-Liste + Quick-Actions | 🔜 (benötigt #2) |
+### Produktausrichtung: Anfänger
 
-### Phase 2 – Polish
-| Issue | Feature | Status |
-|-------|---------|--------|
-| #7 | Foto-Galerie + Schema-Migration (photos: PlantPhoto[]) | 🔜 |
-| #8 | Theme-Tokens + Empty-States + Dark-Mode-Audit | 🔜 |
-| #9 | Animationen (Reanimated) + Haptik | 🔜 |
-| #10 | Notizen pro Pflanze | 🔜 |
-| #11 | First-Run-Onboarding (3 Slides) | 🔜 |
-| #12 | Statistik-Screen: Streak, Counts | 🔜 |
-| #13 | Pflanzen-Templates | 🔜 |
+Hebel gegen eingehende Pflanzen (Reihenfolge der Umsetzung):
 
-### Phase 3 – Stretch
-| Issue | Feature | Status |
-|-------|---------|--------|
-| #14 | Push-Notifications (expo-notifications) | 🔜 |
-| #15 | JSON-Export / Import (expo-sharing) | 🔜 |
+1. **Fingertest** – „Erde noch feucht" verschiebt die Gießerinnerung (statt Rot = „jetzt gießen") → PR #180. Snooze wird bewusst **nicht** im CareLog protokolliert.
+2. **Pflegedaten der Templates gegen Quellen prüfen** (v. a. Gießintervalle).
+3. **Problem-Ratgeber nach Symptom** (gelbe Blätter, braune Spitzen, Schimmel, …), unabhängig vom pro-Pflanze-Feld `diseases`.
+4. Zurückgestellt: Statistik/Streaks ausbauen, weitere Animationen, Onboarding-Ausbau.
 
 ### Ad-hoc / Maintenance
 
-| Issue | Feature | Status |
-|-------|---------|--------|
+| Issue/PR | Thema | Status |
+|----------|-------|--------|
 | #52 | npm audit fix (uuid/js-yaml via `overrides`, kein SDK-Downgrade) | ✅ merged (PR #83) |
-| #77 | UI-Verbesserung / Micro-Animationen (Karten-Eintritt, Press-Feedback, `AnimatedPressable`) | ✅ merged (PR #82, #83) |
+| #77 | UI-Verbesserung / Micro-Animationen | ✅ merged (PR #82, #83) |
+| – | Admin-/PIN-Rückbau (`admin.tsx`, `PinGuard`, `smp-admin-pin`) | 🔄 in Arbeit |
 
 ## Spätere Zusammenführung mit Pflanzkalender
 
