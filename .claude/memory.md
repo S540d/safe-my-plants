@@ -328,11 +328,11 @@ Erster Durchlauf des wiederkehrenden Code-Health-Audit-Standards (project-templa
 - UI: Button „✋ Erde noch feucht" in `PlantCard` (`onSnooze`) und als Aktion in `QuickActionBar`, jeweils nur bei Gießstatus ≠ ok.
 - Gilt nur für Gießen (nicht Düngen). Die tägliche Sammel-Notification (`useNotificationScheduler`) kennt den Snooze nicht – sie ist global und nicht fälligkeitsbasiert.
 
-## Symptom-Ratgeber (Branch feature/symptom-guide)
+## Symptom-Ratgeber (PR #183, gemerged 2026-10-04)
 
 - `app/symptom-guide.tsx` (Menüeintrag „Problem-Ratgeber" im ⋮-Menü, 🩺; zusätzlich Link-Zeile in `app/plant/[id].tsx`, ohne Pflanzenbezug) + Inhalte in `src/constants/symptomGuide.ts` (`Localized = {de, en}`, je Symptom Ursachen nach Häufigkeit, je Ursache `check`/`fix`). Texte der Oberfläche in `translations.ts` (`symptom_guide_*`). Test: `src/constants/symptomGuide.test.ts` (IDs eindeutig, DE/EN vollständig).
 - Allgemeiner Ratgeber, unabhängig vom pro-Pflanze-Feld `diseases`. Bewusst Fragen-frei: der Check-Text jeder Ursache ersetzt den geplanten Frage-Dialog.
 - **Quellenlage (ehrlich):** Die Inhalte stützen sich auf Such-Zusammenfassungen von RHS (How to help a poorly houseplant; Leaf damage on houseplants), Univ. Missouri Extension (Caring for Houseplants g6510; Least-Toxic Control g7273), Clemson HGIC (Houseplant Diseases & Disorders; Common Houseplant Insects), Univ. Illinois Extension, UMN Extension (Watering houseplants; Managing insects on indoor plants), Colorado State Extension (Managing Houseplant Pests), UC IPM (Houseplant Problems). Die Originalseiten waren über den Egress-Proxy der Session **nicht abrufbar** (EGRESS_BLOCKED), Wortlaut wurde nicht gegen die Seiten geprüft.
-- **Schwächer belegt (Blog-/Händlerquellen, allgemeines Gartenwissen):** Nährstoffmangel-Zeichen (Adern grün), Fluorid/Leitungswasser bei Grünlilie/Calathea, „Überschuss nach ~15 Min. wegkippen", Eingewöhnung nach Standortwechsel, Steckling-Rettung bei Stängelfäule, Weißschimmel als harmloser Saprophyt. Vor einem Release gegenlesen.
+- **Schwächer belegt (Blog-/Händlerquellen, allgemeines Gartenwissen):** Nährstoffmangel-Zeichen (Adern grün), Fluorid/Leitungswasser bei Grünlilie/Calathea, „Überschuss nach ~15 Min. wegkippen", Eingewöhnung nach Standortwechsel, Steckling-Rettung bei Stängelfäule, Weißschimmel als harmloser Saprophyt. Vor einem Release gegenlesen (Issue #184: Template-Pflegedaten und diese Aussagen in einem Durchgang gegen Quellen prüfen).
 - Nicht enthalten: Pflanzenspezifische Hinweise, Krankheiten einzelner Arten, chemische Mittel mit Produktnamen/Dosierung (nur Verweis auf Packungsangabe).
 
