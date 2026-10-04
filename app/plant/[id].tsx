@@ -110,7 +110,12 @@ export default function PlantDetailScreen() {
             <View style={[styles.nextCareItem, { backgroundColor: colors.accentSurface }]}>
               <Text style={[styles.nextCareLabel, { color: colors.primary }]}>💧 {t(lang, 'detail_watering')}</Text>
               <Text style={[styles.nextCareValue, { color: colors.primaryMid }]}>
-                {formatNextDate(plant.lastWatered, plant.careInfo.wateringFrequencyDays, lang)}
+                {formatNextDate(
+                  plant.lastWatered,
+                  plant.careInfo.wateringFrequencyDays,
+                  lang,
+                  plant.wateringSnoozedUntil
+                )}
               </Text>
               <TrafficLight status={careStatus.watering} size={8} />
             </View>

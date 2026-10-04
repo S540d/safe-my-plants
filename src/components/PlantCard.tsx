@@ -16,9 +16,10 @@ interface PlantCardProps {
   onPress: () => void
   onWater?: () => void
   onFertilize?: () => void
+  onSnooze?: () => void
 }
 
-export function PlantCard({ plant, lang, index = 0, onPress, onWater, onFertilize }: PlantCardProps) {
+export function PlantCard({ plant, lang, index = 0, onPress, onWater, onFertilize, onSnooze }: PlantCardProps) {
   const status = getCareStatus(plant)
   const hasPhoto = plant.photos.length > 0
   const colors = useThemeColors()
@@ -75,6 +76,14 @@ export function PlantCard({ plant, lang, index = 0, onPress, onWater, onFertiliz
                 <TrafficLight status={status.fertilizing} size={10} />
               </View>
             </View>
+            {onSnooze && status.watering !== 'ok' && (
+              <CareActionButton
+                label={t(lang, 'card_soil_moist')}
+                backgroundColor={colors.accentSurface}
+                textColor={colors.primary}
+                onPress={onSnooze}
+              />
+            )}
             {(onWater || onFertilize) && (
               <View style={styles.actionRow}>
                 {onWater && (

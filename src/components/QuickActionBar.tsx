@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { usePlants } from '../contexts/PlantContext'
+import { getCareStatus } from '../hooks/useCareStatus'
 import { useCareLog } from '../hooks/useCareLog'
 import { usePreferences } from '../hooks/usePreferences'
 import { t } from '../i18n/translations'
@@ -14,6 +15,7 @@ interface Props {
 
 const ACTIONS = [
   { type: 'water' as const, icon: '💧', labelKey: 'action_water' as const },
+  { type: 'snooze' as const, icon: '✋', labelKey: 'action_soil_moist' as const },
   { type: 'fertilize' as const, icon: '🌿', labelKey: 'action_fertilize' as const },
   { type: 'repot' as const, icon: '🪴', labelKey: 'action_repot' as const },
   { type: 'prune' as const, icon: '✂️', labelKey: 'action_prune' as const },
@@ -21,7 +23,10 @@ const ACTIONS = [
 ]
 
 export function QuickActionBar({ plantId, onWater, onFertilize }: Props) {
-  const { markWatered, markFertilized } = usePlants()
+  const { plants, markWatered, markFertilized, snoozeWatering } = usePlants()
+  const plant = plants.find((p) => p.id === plantId)
+  // Soil check only makes sense while watering is due or nearly due.
+  const showSnooze = plant ? getCareStatus(plant).watering !== 'ok' : false
   const { addAction } = useCareLog()
   const { language } = usePreferences()
   const [noteModalVisible, setNoteModalVisible] = useState(false)
@@ -31,6 +36,8 @@ export function QuickActionBar({ plantId, onWater, onFertilize }: Props) {
     if (type === 'water') {
       await markWatered(plantId)
       onWater?.()
+    } else if (type === 'snooze') {
+      await snoozeWatering(plantId)
     } else if (type === 'fertilize') {
       await markFertilized(plantId)
       onFertilize?.()
@@ -57,7 +64,7 @@ export function QuickActionBar({ plantId, onWater, onFertilize }: Props) {
         contentContainerStyle={styles.row}
         style={styles.scroll}
       >
-        {ACTIONS.map(({ type, icon, labelKey }) => (
+        {ACTIONS.filter(({ type }) => type !== 'snooze' || showSnooze).map(({ type, icon, labelKey }) => (
           <QuickActionButton key={type} icon={icon} label={t(language, labelKey)} onPress={() => handleAction(type)} />
         ))}
       </ScrollView>
