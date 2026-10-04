@@ -38,6 +38,12 @@
     "prettier": "^3.9.6",
     "typescript": "~7.0.2"
   },
+  "overridesComment": [
+    "Siehe CLAUDE.md -> Dependency-Pflege: Overrides eng scopen, Modulformat pruefen.",
+    "@xmldom/xmldom ist bewusst nur fuer 'plist' gepinnt: @expo/plist nutzt 0.8.x und liegt ausserhalb der Advisory-Range (>=0.9.0 <=0.9.11).",
+    "decode-uri-component wird bewusst NICHT gepinnt: die einzige gepatchte Version (0.5.0) ist ESM-only, query-string@7 laedt sie per require() -> 'decodeComponent is not a function' und expo-router kann keine URLs mehr parsen (PR #160/#161).",
+    "Wieder moeglich, sobald expo-router auf query-string >= 10 geht."
+  ],
   "overrides": {
     "uuid": "^11.1.1",
     "js-yaml": "^4.3.1",

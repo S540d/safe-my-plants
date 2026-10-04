@@ -1,4 +1,4 @@
-import { getCareStatus, formatLastDate, formatNextDate } from './useCareStatus'
+import { getCareStatus, getDueTime, getSnoozeDays, formatLastDate, formatNextDate } from './useCareStatus'
 import { Plant } from '../types/plant'
 
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -84,5 +84,49 @@ describe('formatNextDate', () => {
 
   it('reports days overdue when the interval has passed', () => {
     expect(formatNextDate(isoDaysAgo(9), 7, 'en')).toBe('2 days overdue')
+  })
+})
+
+describe('watering snooze ("soil still moist")', () => {
+  const inDays = (days: number) => new Date(Date.now() + days * DAY_MS).toISOString()
+
+  it('turns an overdue watering back to ok while the snooze lasts', () => {
+    const plant = makePlant({ lastWatered: isoDaysAgo(10), wateringSnoozedUntil: inDays(3) })
+    expect(getCareStatus(plant).watering).toBe('ok')
+  })
+
+  it('is overdue again once the snooze has expired', () => {
+    const plant = makePlant({ lastWatered: isoDaysAgo(10), wateringSnoozedUntil: inDays(-1) })
+    expect(getCareStatus(plant).watering).toBe('overdue')
+  })
+
+  it('applies to a never-watered plant', () => {
+    const plant = makePlant({ wateringSnoozedUntil: inDays(3) })
+    expect(getCareStatus(plant).watering).toBe('ok')
+  })
+
+  it('never pulls the due date earlier than the regular interval', () => {
+    const plant = makePlant({ lastWatered: isoDaysAgo(1), wateringSnoozedUntil: inDays(1) })
+    expect(getDueTime(plant.lastWatered, 7, plant.wateringSnoozedUntil)).toBeGreaterThan(Date.now() + 5 * DAY_MS)
+  })
+
+  it('does not affect fertilizing', () => {
+    const plant = makePlant({ lastWatered: isoDaysAgo(10), wateringSnoozedUntil: inDays(3) })
+    expect(getCareStatus(plant).fertilizing).toBe('overdue')
+  })
+
+  it('ignores an invalid snooze date', () => {
+    const plant = makePlant({ lastWatered: isoDaysAgo(10), wateringSnoozedUntil: 'not-a-date' })
+    expect(getCareStatus(plant).watering).toBe('overdue')
+  })
+
+  it('formats the next date with the snooze', () => {
+    expect(formatNextDate(isoDaysAgo(10), 7, 'de', inDays(2))).toBe('in 2 Tagen')
+  })
+
+  it('scales the snooze length with the interval, clamped to 2-7 days', () => {
+    expect(getSnoozeDays(3)).toBe(2)
+    expect(getSnoozeDays(14)).toBe(4)
+    expect(getSnoozeDays(60)).toBe(7)
   })
 })

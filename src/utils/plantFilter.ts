@@ -1,4 +1,4 @@
-import { getCareStatus } from '../hooks/useCareStatus'
+import { getCareStatus, getDueTime } from '../hooks/useCareStatus'
 import { CareStatus, Plant, PlantLocation } from '../types/plant'
 
 export type SortOption = 'name' | 'nextCare' | 'recent'
@@ -11,12 +11,10 @@ export interface FilterState {
 }
 
 function daysUntilNextCare(plant: Plant, now: number): number {
-  const waterDays = plant.lastWatered
-    ? plant.careInfo.wateringFrequencyDays - (now - new Date(plant.lastWatered).getTime()) / 86400000
-    : Number.NEGATIVE_INFINITY
-  const fertDays = plant.lastFertilized
-    ? plant.careInfo.fertilizingFrequencyDays - (now - new Date(plant.lastFertilized).getTime()) / 86400000
-    : Number.NEGATIVE_INFINITY
+  const water = getDueTime(plant.lastWatered, plant.careInfo.wateringFrequencyDays, plant.wateringSnoozedUntil)
+  const fert = getDueTime(plant.lastFertilized, plant.careInfo.fertilizingFrequencyDays)
+  const waterDays = water === undefined ? Number.NEGATIVE_INFINITY : (water - now) / 86400000
+  const fertDays = fert === undefined ? Number.NEGATIVE_INFINITY : (fert - now) / 86400000
   const min = Math.min(waterDays, fertDays)
   return isFinite(min) ? min : Number.NEGATIVE_INFINITY
 }

@@ -42,7 +42,7 @@ function groupByRoom(plants: Plant[], lang: Language): Section[] {
 }
 
 export default function HomeScreen() {
-  const { plants, isLoaded, markWatered, markFertilized } = usePlants()
+  const { plants, isLoaded, markWatered, markFertilized, snoozeWatering } = usePlants()
   const { language } = usePreferences()
   const colors = useThemeColors()
   const router = useRouter()
@@ -84,6 +84,7 @@ export default function HomeScreen() {
               onPress={() => router.push(`/plant/${item.id}`)}
               onWater={() => markWatered(item.id)}
               onFertilize={() => markFertilized(item.id)}
+              onSnooze={() => snoozeWatering(item.id)}
             />
           )}
           renderSectionHeader={({ section }) => (

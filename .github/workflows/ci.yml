@@ -4,9 +4,13 @@ on:
   push:
     branches: [main, testing]
   pull_request:
-    branches: [main]
+    branches: [main, testing]
 
 jobs:
+  actionlint:
+    name: ⚙️ Workflow Linting
+    uses: S540d/project-templates/.github/workflows/reusable-actionlint.yml@v2
+
   lint-and-typecheck:
     name: lint-and-typecheck
     runs-on: ubuntu-latest
@@ -18,4 +22,4 @@ jobs:
           cache: 'npm'
       - run: npm ci --legacy-peer-deps
       - run: npx tsc --noEmit
-      - run: npm test -- --ci
+      - run: npm test -- --ci --coverage

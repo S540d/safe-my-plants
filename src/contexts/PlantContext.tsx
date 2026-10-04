@@ -11,9 +11,11 @@ import {
   savePlants,
   saveSchemaVersion,
 } from '../services/storage'
+import { getSnoozeDays } from '../hooks/useCareStatus'
 import { notifyCareLogUpdate } from '../hooks/useCareLog'
 import { CareAction } from '../types/careLog'
 import { Plant, PlantPhoto } from '../types/plant'
+import { generateId } from '../utils/id'
 
 interface PlantContextValue {
   plants: Plant[]
@@ -23,6 +25,7 @@ interface PlantContextValue {
   deletePlant: (id: string) => Promise<void>
   markWatered: (id: string) => Promise<void>
   markFertilized: (id: string) => Promise<void>
+  snoozeWatering: (id: string) => Promise<void>
 }
 
 const PlantContext = createContext<PlantContextValue | null>(null)
@@ -142,9 +145,13 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
   const markWatered = useCallback(
     async (id: string) => {
       const now = new Date().toISOString()
-      await persist(plants.map((p) => (p.id === id ? { ...p, lastWatered: now, updatedAt: now } : p)))
+      await persist(
+        plants.map((p) =>
+          p.id === id ? { ...p, lastWatered: now, wateringSnoozedUntil: undefined, updatedAt: now } : p
+        )
+      )
       await addCareAction({
-        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        id: generateId(),
         plantId: id,
         type: 'water',
         timestamp: now,
@@ -160,7 +167,7 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
       const now = new Date().toISOString()
       await persist(plants.map((p) => (p.id === id ? { ...p, lastFertilized: now, updatedAt: now } : p)))
       await addCareAction({
-        id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+        id: generateId(),
         plantId: id,
         type: 'fertilize',
         timestamp: now,
@@ -171,9 +178,35 @@ export function PlantProvider({ children }: { children: React.ReactNode }) {
     [plants, persist]
   )
 
+  // "Soil still moist": push the watering reminder back instead of watering too early.
+  const snoozeWatering = useCallback(
+    async (id: string) => {
+      const now = new Date()
+      await persist(
+        plants.map((p) => {
+          if (p.id !== id) return p
+          const days = getSnoozeDays(p.careInfo.wateringFrequencyDays)
+          const until = new Date(now.getTime() + days * 24 * 60 * 60 * 1000).toISOString()
+          return { ...p, wateringSnoozedUntil: until, updatedAt: now.toISOString() }
+        })
+      )
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {})
+    },
+    [plants, persist]
+  )
+
   return (
     <PlantContext.Provider
-      value={{ plants, isLoaded, addPlant, updatePlant, deletePlant, markWatered, markFertilized }}
+      value={{
+        plants,
+        isLoaded,
+        addPlant,
+        updatePlant,
+        deletePlant,
+        markWatered,
+        markFertilized,
+        snoozeWatering,
+      }}
     >
       {children}
     </PlantContext.Provider>

@@ -23,10 +23,7 @@ import { t } from '../src/i18n/translations'
 import { Disease, Plant, PlantLocation, PlantPhoto } from '../src/types/plant'
 import { getCareStatus } from '../src/hooks/useCareStatus'
 import { TrafficLight } from '../src/components/TrafficLight'
-
-function generateId() {
-  return `plant-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
-}
+import { generateId } from '../src/utils/id'
 
 const LOCATIONS: PlantLocation[] = ['sun', 'partial-shade', 'shade', 'indoor']
 const LOCATION_LABELS: Record<string, Record<PlantLocation, string>> = {
@@ -36,7 +33,7 @@ const LOCATION_LABELS: Record<string, Record<PlantLocation, string>> = {
 
 function emptyPlant(): Plant {
   return {
-    id: generateId(),
+    id: generateId('plant'),
     name: '',
     scientificName: '',
     description: '',
@@ -59,7 +56,7 @@ function emptyPlant(): Plant {
 }
 
 function emptyDisease(): Disease {
-  return { id: generateId(), name: '', symptoms: '', treatment: '' }
+  return { id: generateId('disease'), name: '', symptoms: '', treatment: '' }
 }
 
 interface PlantFormProps {

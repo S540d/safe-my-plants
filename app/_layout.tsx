@@ -22,9 +22,9 @@ function AppStack() {
       <Stack.Screen name="index" />
       <Stack.Screen name="add-plant" />
       <Stack.Screen name="manage-plants" />
-      <Stack.Screen name="admin" />
       <Stack.Screen name="settings" />
       <Stack.Screen name="stats" />
+      <Stack.Screen name="symptom-guide" />
       <Stack.Screen name="plant/[id]" />
       <Stack.Screen name="onboarding" />
     </Stack>

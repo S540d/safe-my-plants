@@ -37,6 +37,7 @@ export interface Plant {
   diseases: Disease[]
   lastWatered?: string
   lastFertilized?: string
+  wateringSnoozedUntil?: string // ISO-8601; set by the "soil still moist" check
   createdAt: string
   updatedAt: string
 }

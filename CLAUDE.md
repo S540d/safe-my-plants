@@ -2,7 +2,7 @@
 
 ## Projektbeschreibung
 
-Topfpflanzen-Companion-App für Android. Zeigt Pflegehinweise, Ampel-Status für Gieß-/Düngeintervalle, Krankheitsbilder und Fotos. Inhalte werden manuell als Admin eingepflegt (kein Backend, kein Cloud-Build).
+Topfpflanzen-Companion-App für Android. Zielgruppe: **Anfänger**, deren Pflanzen immer wieder eingehen (meist durch falsches Gießen oder falschen Standort). Zeigt Pflegehinweise, Ampel-Status für Gieß-/Düngeintervalle, Krankheitsbilder und Fotos. Nutzer legen Pflanzen aus ~30 eingebauten Templates an (kein Backend, kein Cloud-Build, kein PIN/Admin-Bereich).
 
 ## Workflow-Regeln (verbindlich)
 
@@ -19,12 +19,13 @@ Das Repository ist öffentlich. Keine vollständigen Implementierungsdetails (Sc
 
 ## Tech Stack
 
-- React Native + Expo 56 (TypeScript)
-- Expo Router (file-based routing, Tab-Navigation)
+- React Native + Expo 57 (TypeScript)
+- Expo Router (file-based routing, reine Stack-Navigation – kein Tab-Footer, Menü über ⋮ im Header)
 - AsyncStorage (lokale Datenpersistenz)
 - expo-image-picker (Fotos)
 - expo-linear-gradient (Header-Design)
 - react-native-reanimated (Micro-Animationen: Karten-Eintritt, Press-Feedback via `AnimatedPressable`)
+- expo-notifications (tägliche Sammel-Erinnerung), expo-sharing + expo-document-picker (JSON-Export/-Import)
 
 ## Dependency-Pflege
 
@@ -33,17 +34,47 @@ Das Repository ist öffentlich. Keine vollständigen Implementierungsdetails (Sc
   `overrides` in `package.json` auf die gepatchte Version pinnen (siehe `uuid`, `js-yaml`).
   Vor dem Pinnen prüfen, ob App-Code das Paket direkt importiert.
 
+### Checkliste vor jedem neuen `overrides`-Eintrag
+
+1. **Modulformat prüfen** – wechselt die gepatchte Version von CommonJS zu ESM?
+   ```bash
+   npm view <paket>@<version> type exports
+   ```
+   `type: "module"` bei einem Konsumenten, der per `require()` lädt, ist ein **stiller
+   Runtime-Breaker**: `npm audit`, `tsc` und Jest laufen grün durch, die App bricht erst zur
+   Laufzeit. Gegenprobe nach `npm install`:
+   ```bash
+   node -e "const m=require('<konsument>'); /* typischen Aufruf ausführen */"
+   ```
+
+2. **Override so eng wie möglich scopen.** Nicht global pinnen, wenn nur ein Konsument betroffen
+   ist – sonst werden unbeteiligte Pakete über Major-Grenzen gehoben:
+   ```jsonc
+   "overrides": { "plist": { "@xmldom/xmldom": "^0.9.12" } }
+   ```
+   Vorher prüfen, welche Konsumenten überhaupt in der Advisory-Range liegen (`npm ls <paket>`).
+
+3. **Lockfile gegenprüfen.** Ein `^`-Range garantiert keine gepatchte Version – das Lockfile kann
+   auf einer älteren, im Range liegenden Version einfrieren (so geschehen bei `js-yaml` 4.3.0,
+   PR #140). Nach `npm install` prüfen, welche Version tatsächlich aufgelöst wurde.
+
+4. **Nicht jede Advisory ist den Fix wert.** Ein Runtime-Breakage in der App wiegt schwerer als
+   eine moderate DoS-Advisory in einer reinen Build-/Dev-Kette. Bewusste Nicht-Fixes als
+   Kommentar über dem `overrides`-Block festhalten, inklusive der Bedingung, unter der der Fix
+   wieder möglich wird.
+
 ## Projektstruktur
 
 ```
-app/               – Expo Router Screens (Tabs: index, admin, settings; Dynamic: plant/[id])
+app/               – Expo Router Screens: index, add-plant, manage-plants, stats, settings, onboarding; Dynamic: plant/[id]
 src/
-  components/      – TrafficLight, PlantCard, DiseaseCard, DashboardSummary, HeroPlantCard
-  contexts/        – PlantContext (CRUD + Persistenz + CareLog-Writes)
-  hooks/           – useCareStatus, usePreferences, useCareLog
+  components/      – PlantCard, QuickActionBar, ReminderBanner, HeroPlantCard, DashboardSummary, TrafficLight, …
+  contexts/        – PlantContext (CRUD + Persistenz + CareLog-Writes + Migrationen)
+  hooks/           – useCareStatus, usePreferences, useCareLog, useNotificationScheduler, useStreak, …
   types/           – plant.ts, careLog.ts (CareAction, CareActionType)
-  constants/       – defaultPlants.ts (3 Musterpflanzen)
-  services/        – storage.ts (AsyncStorage-Wrapper inkl. CareLog + Schema-Version)
+  constants/       – plantTemplates.ts (~30 Templates), defaultPlants.ts (Musterpflanzen), theme.ts
+  services/        – storage.ts (AsyncStorage-Wrapper), exportImport.ts
+  utils/           – plantFilter.ts, id.ts
   i18n/            – translations.ts (DE/EN)
 ```
 
@@ -57,38 +88,17 @@ npx expo start --android  # direkt im Android-Emulator
 
 ## Android-Build (lokal, kein EAS)
 
-### 1. Prebuild (einmalig oder nach Dependency-Änderungen)
+> Die `/build-android`-Skill deckt dieses Projekt **nicht** ab. Maßgeblich ist der Ablauf in
+> [`docs/ANDROID_BUILD.md`](docs/ANDROID_BUILD.md) (versionCode prüfen → Prebuild → **Signing
+> injizieren** → Build → Fingerprint prüfen → Archivieren/Upload → Tag).
 
-```bash
-npx expo prebuild --platform android
-```
+Kernregeln (nicht überspringen):
 
-Erzeugt den `/android`-Ordner (nicht eingecheckt, in .gitignore).
-
-### 2. Keystore
-
-Keystore liegt unter:
-`/Users/svenstrohkark/Documents/Programmierung/Projects/Keystore/`
-
-Neuen Keystore für diese App anlegen:
-```bash
-keytool -genkey -v -keystore safe_my_plants.jks \
-  -alias safemyplants -keyalg RSA -keysize 2048 -validity 10000
-```
-
-Signing-Konfiguration in `android/app/build.gradle` eintragen (analog Pflanzkalender).
-`keystore.properties` und `local.properties` sind in `.gitignore` – niemals einchecken.
-
-### 3. Build
-
-```bash
-cd android
-./gradlew assembleDebug        # Debug APK
-./gradlew assembleRelease      # Release APK (mit Signing)
-./gradlew bundleRelease        # Release AAB
-```
-
-APK-Output: `android/app/build/outputs/apk/`
+- `versionCode` bei **jedem** Upload +1, als eigener Commit vor dem Build (verbrauchte Codes sind nie wiederverwendbar).
+- `expo prebuild` signiert den Release-Build mit dem **Debug-Key** – Signing-Config nach **jedem** Prebuild neu injizieren, sonst lehnt Play den AAB ab (Build läuft trotzdem grün durch).
+- Vor jedem Upload SHA256-Fingerprint gegen den Vorgänger-AAB in `aab-archive/` prüfen.
+- Keystore: `Projects/Keystore/safe_my_plants.jks`, Credentials in `docs/private/CLAUDE.md` (gitignored). **Secrets nie ausgeben und nie lesen/anzeigen** – nur per Skript (`grep`/`sed`) direkt nach `android/gradle.properties` übertragen, nie als CLI-Argument (Auslöser: Issue #164, Details in `docs/private/INCIDENTS.md`).
+- Git-Tag erst nach erfolgreichem Play-Upload; Regelfall `vX.Y.Z`.
 
 ## Branch-Strategie
 
@@ -106,8 +116,9 @@ main (production) ← testing ← feature/issue-XXX
 ```typescript
 Plant {
   id, name, scientificName?, description
-  photos: string[]           // lokale URIs
+  photos: PlantPhoto[]       // { uri, takenAt } (seit Schema v3, davor: string[])
   location: 'sun' | 'partial-shade' | 'shade' | 'indoor'
+  room?: string               // freier Text, seit Schema v4
   careInfo: {
     wateringFrequencyDays, wateringTips
     fertilizingFrequencyDays, fertilizingTips
@@ -117,10 +128,11 @@ Plant {
   }
   diseases: Disease[]        // { id, name, symptoms, treatment, imageUri? }
   lastWatered?, lastFertilized?   // ISO date strings (bleiben als Schnellzugriff)
+  wateringSnoozedUntil?           // ISO; gesetzt durch Fingertest („Erde noch feucht")
   createdAt, updatedAt
 }
 
-// Neu (Schema v2):
+// Seit Schema v2:
 CareAction {
   id: string
   plantId: string
@@ -135,17 +147,21 @@ CareAction {
 | Key | Inhalt |
 |-----|--------|
 | `smp-plants` | `Plant[]` |
-| `smp-admin-pin` | PIN-String |
 | `smp-language` | `'de' \| 'en'` |
 | `smp-theme` | `'light' \| 'dark' \| 'system'` |
-| `smp-carelog` | `CareAction[]` (neu, Schema v2) |
-| `smp-schema-version` | `number` (aktuell: 2) |
+| `smp-carelog` | `CareAction[]` (seit Schema v2) |
+| `smp-schema-version` | `number` (aktuell: 5) |
+| `smp-reminders` | `ReminderSettings` (`{ enabled, time }`) |
+
+`smp-admin-pin` existiert nicht mehr (PIN-Funktion entfernt); `usePreferences` löscht den Altwert beim Start einmalig.
 
 ## Schema-Migration
 
-`PlantContext` führt beim App-Start eine idempotente Migration durch:
-- v1 → v2: bestehende `lastWatered`/`lastFertilized` werden als initiale CareLog-Einträge übernommen (IDs: `migration-water-{plantId}`, `migration-fertilize-{plantId}`)
-- `smp-schema-version` wird auf `2` gesetzt
+`PlantContext.runMigrations()` führt beim App-Start eine idempotente, schrittweise Migration durch (jeder Schritt hebt `smp-schema-version` einzeln an):
+- v1 → v2: bestehende `lastWatered`/`lastFertilized` werden als initiale CareLog-Einträge übernommen (IDs: `migration-water-{plantId}`, `migration-fertilize-{plantId}`, dedupliziert über vorhandene IDs)
+- v2 → v3: `photos: string[]` → `photos: PlantPhoto[]` (`{ uri, takenAt }`, `takenAt` = `plant.createdAt` als Fallback)
+- v3 → v4: neues optionales `room`-Feld, keine Datentransformation (fehlend = "Ohne Raum")
+- v4 → v5: Pflanzen ohne Foto bekommen das Template-`imageUrl` (per Namensabgleich mit `PLANT_TEMPLATES`) als erstes Foto nachgetragen
 
 ## CareLog-Architektur
 
@@ -159,50 +175,34 @@ CareAction {
 - **Grün (ok):** > 20% des Intervalls verbleibend
 - **Gelb (soon):** 0–20% verbleibend
 - **Rot (overdue):** Datum überschritten oder noch nie gegossen/gedüngt (`lastWatered`/`lastFertilized` fehlt → direkt `overdue`)
+- **Fingertest:** Fälligkeit Gießen = max(letztes Gießen + Intervall, `wateringSnoozedUntil`). „Erde noch feucht" (`PlantContext.snoozeWatering`) setzt den Snooze auf 25 % des Intervalls, begrenzt 2–7 Tage (`getSnoozeDays`); `markWatered` setzt ihn zurück. Nicht im CareLog protokolliert.
 
 Berechnung in `src/hooks/useCareStatus.ts`.
 
-## Admin-Bereich
+## Pflanzen verwalten
 
-PIN-geschützt (4-stellig, in AsyncStorage). Beim ersten Start wird die PIN gesetzt.
-Admin kann: Pflanzen anlegen/bearbeiten/löschen, Fotos hinzufügen, Krankheiten verwalten.
+Kein PIN, kein Admin-Bereich. `add-plant.tsx` legt Pflanzen aus Templates (Suche + Raum) an, `manage-plants.tsx` bearbeitet/löscht sie. Erreichbar über das ⋮-Menü im Header.
 
 ## Feature-Roadmap (GitHub Issues: s540d/safe-my-plants)
 
-Vollständige Planung: Issue #16 (Tracking-Issue)
+Die ursprüngliche Roadmap (Issue #16, Features #2–#15: CareLog, Dashboard, Suche/Filter, Reminder-Banner, Quick-Actions, Foto-Galerie, Theme/Dark-Mode, Animationen, Notizen, Onboarding, Statistik, Templates, Push-Erinnerung, Export/Import) ist **vollständig umgesetzt und geschlossen**. Offen ist nur das Tracking-Issue #85 (Play-Store-Launch).
 
-### Phase 1 – MVP ✅/🔄
-| Issue | Feature | Status |
-|-------|---------|--------|
-| #2 | CareLog-Datenmodell + History-Hook | ✅ merged (PR #17) |
-| #3 | Dashboard-Karten + Hero-Tile am Index | ✅ merged (PR #17) |
-| #4 | Suchleiste + Filter-Chips + Sortierung | 🔜 |
-| #5 | In-App-Reminder-Banner + Tab-Badge | 🔜 |
-| #6 | Plant-Detail: History-Liste + Quick-Actions | 🔜 (benötigt #2) |
+### Produktausrichtung: Anfänger
 
-### Phase 2 – Polish
-| Issue | Feature | Status |
-|-------|---------|--------|
-| #7 | Foto-Galerie + Schema-Migration (photos: PlantPhoto[]) | 🔜 |
-| #8 | Theme-Tokens + Empty-States + Dark-Mode-Audit | 🔜 |
-| #9 | Animationen (Reanimated) + Haptik | 🔜 |
-| #10 | Notizen pro Pflanze | 🔜 |
-| #11 | First-Run-Onboarding (3 Slides) | 🔜 |
-| #12 | Statistik-Screen: Streak, Counts | 🔜 |
-| #13 | Pflanzen-Templates | 🔜 |
+Hebel gegen eingehende Pflanzen (Reihenfolge der Umsetzung):
 
-### Phase 3 – Stretch
-| Issue | Feature | Status |
-|-------|---------|--------|
-| #14 | Push-Notifications (expo-notifications) | 🔜 |
-| #15 | JSON-Export / Import (expo-sharing) | 🔜 |
+1. **Fingertest** – „Erde noch feucht" verschiebt die Gießerinnerung (statt Rot = „jetzt gießen") → ✅ PR #180. Snooze wird bewusst **nicht** im CareLog protokolliert.
+2. **Pflegedaten der Templates gegen Quellen prüfen** (v. a. Gießintervalle) → Issue #184, offen.
+3. **Problem-Ratgeber nach Symptom** (gelbe Blätter, braune Spitzen, Schimmel, …), unabhängig vom pro-Pflanze-Feld `diseases` → ✅ PR #183 (`app/symptom-guide.tsx`, Inhalte in `src/constants/symptomGuide.ts`, Link auch in der Pflanzen-Detailansicht).
+4. Zurückgestellt: Statistik/Streaks ausbauen, weitere Animationen, Onboarding-Ausbau.
 
 ### Ad-hoc / Maintenance
 
-| Issue | Feature | Status |
-|-------|---------|--------|
+| Issue/PR | Thema | Status |
+|----------|-------|--------|
 | #52 | npm audit fix (uuid/js-yaml via `overrides`, kein SDK-Downgrade) | ✅ merged (PR #83) |
-| #77 | UI-Verbesserung / Micro-Animationen (Karten-Eintritt, Press-Feedback, `AnimatedPressable`) | ✅ merged (PR #82, #83) |
+| #77 | UI-Verbesserung / Micro-Animationen | ✅ merged (PR #82, #83) |
+| PR #181 | Admin-/PIN-Rückbau (`admin.tsx`, `PinGuard`, `smp-admin-pin`) | ✅ merged |
 
 ## Spätere Zusammenführung mit Pflanzkalender
 
@@ -224,6 +224,7 @@ Vollständige Planung: Issue #16 (Tracking-Issue)
 - `--no-verify` nur auf explizite Bitte
 - **Vor jedem Push: lokale Tests ausführen** (`npm test` bzw. projektspezifischer Test-Befehl) – kein Push ohne grüne lokale Tests
 - **Kein Merge bei CI-Fail** – Branch Protection erzwingt das technisch; nie mit `--admin` umgehen außer auf explizite Bitte
+- **Zugehöriges Issue beim Merge schließen** (Issue #111): `Closes #X` im PR-Body greift nur beim Merge in den Default-Branch (`main`) — bei PRs nach `testing` also **nie**. Das Issue nach dem Merge manuell schließen (`gh issue close <N> -c "Umgesetzt in #<PR>, gemergt nach \`testing\`."`), sonst bleiben erledigte Issues offen liegen. Ausnahme: Sammel-/Meta-Issues, die ein Teil-PR nur anteilig abarbeitet — die bleiben offen. `Closes #X` trotzdem im PR-Body lassen: es erzeugt die sichtbare Verknüpfung.
 
 ## [ANDROID BUILD – PFLICHTREGELN]
 
@@ -233,6 +234,24 @@ Vollständige Planung: Issue #16 (Tracking-Issue)
 - **JAVA_HOME** für EAS/Expo-Builds explizit auf Android Studio JBR setzen: `export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"`
 - **Gradle-Lock nach Absturz:** Bei "Cannot lock file hash cache"-Fehler Daemons stoppen: `pkill -f GradleDaemon`, dann Workingdir leeren und neu starten
 - **AAB-Archiv:** Gebaute Release-AABs in einem **gitignored** `aab-archive/`-Verzeichnis im Repo-Root ablegen (in `.gitignore` aufnehmen – AABs sind 3–110 MB und gehören nie in die Git-History). Benennung: `<Projekt>-vX.Y.Z-vc<versionCode>-YYYY-MM-DD.aab`. **Retention: max. 2 Dateien** (aktuelles Release + ein Vorgänger für schnelles Rollback); ältere AABs löschen. Der Git-Tag `vX.Y.Z` ist die eigentliche Release-Baseline – ältere AABs lassen sich daraus jederzeit neu bauen.
+
+## [CLAUDE.MD-WARTUNG]
+
+- **CLAUDE.md bleibt bei maximal 300 Zeilen** (Issue #160): Sie wird bei jeder Session vollständig in den Kontext geladen. Beschreibt ein Abschnitt einen konkreten Vorfall, gehören maximal 2-3 Zeilen (Kernregel + kurzer Auslöser-Kontext) + ein Link auf `docs/private/INCIDENTS.md` hinein; aktuell gültiges Architektur-/Prozesswissen, das kein Vorfall ist, aber zu ausführlich für CLAUDE.md, gehört in versionierte `docs/*.md`-Dateien (z. B. `docs/ARCHITECTURE.md`). Die Schwelle ist ein Prüf-Auslöser, kein Zwang, bewusst dort gehaltenes, aktuelles Architekturwissen aus CLAUDE.md zu verdrängen. Aktiv gekürzt wird erst ab 500 Zeilen; Dateien zwischen 300 und 500 Zeilen werden im Turnus nicht angefasst. Ausführlicher Prozess, Checkliste und Stand pro Projekt: https://github.com/S540d/project-templates/blob/main/dev-standards/claude-md-maintenance.md
+- **`docs/private/INCIDENTS.md` ist bewusst gitignored** — reine lokale Gedächtnisstütze wie Memory, kein Teil des geteilten Repo-Zustands. In jedem Projekt mit dieser Datei muss `.gitignore` einen Eintrag `docs/private/` enthalten; existiert die Datei bereits versioniert (z. B. als `docs/INCIDENTS.md`), gehört sie nach `docs/private/` verschoben und per `git rm --cached` aus dem Tracking genommen.
+- **Regelmäßig `/simplify` auf CLAUDE.md ausführen**, nicht nur einmalig beim Überschreiten der Schwelle — Ziel ist dauerhaft niedriger Token-Verbrauch pro Session statt zyklischem Anwachsen und Zurückkürzen in großen Sprüngen.
+
+## [CODE HEALTH AUDIT]
+
+- **Wiederkehrendes Code-Health-Audit** (Ballast/Architektur: God Components, Boilerplate-Duplikation, toter Code, Dependency-Bloat, Test-Integrität, Design-Konsistenz, Bundle-Größe) alle ~3 Monate oder ~15 gemergte Feature-PRs (je nachdem was zuerst eintritt). Checkliste + Ablauf: https://github.com/S540d/project-templates/blob/main/dev-standards/code-health-audit.md — Ergebnis ist immer ein Issue im jeweiligen Projekt-Repo, nie in project-templates.
+
+## [SIMPLIFY-AUDIT]
+
+- **Wiederkehrender `/simplify`-Durchlauf auf den Quellcode** (Reuse, Simplification, Efficiency, Altitude) alle ~3 Monate oder ~15 gemergte Feature-PRs (je nachdem was zuerst eintritt), gleiche Kadenz wie das Code-Health-Audit. Anders als dieses wendet er die Fixes direkt an: Ergebnis ist ein PR gegen den projektüblichen Ziel-Branch, nur kleine, verhaltensneutrale Refactorings (bei Unsicherheit Finding auslassen). Ablauf: https://github.com/S540d/project-templates/blob/main/dev-standards/simplify-audit.md
+
+## [ÜBER-ABSCHNITT]
+
+- **Einheitlicher „Über"-Abschnitt im Settingsmenü** (Issue #150): Jedes Web-Projekt zeigt „Über" als Eintrag in einem `⋮`-Settingsmenü (kein Footer — wird bei Bedarf neu angelegt, auch für aktuell menülose Projekte). Fester Vollausbau: App-Name, Version, Impressum, Datenschutz, Quellcode, Play Store, Feedback — nicht zutreffende Felder werden weggelassen, nie umsortiert. Spezifikation: https://github.com/S540d/project-templates/blob/main/dev-standards/about-section.md — Umsetzung ist immer ein Issue im jeweiligen Projekt-Repo, nie in project-templates.
 
 ## [CI – CACHE-CLEANUP]
 

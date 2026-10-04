@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { addCareAction as storageAddAction, getCareLog } from '../services/storage'
 import { CareAction } from '../types/careLog'
+import { generateId } from '../utils/id'
 
 // Module-level subscribers so all useCareLog instances and PlantContext stay in sync.
 const listeners = new Set<() => void>()
@@ -28,7 +29,7 @@ export function useCareLog() {
 
   const addAction = useCallback(async (partial: Omit<CareAction, 'id' | 'timestamp'>) => {
     const action: CareAction = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      id: generateId(),
       timestamp: new Date().toISOString(),
       ...partial,
     }

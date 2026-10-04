@@ -1,13 +1,7 @@
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
-import { Colors } from '../constants/theme'
+import { useThemeColors } from '../hooks/useThemeColors'
 import { CareStatus } from '../types/plant'
-
-const STATUS_COLORS: Record<CareStatus, string> = {
-  ok: Colors.light.statusOk,
-  soon: Colors.light.statusSoon,
-  overdue: Colors.light.statusOverdue,
-}
 
 interface TrafficLightProps {
   status: CareStatus
@@ -15,12 +9,16 @@ interface TrafficLightProps {
 }
 
 export function TrafficLight({ status, size = 14 }: TrafficLightProps) {
+  const colors = useThemeColors()
+  const statusColors: Record<CareStatus, string> = {
+    ok: colors.statusOk,
+    soon: colors.statusSoon,
+    overdue: colors.statusOverdue,
+  }
+
   return (
     <View
-      style={[
-        styles.dot,
-        { width: size, height: size, borderRadius: size / 2, backgroundColor: STATUS_COLORS[status] },
-      ]}
+      style={[styles.dot, { width: size, height: size, borderRadius: size / 2, backgroundColor: statusColors[status] }]}
     />
   )
 }

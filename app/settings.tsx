@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { Alert, SafeAreaView, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native'
+import { Alert, SafeAreaView, ScrollView, StyleSheet, Switch, Text, View } from 'react-native'
 import { AnimatedPressable } from '../src/components/AnimatedPressable'
 import { Shadow, Typography } from '../src/constants/theme'
 import { usePreferences } from '../src/hooks/usePreferences'
@@ -20,13 +20,10 @@ import { t } from '../src/i18n/translations'
 type ThemeMode = 'light' | 'dark' | 'system'
 
 export default function SettingsScreen() {
-  const { language, theme, adminPin, setLanguage, setTheme, setAdminPin } = usePreferences()
+  const { language, theme, setLanguage, setTheme } = usePreferences()
   const colors = useThemeColors()
   const router = useRouter()
   const canGoBack = router.canGoBack()
-  const [showPinChange, setShowPinChange] = useState(false)
-  const [newPin, setNewPin] = useState('')
-  const [confirmPin, setConfirmPin] = useState('')
 
   const lang = language
 
@@ -108,22 +105,6 @@ export default function SettingsScreen() {
     ])
   }
 
-  const handleSavePin = async () => {
-    if (newPin.length !== 4 || !/^\d{4}$/.test(newPin)) {
-      Alert.alert('', lang === 'de' ? 'PIN muss 4 Ziffern haben.' : 'PIN must be 4 digits.')
-      return
-    }
-    if (newPin !== confirmPin) {
-      Alert.alert('', lang === 'de' ? 'PINs stimmen nicht überein.' : 'PINs do not match.')
-      return
-    }
-    await setAdminPin(newPin)
-    setNewPin('')
-    setConfirmPin('')
-    setShowPinChange(false)
-    Alert.alert('', lang === 'de' ? 'PIN gespeichert.' : 'PIN saved.')
-  }
-
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
@@ -167,56 +148,6 @@ export default function SettingsScreen() {
           />
           <Chip label="System" active={theme === 'system'} onPress={() => setTheme('system')} colors={colors} />
         </View>
-
-        {/* Admin */}
-        <Text style={[styles.sectionLabel, { color: colors.primaryLight }]}>
-          {lang === 'de' ? 'Admin-Bereich' : 'Admin Area'}
-        </Text>
-        <AnimatedPressable
-          style={[styles.listItem, { backgroundColor: colors.surface }, Shadow.cardSm]}
-          onPress={() => setShowPinChange(!showPinChange)}
-        >
-          <Text style={[styles.listItemText, { color: colors.primary }]}>
-            {lang === 'de' ? 'Admin-PIN' : 'Admin PIN'} {adminPin ? '✓' : '(nicht gesetzt)'}
-          </Text>
-          <Text style={[styles.chevron, { color: colors.accent }]}>›</Text>
-        </AnimatedPressable>
-
-        {showPinChange && (
-          <View style={[styles.pinForm, { backgroundColor: colors.surface }, Shadow.cardSm]}>
-            <TextInput
-              style={[
-                styles.pinInput,
-                { borderColor: colors.border, backgroundColor: colors.surfaceAlt, color: colors.text },
-              ]}
-              placeholder={lang === 'de' ? 'Neue PIN (4 Ziffern)' : 'New PIN (4 digits)'}
-              placeholderTextColor={colors.textSubtle}
-              keyboardType="number-pad"
-              maxLength={4}
-              secureTextEntry
-              value={newPin}
-              onChangeText={setNewPin}
-            />
-            <TextInput
-              style={[
-                styles.pinInput,
-                { borderColor: colors.border, backgroundColor: colors.surfaceAlt, color: colors.text },
-              ]}
-              placeholder={lang === 'de' ? 'PIN bestätigen' : 'Confirm PIN'}
-              placeholderTextColor={colors.textSubtle}
-              keyboardType="number-pad"
-              maxLength={4}
-              secureTextEntry
-              value={confirmPin}
-              onChangeText={setConfirmPin}
-            />
-            <AnimatedPressable style={[styles.saveBtn, { backgroundColor: colors.primaryMid }]} onPress={handleSavePin}>
-              <Text style={[styles.saveBtnText, { color: colors.textOnPrimary }]}>
-                {lang === 'de' ? 'Speichern' : 'Save'}
-              </Text>
-            </AnimatedPressable>
-          </View>
-        )}
 
         {/* Notifications */}
         <View style={styles.sectionLabelRow}>
@@ -382,32 +313,6 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
   },
   chipText: { fontSize: 14 },
-  listItem: {
-    borderRadius: 12,
-    padding: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  listItemText: { flex: 1, fontSize: 15 },
-  chevron: { fontSize: 20 },
-  pinForm: {
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 8,
-    gap: 10,
-  },
-  pinInput: {
-    borderWidth: 1.5,
-    borderRadius: 8,
-    padding: 10,
-    fontSize: 16,
-  },
-  saveBtn: {
-    borderRadius: 8,
-    padding: 12,
-    alignItems: 'center',
-  },
-  saveBtnText: { fontSize: 15, fontWeight: '600' },
   notifCard: {
     borderRadius: 12,
     padding: 14,
