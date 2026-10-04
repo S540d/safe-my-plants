@@ -78,6 +78,7 @@ Plant {
   careInfo: CareInfo
   diseases: Disease[]
   lastWatered?, lastFertilized?
+  wateringSnoozedUntil?       // ISO, Fingertest (PR #180), optional → keine Migration
   createdAt, updatedAt
 }
 ```
@@ -321,9 +322,15 @@ Erster Durchlauf des wiederkehrenden Code-Health-Audit-Standards (project-templa
 - Produktausrichtung: Anfänger. Fingertest („Erde noch feucht", `wateringSnoozedUntil`, PR #180) ist der erste Schritt; Snooze wird bewusst nicht im CareLog protokolliert.
 - Die ursprüngliche Roadmap (#2–#15) ist komplett umgesetzt, auch die tägliche Push-Erinnerung (#14, globale Sammel-Notification ohne Pflanzenbezug).
 
+## Fingertest (PR #180, gemerged 2026-10-04)
+
+- `getDueTime()`/`getSnoozeDays()` in `src/hooks/useCareStatus.ts`; Ampel (`computeStatus`), `formatNextDate` (4. Param `snoozedUntil`) und Sortierung „nächste Pflege" (`plantFilter.ts`) nutzen `getDueTime`. Der Snooze kann die Fälligkeit nur nach hinten schieben, nie vor das reguläre Intervall.
+- UI: Button „✋ Erde noch feucht" in `PlantCard` (`onSnooze`) und als Aktion in `QuickActionBar`, jeweils nur bei Gießstatus ≠ ok.
+- Gilt nur für Gießen (nicht Düngen). Die tägliche Sammel-Notification (`useNotificationScheduler`) kennt den Snooze nicht – sie ist global und nicht fälligkeitsbasiert.
+
 ## Symptom-Ratgeber (Branch feature/symptom-guide)
 
-- `app/symptom-guide.tsx` (Menüeintrag „Problem-Ratgeber" im ⋮-Menü, 🩺) + Inhalte in `src/constants/symptomGuide.ts` (`Localized = {de, en}`, je Symptom Ursachen nach Häufigkeit, je Ursache `check`/`fix`). Texte der Oberfläche in `translations.ts` (`symptom_guide_*`). Test: `src/constants/symptomGuide.test.ts` (IDs eindeutig, DE/EN vollständig).
+- `app/symptom-guide.tsx` (Menüeintrag „Problem-Ratgeber" im ⋮-Menü, 🩺; zusätzlich Link-Zeile in `app/plant/[id].tsx`, ohne Pflanzenbezug) + Inhalte in `src/constants/symptomGuide.ts` (`Localized = {de, en}`, je Symptom Ursachen nach Häufigkeit, je Ursache `check`/`fix`). Texte der Oberfläche in `translations.ts` (`symptom_guide_*`). Test: `src/constants/symptomGuide.test.ts` (IDs eindeutig, DE/EN vollständig).
 - Allgemeiner Ratgeber, unabhängig vom pro-Pflanze-Feld `diseases`. Bewusst Fragen-frei: der Check-Text jeder Ursache ersetzt den geplanten Frage-Dialog.
 - **Quellenlage (ehrlich):** Die Inhalte stützen sich auf Such-Zusammenfassungen von RHS (How to help a poorly houseplant; Leaf damage on houseplants), Univ. Missouri Extension (Caring for Houseplants g6510; Least-Toxic Control g7273), Clemson HGIC (Houseplant Diseases & Disorders; Common Houseplant Insects), Univ. Illinois Extension, UMN Extension (Watering houseplants; Managing insects on indoor plants), Colorado State Extension (Managing Houseplant Pests), UC IPM (Houseplant Problems). Die Originalseiten waren über den Egress-Proxy der Session **nicht abrufbar** (EGRESS_BLOCKED), Wortlaut wurde nicht gegen die Seiten geprüft.
 - **Schwächer belegt (Blog-/Händlerquellen, allgemeines Gartenwissen):** Nährstoffmangel-Zeichen (Adern grün), Fluorid/Leitungswasser bei Grünlilie/Calathea, „Überschuss nach ~15 Min. wegkippen", Eingewöhnung nach Standortwechsel, Steckling-Rettung bei Stängelfäule, Weißschimmel als harmloser Saprophyt. Vor einem Release gegenlesen.
