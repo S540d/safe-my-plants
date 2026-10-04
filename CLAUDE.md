@@ -312,7 +312,7 @@ Hebel gegen eingehende Pflanzen (Reihenfolge der Umsetzung):
 
 1. **Fingertest** – „Erde noch feucht" verschiebt die Gießerinnerung (statt Rot = „jetzt gießen") → PR #180. Snooze wird bewusst **nicht** im CareLog protokolliert.
 2. **Pflegedaten der Templates gegen Quellen prüfen** (v. a. Gießintervalle).
-3. **Problem-Ratgeber nach Symptom** (gelbe Blätter, braune Spitzen, Schimmel, …), unabhängig vom pro-Pflanze-Feld `diseases`.
+3. **Problem-Ratgeber nach Symptom** (gelbe Blätter, braune Spitzen, Schimmel, …), unabhängig vom pro-Pflanze-Feld `diseases` → 🔄 PR offen (`app/symptom-guide.tsx`, Inhalte in `src/constants/symptomGuide.ts`).
 4. Zurückgestellt: Statistik/Streaks ausbauen, weitere Animationen, Onboarding-Ausbau.
 
 ### Ad-hoc / Maintenance

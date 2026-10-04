@@ -24,6 +24,7 @@ function AppStack() {
       <Stack.Screen name="manage-plants" />
       <Stack.Screen name="settings" />
       <Stack.Screen name="stats" />
+      <Stack.Screen name="symptom-guide" />
       <Stack.Screen name="plant/[id]" />
       <Stack.Screen name="onboarding" />
     </Stack>
