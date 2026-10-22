@@ -236,6 +236,11 @@ const translations = {
     home_plant_singular: 'Pflanze',
     home_plant_plural: 'Pflanzen',
     home_no_room: 'Ohne Raum',
+    home_due_title: 'Heute dran',
+    home_due_one: '1 Pflanze braucht Pflege',
+    home_due_other: '{{n}} Pflanzen brauchen Pflege',
+    home_all_done_title: 'Alles erledigt',
+    home_all_done_body: 'Deinen Pflanzen geht es gut. Schau später wieder vorbei.',
     home_empty_tap: 'Noch keine Pflanzen.\nTippe auf ⋮ → Pflanze hinzufügen.',
 
     // PlantCard
@@ -497,6 +502,11 @@ const translations = {
     home_plant_singular: 'plant',
     home_plant_plural: 'plants',
     home_no_room: 'No room',
+    home_due_title: 'Needs care today',
+    home_due_one: '1 plant needs care',
+    home_due_other: '{{n}} plants need care',
+    home_all_done_title: 'All done',
+    home_all_done_body: 'Your plants are doing fine. Check back later.',
     home_empty_tap: 'No plants yet.\nTap ⋮ → Add plant.',
 
     // PlantCard
