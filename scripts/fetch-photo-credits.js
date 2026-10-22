@@ -9,12 +9,19 @@ const TEMPLATES = path.join(ROOT, 'src', 'constants', 'plantTemplates.ts')
 const OUT_FILE = path.join(ROOT, 'src', 'constants', 'photoCredits.ts')
 const API = 'https://commons.wikimedia.org/w/api.php'
 
+// Commons liefert Artist als HTML-Schnipsel; wir brauchen nur reinen Text.
 function stripHtml(html) {
-  return html
-    .replace(/<[^>]*>/g, '')
-    .replace(/&amp;/g, '&')
+  let text = html
+  let previous
+  do {
+    previous = text
+    text = text.replace(/<[^>]*>/g, '')
+  } while (text !== previous)
+  return text
+    .replace(/[<>]/g, '')
     .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'")
+    .replace(/&#0?39;/g, "'")
+    .replace(/&amp;/g, '&') // zuletzt, damit nichts doppelt dekodiert wird
     .replace(/\s+/g, ' ')
     .trim()
 }
