@@ -1,8 +1,10 @@
-import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
-import { Alert, SafeAreaView, ScrollView, StyleSheet, Switch, Text, View } from 'react-native'
+import { Alert, Linking, SafeAreaView, ScrollView, StyleSheet, Switch, Text, View } from 'react-native'
 import { AnimatedPressable } from '../src/components/AnimatedPressable'
+import { Icon } from '../src/components/Icon'
+import { ScreenHeader } from '../src/components/ScreenHeader'
+import { PLANT_TEMPLATES } from '../src/constants/plantTemplates'
 import { Shadow, Typography } from '../src/constants/theme'
 import { usePreferences } from '../src/hooks/usePreferences'
 import { useThemeColors } from '../src/hooks/useThemeColors'
@@ -16,8 +18,14 @@ import {
 } from '../src/hooks/useNotificationScheduler'
 import { exportData, importData } from '../src/services/exportImport'
 import { t } from '../src/i18n/translations'
+import { formatPhotoCredit, getPhotoCredit } from '../src/utils/photoCredit'
 
 type ThemeMode = 'light' | 'dark' | 'system'
+
+const TEMPLATE_CREDITS = PLANT_TEMPLATES.flatMap((tpl) => {
+  const credit = getPhotoCredit(tpl.imageUrl)
+  return credit ? [{ name: tpl.name, credit }] : []
+})
 
 export default function SettingsScreen() {
   const { language, theme, setLanguage, setTheme } = usePreferences()
@@ -107,18 +115,11 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
-        <View style={styles.headerRow}>
-          {canGoBack && (
-            <AnimatedPressable onPress={() => router.back()} style={styles.backBtn} scaleTo={0.9}>
-              <Text style={[styles.backBtnText, { color: colors.gradientText }]}>
-                ← {lang === 'de' ? 'Zurück' : 'Back'}
-              </Text>
-            </AnimatedPressable>
-          )}
-          <Text style={styles.headerTitle}>{lang === 'de' ? 'Einstellungen' : 'Settings'}</Text>
-        </View>
-      </LinearGradient>
+      <ScreenHeader
+        title={lang === 'de' ? 'Einstellungen' : 'Settings'}
+        onBack={canGoBack ? () => router.back() : undefined}
+        backLabel={t(lang, 'back')}
+      />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Language */}
         <Text style={[styles.sectionLabel, { color: colors.primaryLight }]}>
@@ -215,7 +216,8 @@ export default function SettingsScreen() {
             style={[styles.dataBtn, { backgroundColor: colors.primaryMid }, Shadow.cardSm]}
             onPress={handleExport}
           >
-            <Text style={[styles.dataBtnText, { color: colors.textOnPrimary }]}>📤 {t(lang, 'settings_export')}</Text>
+            <Icon name="export" size={18} color={colors.textOnPrimary} />
+            <Text style={[styles.dataBtnText, { color: colors.textOnPrimary }]}>{t(lang, 'settings_export')}</Text>
           </AnimatedPressable>
           <AnimatedPressable
             style={[
@@ -225,7 +227,8 @@ export default function SettingsScreen() {
             ]}
             onPress={handleImport}
           >
-            <Text style={[styles.dataBtnText, { color: colors.primaryMid }]}>📥 {t(lang, 'settings_import')}</Text>
+            <Icon name="import" size={18} color={colors.primaryMid} />
+            <Text style={[styles.dataBtnText, { color: colors.primaryMid }]}>{t(lang, 'settings_import')}</Text>
           </AnimatedPressable>
         </View>
 
@@ -234,13 +237,38 @@ export default function SettingsScreen() {
           {lang === 'de' ? 'Über die App' : 'About'}
         </Text>
         <View style={[styles.aboutCard, { backgroundColor: colors.surface }, Shadow.cardSm]}>
-          <Text style={[styles.aboutTitle, { color: colors.primary }]}>🪴 Safe My Plants</Text>
+          <Text style={[styles.aboutTitle, { color: colors.primary }]}>Safe My Plants</Text>
           <Text style={[styles.aboutVersion, { color: colors.accent }]}>Version 1.0.0</Text>
           <Text style={[styles.aboutText, { color: colors.text }]}>
             {lang === 'de'
               ? 'Verwalte deine Topfpflanzen, behalte Pflege-Termine im Blick und erkenne Krankheiten frühzeitig.'
               : 'Manage your houseplants, track care schedules, and identify diseases early.'}
           </Text>
+        </View>
+
+        {/* Photo credits */}
+        <Text style={[styles.sectionLabel, { color: colors.primaryLight }]}>{t(lang, 'settings_photo_credits')}</Text>
+        <View style={[styles.aboutCard, { backgroundColor: colors.surface }, Shadow.cardSm]}>
+          <Text style={[styles.creditIntro, { color: colors.textMuted }]}>
+            {t(lang, 'settings_photo_credits_intro')}
+          </Text>
+          {TEMPLATE_CREDITS.map(({ name, credit }) => (
+            <AnimatedPressable
+              key={name}
+              style={[styles.creditRow, { borderTopColor: colors.border }]}
+              onPress={() => Linking.openURL(credit.sourceUrl)}
+              scaleTo={0.98}
+              accessibilityRole="link"
+            >
+              <View style={styles.creditText}>
+                <Text style={[styles.creditName, { color: colors.text }]}>{name}</Text>
+                <Text style={[styles.creditMeta, { color: colors.textSubtle }]} numberOfLines={1}>
+                  {formatPhotoCredit(credit)}
+                </Text>
+              </View>
+              <Icon name="link" size={16} color={colors.textSubtle} />
+            </AnimatedPressable>
+          ))}
         </View>
 
         <View style={{ height: 40 }} />
@@ -284,12 +312,7 @@ function Chip({
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 20 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  backBtn: { paddingVertical: 4, paddingRight: 8 },
-  backBtnText: { fontSize: 15, fontWeight: '500' },
-  headerTitle: { ...Typography.headerTitle, color: '#fff', flex: 1 },
-  scroll: { padding: 16 },
+  scroll: { padding: 16, paddingTop: 4 },
   sectionLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 20, marginBottom: 8 },
   betaBadge: {
     borderRadius: 8,
@@ -298,12 +321,10 @@ const styles = StyleSheet.create({
   },
   betaBadgeText: { fontSize: 10, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
   sectionLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    marginTop: 20,
-    marginBottom: 8,
+    ...Typography.title,
+    fontSize: 17,
+    marginTop: 24,
+    marginBottom: 10,
   },
   chipRow: { flexDirection: 'row', gap: 8, flexWrap: 'wrap' },
   chip: {
@@ -314,7 +335,7 @@ const styles = StyleSheet.create({
   },
   chipText: { fontSize: 14 },
   notifCard: {
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 14,
   },
   notifRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
@@ -334,15 +355,29 @@ const styles = StyleSheet.create({
   dataBtn: {
     flex: 1,
     padding: 14,
-    borderRadius: 12,
+    borderRadius: 999,
+    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
+    gap: 8,
   },
   dataBtnText: { fontSize: 13, fontWeight: '600' },
   aboutCard: {
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
   },
-  aboutTitle: { fontSize: 18, fontWeight: '700', marginBottom: 4 },
+  aboutTitle: { ...Typography.title, marginBottom: 4 },
   aboutVersion: { fontSize: 13, marginBottom: 8 },
   aboutText: { fontSize: 14, lineHeight: 20 },
+  creditIntro: { fontSize: 13, lineHeight: 18, marginBottom: 8 },
+  creditRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 10,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  creditText: { flex: 1 },
+  creditName: { fontSize: 14, fontWeight: '600' },
+  creditMeta: { fontSize: 12, marginTop: 1 },
 })

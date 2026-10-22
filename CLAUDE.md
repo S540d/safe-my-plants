@@ -23,9 +23,15 @@ Das Repository ist öffentlich. Keine vollständigen Implementierungsdetails (Sc
 - Expo Router (file-based routing, reine Stack-Navigation – kein Tab-Footer, Menü über ⋮ im Header)
 - AsyncStorage (lokale Datenpersistenz)
 - expo-image-picker (Fotos)
-- expo-linear-gradient (Header-Design)
+- expo-font + `@expo-google-fonts/fraunces` (Display-Schrift, lokal gebündelt), `@expo/vector-icons` (Ionicons, nur Outline)
 - react-native-reanimated (Micro-Animationen: Karten-Eintritt, Press-Feedback via `AnimatedPressable`)
 - expo-notifications (tägliche Sammel-Erinnerung), expo-sharing + expo-document-picker (JSON-Export/-Import)
+
+## Designsprache (gemeinsam mit Pflanzkalender)
+
+- Farben nur über `useThemeColors()`; Werte kommen aus `src/constants/brandPalette.ts` – **wertgleich mit Pflanzkalender halten**.
+- UI-Icons nur über `Icon` (`src/components/Icon.tsx`), keine Emojis in der Oberfläche; Screen-Köpfe über `ScreenHeader`.
+- Wikimedia-Templatebilder brauchen Namensnennung: `getPhotoCredit()` + `photoCredits.ts` (generiert via `node scripts/fetch-photo-credits.js`).
 
 ## Dependency-Pflege
 
@@ -68,7 +74,7 @@ Das Repository ist öffentlich. Keine vollständigen Implementierungsdetails (Sc
 ```
 app/               – Expo Router Screens: index, add-plant, manage-plants, stats, settings, onboarding; Dynamic: plant/[id]
 src/
-  components/      – PlantCard, QuickActionBar, ReminderBanner, HeroPlantCard, DashboardSummary, TrafficLight, …
+  components/      – PlantCard, QuickActionBar, ScreenHeader, Icon, HeaderMenu, TrafficLight, …
   contexts/        – PlantContext (CRUD + Persistenz + CareLog-Writes + Migrationen)
   hooks/           – useCareStatus, usePreferences, useCareLog, useNotificationScheduler, useStreak, …
   types/           – plant.ts, careLog.ts (CareAction, CareActionType)

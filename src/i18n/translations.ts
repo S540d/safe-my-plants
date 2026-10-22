@@ -227,9 +227,13 @@ const translations = {
     home_empty_tap: 'Noch keine Pflanzen.\nTippe auf ⋮ → Pflanze hinzufügen.',
 
     // PlantCard
-    card_watered: '💧 Gegossen',
-    card_fertilized: '🌿 Gedüngt',
-    card_soil_moist: '✋ Erde noch feucht – später prüfen',
+    card_watered: 'Gegossen',
+    card_fertilized: 'Gedüngt',
+    card_soil_moist: 'Erde noch feucht – später prüfen',
+    settings_photo_credits: 'Bildnachweise',
+    settings_photo_credits_intro:
+      'Die Vorlagenbilder stammen von Wikimedia Commons. Tippe auf einen Eintrag für Urheber und Lizenz.',
+    photo_credit_prefix: 'Foto',
 
     // Common
     ok: 'OK',
@@ -472,9 +476,12 @@ const translations = {
     home_empty_tap: 'No plants yet.\nTap ⋮ → Add plant.',
 
     // PlantCard
-    card_watered: '💧 Watered',
-    card_fertilized: '🌿 Fertilized',
-    card_soil_moist: '✋ Soil still moist – check later',
+    card_watered: 'Watered',
+    card_fertilized: 'Fertilized',
+    card_soil_moist: 'Soil still moist – check later',
+    settings_photo_credits: 'Photo credits',
+    settings_photo_credits_intro: 'Template photos come from Wikimedia Commons. Tap an entry for author and license.',
+    photo_credit_prefix: 'Photo',
 
     // Common
     ok: 'OK',

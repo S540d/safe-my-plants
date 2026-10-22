@@ -1,6 +1,11 @@
 import React, { useRef, useState } from 'react'
 import { Dimensions, FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { brandPalette } from '../constants/brandPalette'
 import { PlantPhoto } from '../types/plant'
+import { Icon } from './Icon'
+
+// Galerie ist immer dunkel (Vollbild-Foto) – Akzent aus der dunklen Markenpalette.
+const ACCENT = brandPalette.dark.leaf
 
 interface Props {
   photos: PlantPhoto[]
@@ -51,7 +56,7 @@ export function PhotoGalleryModal({ photos, initialIndex = 0, visible, onClose, 
             </TouchableOpacity>
           )}
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-            <Text style={styles.closeBtnText}>✕</Text>
+            <Icon name="close" size={26} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
 
@@ -126,13 +131,12 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#52B788',
+    borderColor: ACCENT,
   },
-  compareBtnActive: { backgroundColor: '#52B788' },
-  compareBtnText: { color: '#52B788', fontSize: 13, fontWeight: '600' },
+  compareBtnActive: { backgroundColor: ACCENT },
+  compareBtnText: { color: ACCENT, fontSize: 13, fontWeight: '600' },
   compareBtnTextActive: { color: '#000' },
   closeBtn: { padding: 8 },
-  closeBtnText: { color: '#fff', fontSize: 22 },
   slide: { width: SCREEN_WIDTH, flex: 1, justifyContent: 'center', alignItems: 'center' },
   image: { width: SCREEN_WIDTH, height: '100%' },
   dateOverlay: {
@@ -176,6 +180,6 @@ const styles = StyleSheet.create({
   compareItem: { flex: 1, alignItems: 'center' },
   compareImage: { flex: 1, width: '100%', borderRadius: 8 },
   compareDivider: { width: 1, backgroundColor: '#333' },
-  compareLabel: { color: '#52B788', fontSize: 12, fontWeight: '600', marginTop: 8 },
+  compareLabel: { color: ACCENT, fontSize: 12, fontWeight: '600', marginTop: 8 },
   compareDate: { color: '#9CA3AF', fontSize: 11, marginTop: 2 },
 })
