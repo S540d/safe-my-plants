@@ -18,11 +18,26 @@ import { ScreenHeader } from '../src/components/ScreenHeader'
 import { PLANT_TEMPLATES, PlantTemplate } from '../src/constants/plantTemplates'
 import { Radius, Shadow, Spacing, Typography } from '../src/constants/theme'
 import { usePlants } from '../src/contexts/PlantContext'
+import { notifyCareLogUpdate } from '../src/hooks/useCareLog'
+import { addCareAction } from '../src/services/storage'
 import { usePreferences } from '../src/hooks/usePreferences'
 import { useThemeColors } from '../src/hooks/useThemeColors'
 import { t } from '../src/i18n/translations'
 import { Plant } from '../src/types/plant'
 import { generateId } from '../src/utils/id'
+import {
+  LAST_WATERED_CHOICES,
+  LastWateredChoice,
+  lastWateredFromChoice,
+  shouldLogWatering,
+} from '../src/utils/lastWatered'
+
+const LAST_WATERED_LABEL_KEYS = {
+  today: 'add_plant_last_watered_today',
+  'few-days': 'add_plant_last_watered_few_days',
+  week: 'add_plant_last_watered_week',
+  unknown: 'add_plant_last_watered_unknown',
+} as const
 
 type Step = 'search' | 'details'
 
@@ -38,6 +53,7 @@ export default function AddPlantScreen() {
   const [name, setName] = useState('')
   const [room, setRoom] = useState('')
   const [showRoomSuggestions, setShowRoomSuggestions] = useState(false)
+  const [lastWatered, setLastWatered] = useState<LastWateredChoice>('unknown')
 
   const existingRooms = [...new Set(plants.map((p) => p.room).filter((r): r is string => !!r?.trim()))]
 
@@ -94,13 +110,17 @@ export default function AddPlantScreen() {
       name: plantName,
       room: room.trim() || undefined,
       photos: templatePhoto,
-      lastWatered: undefined,
+      lastWatered: lastWateredFromChoice(lastWatered, new Date(now)),
       lastFertilized: undefined,
       createdAt: now,
       updatedAt: now,
     }
 
     await addPlant(newPlant)
+    if (shouldLogWatering(lastWatered)) {
+      await addCareAction({ id: generateId(), plantId: newPlant.id, type: 'water', timestamp: now })
+      notifyCareLogUpdate()
+    }
     router.back()
   }
 
@@ -163,6 +183,40 @@ export default function AddPlantScreen() {
                   </AnimatedPressable>
                 ))}
               </View>
+            )}
+
+            <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>{t(lang, 'add_plant_last_watered')}</Text>
+            <View style={styles.choiceRow}>
+              {LAST_WATERED_CHOICES.map((choice) => {
+                const active = lastWatered === choice
+                return (
+                  <AnimatedPressable
+                    key={choice}
+                    style={[
+                      styles.choiceChip,
+                      { borderColor: colors.border, backgroundColor: colors.surface },
+                      active && { backgroundColor: colors.primary, borderColor: colors.primary },
+                    ]}
+                    onPress={() => setLastWatered(choice)}
+                    accessibilityRole="button"
+                  >
+                    <Text
+                      style={[
+                        styles.choiceChipText,
+                        { color: colors.primaryMid },
+                        active && { color: colors.textOnPrimary, fontWeight: '600' },
+                      ]}
+                    >
+                      {t(lang, LAST_WATERED_LABEL_KEYS[choice])}
+                    </Text>
+                  </AnimatedPressable>
+                )
+              })}
+            </View>
+            {lastWatered === 'unknown' && (
+              <Text style={[styles.hint, { color: colors.textSubtle, marginTop: Spacing.sm }]}>
+                {t(lang, 'add_plant_last_watered_hint')}
+              </Text>
             )}
 
             {selectedTemplate && (
@@ -355,6 +409,14 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   templateBadgeText: { fontSize: 13, fontWeight: '500' },
+  choiceRow: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
+  choiceChip: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.full,
+    borderWidth: 1.5,
+  },
+  choiceChipText: { fontSize: 14 },
   fieldLabel: { fontSize: 13, marginTop: Spacing.md, marginBottom: Spacing.xs },
   input: {
     borderWidth: 1.5,

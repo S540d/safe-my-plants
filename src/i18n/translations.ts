@@ -184,6 +184,13 @@ const translations = {
     add_plant_water_every: 'Gießen alle',
     add_plant_fertilize_every: 'Düngen alle',
     add_plant_hint: 'Weitere Details (Fotos, Krankheiten, …) kannst du später über "Pflanzen verwalten" ergänzen.',
+    add_plant_last_watered: 'Wann hast du zuletzt gegossen?',
+    add_plant_last_watered_today: 'Heute',
+    add_plant_last_watered_few_days: 'Vor 2–3 Tagen',
+    add_plant_last_watered_week: 'Vor etwa einer Woche',
+    add_plant_last_watered_unknown: 'Weiß nicht',
+    add_plant_last_watered_hint:
+      'Bei „Weiß nicht" meldet sich die Pflanze sofort – prüfe dann mit dem Fingertest die Erde.',
     add_plant_save: 'Pflanze hinzufügen',
     add_plant_empty_hint: 'Tippe einen Pflanzennamen ein, um loszulegen.',
 
@@ -433,6 +440,13 @@ const translations = {
     add_plant_water_every: 'Water every',
     add_plant_fertilize_every: 'Fertilize every',
     add_plant_hint: 'Additional details (photos, diseases, …) can be added later via "Manage plants".',
+    add_plant_last_watered: 'When did you last water it?',
+    add_plant_last_watered_today: 'Today',
+    add_plant_last_watered_few_days: '2–3 days ago',
+    add_plant_last_watered_week: 'About a week ago',
+    add_plant_last_watered_unknown: "Don't know",
+    add_plant_last_watered_hint:
+      'With "Don\'t know" the plant shows up as due right away – check the soil with the finger test.',
     add_plant_save: 'Add plant',
     add_plant_empty_hint: 'Type a plant name to get started.',
 
