@@ -191,6 +191,11 @@ const translations = {
     add_plant_last_watered_unknown: 'Weiß nicht',
     add_plant_last_watered_hint:
       'Bei „Weiß nicht" meldet sich die Pflanze sofort – prüfe dann mit dem Fingertest die Erde.',
+    add_plant_last_fertilized: 'Wann hast du zuletzt gedüngt?',
+    add_plant_last_fertilized_today: 'Heute',
+    add_plant_last_fertilized_two_weeks: 'Vor etwa 2 Wochen',
+    add_plant_last_fertilized_month: 'Vor über einem Monat',
+    add_plant_last_fertilized_unknown: 'Weiß nicht / noch nie',
     add_plant_save: 'Pflanze hinzufügen',
     add_plant_empty_hint: 'Tippe einen Pflanzennamen ein, um loszulegen.',
 
@@ -447,6 +452,11 @@ const translations = {
     add_plant_last_watered_unknown: "Don't know",
     add_plant_last_watered_hint:
       'With "Don\'t know" the plant shows up as due right away – check the soil with the finger test.',
+    add_plant_last_fertilized: 'When did you last fertilize it?',
+    add_plant_last_fertilized_today: 'Today',
+    add_plant_last_fertilized_two_weeks: 'About 2 weeks ago',
+    add_plant_last_fertilized_month: 'Over a month ago',
+    add_plant_last_fertilized_unknown: "Don't know / never",
     add_plant_save: 'Add plant',
     add_plant_empty_hint: 'Type a plant name to get started.',
 

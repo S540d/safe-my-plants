@@ -16,7 +16,7 @@ import { AnimatedPressable } from '../src/components/AnimatedPressable'
 import { Icon } from '../src/components/Icon'
 import { ScreenHeader } from '../src/components/ScreenHeader'
 import { PLANT_TEMPLATES, PlantTemplate } from '../src/constants/plantTemplates'
-import { Radius, Shadow, Spacing, Typography } from '../src/constants/theme'
+import { Radius, Shadow, Spacing, ThemeColors, Typography } from '../src/constants/theme'
 import { usePlants } from '../src/contexts/PlantContext'
 import { notifyCareLogUpdate } from '../src/hooks/useCareLog'
 import { addCareAction } from '../src/services/storage'
@@ -26,11 +26,14 @@ import { t } from '../src/i18n/translations'
 import { Plant } from '../src/types/plant'
 import { generateId } from '../src/utils/id'
 import {
+  LAST_FERTILIZED_CHOICES,
   LAST_WATERED_CHOICES,
+  LastFertilizedChoice,
   LastWateredChoice,
+  lastFertilizedFromChoice,
   lastWateredFromChoice,
-  shouldLogWatering,
-} from '../src/utils/lastWatered'
+  shouldLogCare,
+} from '../src/utils/lastCare'
 
 const LAST_WATERED_LABEL_KEYS = {
   today: 'add_plant_last_watered_today',
@@ -39,7 +42,58 @@ const LAST_WATERED_LABEL_KEYS = {
   unknown: 'add_plant_last_watered_unknown',
 } as const
 
+const LAST_FERTILIZED_LABEL_KEYS = {
+  today: 'add_plant_last_fertilized_today',
+  'two-weeks': 'add_plant_last_fertilized_two_weeks',
+  month: 'add_plant_last_fertilized_month',
+  unknown: 'add_plant_last_fertilized_unknown',
+} as const
+
 type Step = 'search' | 'details'
+
+function ChoiceRow<T extends string>({
+  choices,
+  value,
+  onChange,
+  label,
+  colors,
+}: {
+  choices: T[]
+  value: T
+  onChange: (choice: T) => void
+  label: (choice: T) => string
+  colors: ThemeColors
+}) {
+  return (
+    <View style={styles.choiceRow}>
+      {choices.map((choice) => {
+        const active = value === choice
+        return (
+          <AnimatedPressable
+            key={choice}
+            style={[
+              styles.choiceChip,
+              { borderColor: colors.border, backgroundColor: colors.surface },
+              active && { backgroundColor: colors.primary, borderColor: colors.primary },
+            ]}
+            onPress={() => onChange(choice)}
+            accessibilityRole="button"
+          >
+            <Text
+              style={[
+                styles.choiceChipText,
+                { color: colors.primaryMid },
+                active && { color: colors.textOnPrimary, fontWeight: '600' },
+              ]}
+            >
+              {label(choice)}
+            </Text>
+          </AnimatedPressable>
+        )
+      })}
+    </View>
+  )
+}
 
 export default function AddPlantScreen() {
   const { plants, addPlant } = usePlants()
@@ -54,6 +108,7 @@ export default function AddPlantScreen() {
   const [room, setRoom] = useState('')
   const [showRoomSuggestions, setShowRoomSuggestions] = useState(false)
   const [lastWatered, setLastWatered] = useState<LastWateredChoice>('unknown')
+  const [lastFertilized, setLastFertilized] = useState<LastFertilizedChoice>('unknown')
 
   const existingRooms = [...new Set(plants.map((p) => p.room).filter((r): r is string => !!r?.trim()))]
 
@@ -111,16 +166,19 @@ export default function AddPlantScreen() {
       room: room.trim() || undefined,
       photos: templatePhoto,
       lastWatered: lastWateredFromChoice(lastWatered, new Date(now)),
-      lastFertilized: undefined,
+      lastFertilized: lastFertilizedFromChoice(lastFertilized, new Date(now)),
       createdAt: now,
       updatedAt: now,
     }
 
     await addPlant(newPlant)
-    if (shouldLogWatering(lastWatered)) {
+    if (shouldLogCare(lastWatered)) {
       await addCareAction({ id: generateId(), plantId: newPlant.id, type: 'water', timestamp: now })
-      notifyCareLogUpdate()
     }
+    if (shouldLogCare(lastFertilized)) {
+      await addCareAction({ id: generateId(), plantId: newPlant.id, type: 'fertilize', timestamp: now })
+    }
+    if (shouldLogCare(lastWatered) || shouldLogCare(lastFertilized)) notifyCareLogUpdate()
     router.back()
   }
 
@@ -186,38 +244,27 @@ export default function AddPlantScreen() {
             )}
 
             <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>{t(lang, 'add_plant_last_watered')}</Text>
-            <View style={styles.choiceRow}>
-              {LAST_WATERED_CHOICES.map((choice) => {
-                const active = lastWatered === choice
-                return (
-                  <AnimatedPressable
-                    key={choice}
-                    style={[
-                      styles.choiceChip,
-                      { borderColor: colors.border, backgroundColor: colors.surface },
-                      active && { backgroundColor: colors.primary, borderColor: colors.primary },
-                    ]}
-                    onPress={() => setLastWatered(choice)}
-                    accessibilityRole="button"
-                  >
-                    <Text
-                      style={[
-                        styles.choiceChipText,
-                        { color: colors.primaryMid },
-                        active && { color: colors.textOnPrimary, fontWeight: '600' },
-                      ]}
-                    >
-                      {t(lang, LAST_WATERED_LABEL_KEYS[choice])}
-                    </Text>
-                  </AnimatedPressable>
-                )
-              })}
-            </View>
+            <ChoiceRow
+              choices={LAST_WATERED_CHOICES}
+              value={lastWatered}
+              onChange={setLastWatered}
+              label={(choice) => t(lang, LAST_WATERED_LABEL_KEYS[choice])}
+              colors={colors}
+            />
             {lastWatered === 'unknown' && (
               <Text style={[styles.hint, { color: colors.textSubtle, marginTop: Spacing.sm }]}>
                 {t(lang, 'add_plant_last_watered_hint')}
               </Text>
             )}
+
+            <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>{t(lang, 'add_plant_last_fertilized')}</Text>
+            <ChoiceRow
+              choices={LAST_FERTILIZED_CHOICES}
+              value={lastFertilized}
+              onChange={setLastFertilized}
+              label={(choice) => t(lang, LAST_FERTILIZED_LABEL_KEYS[choice])}
+              colors={colors}
+            />
 
             {selectedTemplate && (
               <View style={[styles.previewCard, { backgroundColor: colors.surfaceAlt, borderColor: colors.border }]}>
