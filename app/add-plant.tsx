@@ -16,15 +16,84 @@ import { AnimatedPressable } from '../src/components/AnimatedPressable'
 import { Icon } from '../src/components/Icon'
 import { ScreenHeader } from '../src/components/ScreenHeader'
 import { PLANT_TEMPLATES, PlantTemplate } from '../src/constants/plantTemplates'
-import { Radius, Shadow, Spacing, Typography } from '../src/constants/theme'
+import { Radius, Shadow, Spacing, ThemeColors, Typography } from '../src/constants/theme'
 import { usePlants } from '../src/contexts/PlantContext'
+import { notifyCareLogUpdate } from '../src/hooks/useCareLog'
+import { addCareAction } from '../src/services/storage'
 import { usePreferences } from '../src/hooks/usePreferences'
 import { useThemeColors } from '../src/hooks/useThemeColors'
 import { t } from '../src/i18n/translations'
 import { Plant } from '../src/types/plant'
 import { generateId } from '../src/utils/id'
+import {
+  LAST_FERTILIZED_CHOICES,
+  LAST_WATERED_CHOICES,
+  LastFertilizedChoice,
+  LastWateredChoice,
+  lastFertilizedFromChoice,
+  lastWateredFromChoice,
+  shouldLogCare,
+} from '../src/utils/lastCare'
+
+const LAST_WATERED_LABEL_KEYS = {
+  today: 'add_plant_last_watered_today',
+  'few-days': 'add_plant_last_watered_few_days',
+  week: 'add_plant_last_watered_week',
+  unknown: 'add_plant_last_watered_unknown',
+} as const
+
+const LAST_FERTILIZED_LABEL_KEYS = {
+  today: 'add_plant_last_fertilized_today',
+  'two-weeks': 'add_plant_last_fertilized_two_weeks',
+  month: 'add_plant_last_fertilized_month',
+  unknown: 'add_plant_last_fertilized_unknown',
+} as const
 
 type Step = 'search' | 'details'
+
+function ChoiceRow<T extends string>({
+  choices,
+  value,
+  onChange,
+  label,
+  colors,
+}: {
+  choices: T[]
+  value: T
+  onChange: (choice: T) => void
+  label: (choice: T) => string
+  colors: ThemeColors
+}) {
+  return (
+    <View style={styles.choiceRow}>
+      {choices.map((choice) => {
+        const active = value === choice
+        return (
+          <AnimatedPressable
+            key={choice}
+            style={[
+              styles.choiceChip,
+              { borderColor: colors.border, backgroundColor: colors.surface },
+              active && { backgroundColor: colors.primary, borderColor: colors.primary },
+            ]}
+            onPress={() => onChange(choice)}
+            accessibilityRole="button"
+          >
+            <Text
+              style={[
+                styles.choiceChipText,
+                { color: colors.primaryMid },
+                active && { color: colors.textOnPrimary, fontWeight: '600' },
+              ]}
+            >
+              {label(choice)}
+            </Text>
+          </AnimatedPressable>
+        )
+      })}
+    </View>
+  )
+}
 
 export default function AddPlantScreen() {
   const { plants, addPlant } = usePlants()
@@ -38,6 +107,8 @@ export default function AddPlantScreen() {
   const [name, setName] = useState('')
   const [room, setRoom] = useState('')
   const [showRoomSuggestions, setShowRoomSuggestions] = useState(false)
+  const [lastWatered, setLastWatered] = useState<LastWateredChoice>('unknown')
+  const [lastFertilized, setLastFertilized] = useState<LastFertilizedChoice>('unknown')
 
   const existingRooms = [...new Set(plants.map((p) => p.room).filter((r): r is string => !!r?.trim()))]
 
@@ -94,13 +165,20 @@ export default function AddPlantScreen() {
       name: plantName,
       room: room.trim() || undefined,
       photos: templatePhoto,
-      lastWatered: undefined,
-      lastFertilized: undefined,
+      lastWatered: lastWateredFromChoice(lastWatered, new Date(now)),
+      lastFertilized: lastFertilizedFromChoice(lastFertilized, new Date(now)),
       createdAt: now,
       updatedAt: now,
     }
 
     await addPlant(newPlant)
+    if (shouldLogCare(lastWatered)) {
+      await addCareAction({ id: generateId(), plantId: newPlant.id, type: 'water', timestamp: now })
+    }
+    if (shouldLogCare(lastFertilized)) {
+      await addCareAction({ id: generateId(), plantId: newPlant.id, type: 'fertilize', timestamp: now })
+    }
+    if (shouldLogCare(lastWatered) || shouldLogCare(lastFertilized)) notifyCareLogUpdate()
     router.back()
   }
 
@@ -164,6 +242,29 @@ export default function AddPlantScreen() {
                 ))}
               </View>
             )}
+
+            <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>{t(lang, 'add_plant_last_watered')}</Text>
+            <ChoiceRow
+              choices={LAST_WATERED_CHOICES}
+              value={lastWatered}
+              onChange={setLastWatered}
+              label={(choice) => t(lang, LAST_WATERED_LABEL_KEYS[choice])}
+              colors={colors}
+            />
+            {lastWatered === 'unknown' && (
+              <Text style={[styles.hint, { color: colors.textSubtle, marginTop: Spacing.sm }]}>
+                {t(lang, 'add_plant_last_watered_hint')}
+              </Text>
+            )}
+
+            <Text style={[styles.fieldLabel, { color: colors.textMuted }]}>{t(lang, 'add_plant_last_fertilized')}</Text>
+            <ChoiceRow
+              choices={LAST_FERTILIZED_CHOICES}
+              value={lastFertilized}
+              onChange={setLastFertilized}
+              label={(choice) => t(lang, LAST_FERTILIZED_LABEL_KEYS[choice])}
+              colors={colors}
+            />
 
             {selectedTemplate && (
               <View style={[styles.previewCard, { backgroundColor: colors.surfaceAlt, borderColor: colors.border }]}>
@@ -355,6 +456,14 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   templateBadgeText: { fontSize: 13, fontWeight: '500' },
+  choiceRow: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
+  choiceChip: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.full,
+    borderWidth: 1.5,
+  },
+  choiceChipText: { fontSize: 14 },
   fieldLabel: { fontSize: 13, marginTop: Spacing.md, marginBottom: Spacing.xs },
   input: {
     borderWidth: 1.5,
