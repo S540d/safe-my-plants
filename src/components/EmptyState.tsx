@@ -1,10 +1,12 @@
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated'
+import { Shadow, Typography } from '../constants/theme'
 import { useThemeColors } from '../hooks/useThemeColors'
+import { Icon, IconName } from './Icon'
 
 interface EmptyStateProps {
-  icon: string
+  icon: IconName
   title: string
   body?: string
   ctaLabel?: string
@@ -16,14 +18,17 @@ export function EmptyState({ icon, title, body, ctaLabel, onCta }: EmptyStatePro
 
   return (
     <Animated.View entering={FadeIn.duration(400)} style={[styles.card, { backgroundColor: colors.surface }]}>
-      <Animated.Text entering={ZoomIn.duration(450).delay(100).springify().damping(12)} style={styles.icon}>
-        {icon}
-      </Animated.Text>
+      <Animated.View
+        entering={ZoomIn.duration(450).delay(100).springify().damping(12)}
+        style={[styles.iconCircle, { backgroundColor: colors.accentSurface }]}
+      >
+        <Icon name={icon} size={40} color={colors.primaryLight} />
+      </Animated.View>
       <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
       {body ? <Text style={[styles.body, { color: colors.textMuted }]}>{body}</Text> : null}
       {ctaLabel && onCta ? (
         <TouchableOpacity style={[styles.cta, { backgroundColor: colors.primary }]} onPress={onCta} activeOpacity={0.8}>
-          <Text style={styles.ctaLabel}>{ctaLabel}</Text>
+          <Text style={[styles.ctaLabel, { color: colors.textOnPrimary }]}>{ctaLabel}</Text>
         </TouchableOpacity>
       ) : null}
     </Animated.View>
@@ -37,19 +42,18 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginVertical: 24,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 8,
-    elevation: 3,
+    ...Shadow.card,
   },
-  icon: {
-    fontSize: 56,
+  iconCircle: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 16,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '700',
+    ...Typography.title,
     textAlign: 'center',
     marginBottom: 8,
   },
@@ -63,10 +67,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: 999,
   },
   ctaLabel: {
-    color: '#FFFFFF',
     fontWeight: '600',
     fontSize: 15,
   },

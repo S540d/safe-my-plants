@@ -5,12 +5,11 @@ import { Radius, Shadow, Spacing } from '../constants/theme'
 import { useThemeColors } from '../hooks/useThemeColors'
 import { t, Language } from '../i18n/translations'
 import { AnimatedPressable } from './AnimatedPressable'
+import { Icon, IconName } from './Icon'
 
 interface HeaderMenuProps {
   lang: Language
 }
-
-type MenuItem = { key: string; labelKey: 'home_title'; route: string }
 
 const MENU_ITEMS: { key: string; labelKey: Parameters<typeof t>[1]; route: string }[] = [
   { key: 'add-plant', labelKey: 'add_plant_title', route: '/add-plant' },
@@ -20,12 +19,12 @@ const MENU_ITEMS: { key: string; labelKey: Parameters<typeof t>[1]; route: strin
   { key: 'settings', labelKey: 'settings_title', route: '/settings' },
 ]
 
-const MENU_ICONS: Record<string, string> = {
-  'add-plant': '➕',
-  'manage-plants': '🪴',
-  'symptom-guide': '🩺',
-  stats: '📊',
-  settings: '⚙️',
+const MENU_ICONS: Record<string, IconName> = {
+  'add-plant': 'add',
+  'manage-plants': 'plants',
+  'symptom-guide': 'guide',
+  stats: 'stats',
+  settings: 'settings',
 }
 
 export function HeaderMenu({ lang }: HeaderMenuProps) {
@@ -36,7 +35,7 @@ export function HeaderMenu({ lang }: HeaderMenuProps) {
   return (
     <>
       <AnimatedPressable onPress={() => setVisible(true)} style={styles.trigger} scaleTo={0.85} hitSlop={12}>
-        <Text style={styles.triggerText}>⋮</Text>
+        <Icon name="more" size={24} color={colors.headerTitle} />
       </AnimatedPressable>
 
       <Modal visible={visible} transparent animationType="fade" onRequestClose={() => setVisible(false)}>
@@ -55,11 +54,8 @@ export function HeaderMenu({ lang }: HeaderMenuProps) {
                 }}
                 scaleTo={0.96}
               >
-                <Text style={[styles.menuLabel, { color: colors.primary }]}>
-                  {MENU_ICONS[item.key]}
-                  {'  '}
-                  {t(lang, item.labelKey)}
-                </Text>
+                <Icon name={MENU_ICONS[item.key]} size={20} color={colors.primaryLight} />
+                <Text style={[styles.menuLabel, { color: colors.text }]}>{t(lang, item.labelKey)}</Text>
               </AnimatedPressable>
             ))}
           </View>
@@ -71,14 +67,7 @@ export function HeaderMenu({ lang }: HeaderMenuProps) {
 
 const styles = StyleSheet.create({
   trigger: {
-    paddingHorizontal: Spacing.xs,
-    paddingVertical: 2,
-  },
-  triggerText: {
-    fontSize: 28,
-    color: '#fff',
-    fontWeight: '700',
-    lineHeight: 32,
+    padding: Spacing.xs,
   },
   backdrop: {
     flex: 1,
@@ -94,6 +83,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
     paddingVertical: Spacing.md + 2,
     paddingHorizontal: Spacing.lg + 2,
   },

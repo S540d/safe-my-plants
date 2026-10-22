@@ -7,13 +7,15 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated'
+import { brandPalette } from '../constants/brandPalette'
 
 interface Props {
   visible: boolean
   onFinish?: () => void
 }
 
-const COLORS = ['#52B788', '#74C69D', '#B7E4C7', '#F4A261', '#E63946', '#2D6A4F', '#FFD60A']
+const P = brandPalette.light
+const COLORS = [P.leaf, P.sage, P.sageSurface, P.statusSoon, P.terracotta, P.forestMid, P.ochre]
 
 const PIECES = Array.from({ length: 20 }, (_, i) => ({
   id: i,

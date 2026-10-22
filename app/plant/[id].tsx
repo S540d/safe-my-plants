@@ -1,21 +1,24 @@
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import React, { useState } from 'react'
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { Image, Linking, SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
 import { AnimatedPressable } from '../../src/components/AnimatedPressable'
 import { CareConfetti } from '../../src/components/CareConfetti'
 import { CareHistoryList } from '../../src/components/CareHistoryList'
 import { DiseaseCard } from '../../src/components/DiseaseCard'
+import { Icon, IconName } from '../../src/components/Icon'
 import { NotesSection } from '../../src/components/NotesSection'
 import { PhotoGalleryModal } from '../../src/components/PhotoGalleryModal'
 import { QuickActionBar } from '../../src/components/QuickActionBar'
 import { TrafficLight } from '../../src/components/TrafficLight'
 import { WaterDropAnimation } from '../../src/components/WaterDropAnimation'
-import { Shadow } from '../../src/constants/theme'
+import { LOCATION_ICONS } from '../../src/constants/locationIcons'
+import { Shadow, ThemeColors, Typography } from '../../src/constants/theme'
 import { usePlants } from '../../src/contexts/PlantContext'
 import { formatLastDate, formatNextDate, getCareStatus } from '../../src/hooks/useCareStatus'
 import { usePreferences } from '../../src/hooks/usePreferences'
 import { useThemeColors } from '../../src/hooks/useThemeColors'
 import { t } from '../../src/i18n/translations'
+import { formatPhotoCredit, getPhotoCredit } from '../../src/utils/photoCredit'
 
 const LOCATION_LABELS: Record<string, Record<string, string>> = {
   de: { sun: 'Sonne', 'partial-shade': 'Halbschatten', shade: 'Schatten', indoor: 'Innenraum' },
@@ -51,6 +54,7 @@ export default function PlantDetailScreen() {
 
   const careStatus = getCareStatus(plant)
   const lang = language
+  const photoCredit = getPhotoCredit(plant.photos[photoIndex]?.uri)
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -74,16 +78,35 @@ export default function PlantDetailScreen() {
             )}
           </AnimatedPressable>
         ) : (
-          <View style={[styles.heroPlaceholder, { backgroundColor: colors.primaryMid }]}>
-            <Text style={styles.heroEmoji}>🪴</Text>
+          <View style={[styles.heroPlaceholder, { backgroundColor: colors.accentSurface }]}>
+            <Icon name="plants" size={72} color={colors.primaryLight} />
           </View>
         )}
 
-        <AnimatedPressable style={styles.backButton} onPress={() => router.back()} scaleTo={0.88}>
-          <Text style={styles.backButtonText}>←</Text>
+        {photoCredit && (
+          <AnimatedPressable
+            style={styles.creditBadge}
+            onPress={() => Linking.openURL(photoCredit.sourceUrl)}
+            scaleTo={0.96}
+            accessibilityRole="link"
+          >
+            <Text style={styles.creditText} numberOfLines={1}>
+              {t(lang, 'photo_credit_prefix')}: {formatPhotoCredit(photoCredit)}
+            </Text>
+          </AnimatedPressable>
+        )}
+
+        <AnimatedPressable
+          style={styles.backButton}
+          onPress={() => router.back()}
+          scaleTo={0.88}
+          accessibilityRole="button"
+          accessibilityLabel={t(lang, 'back')}
+        >
+          <Icon name="back" size={22} color="#FFFFFF" />
         </AnimatedPressable>
 
-        <View style={styles.content}>
+        <View style={[styles.content, { backgroundColor: colors.background }]}>
           {/* Name & status */}
           <View style={styles.nameRow}>
             <View style={styles.nameBlock}>
@@ -108,7 +131,8 @@ export default function PlantDetailScreen() {
           {/* Next care dates */}
           <View style={styles.nextCareRow}>
             <View style={[styles.nextCareItem, { backgroundColor: colors.accentSurface }]}>
-              <Text style={[styles.nextCareLabel, { color: colors.primary }]}>💧 {t(lang, 'detail_watering')}</Text>
+              <Icon name="water" size={16} color={colors.primaryLight} />
+              <Text style={[styles.nextCareLabel, { color: colors.primary }]}>{t(lang, 'detail_watering')}</Text>
               <Text style={[styles.nextCareValue, { color: colors.primaryMid }]}>
                 {formatNextDate(
                   plant.lastWatered,
@@ -120,7 +144,8 @@ export default function PlantDetailScreen() {
               <TrafficLight status={careStatus.watering} size={8} />
             </View>
             <View style={[styles.nextCareItem, { backgroundColor: colors.accentSurface }]}>
-              <Text style={[styles.nextCareLabel, { color: colors.primary }]}>🌿 {t(lang, 'detail_fertilizing')}</Text>
+              <Icon name="fertilize" size={16} color={colors.primaryLight} />
+              <Text style={[styles.nextCareLabel, { color: colors.primary }]}>{t(lang, 'detail_fertilizing')}</Text>
               <Text style={[styles.nextCareValue, { color: colors.primaryMid }]}>
                 {formatNextDate(plant.lastFertilized, plant.careInfo.fertilizingFrequencyDays, lang)}
               </Text>
@@ -134,8 +159,11 @@ export default function PlantDetailScreen() {
             onPress={() => router.push('/symptom-guide')}
             scaleTo={0.98}
           >
-            <Text style={[styles.problemLinkText, { color: colors.primary }]}>🩺 {t(lang, 'detail_problem_link')}</Text>
-            <Text style={[styles.problemLinkChevron, { color: colors.accent }]}>›</Text>
+            <View style={[styles.problemLinkIcon, { backgroundColor: colors.terracottaSurface }]}>
+              <Icon name="guide" size={20} color={colors.accent} />
+            </View>
+            <Text style={[styles.problemLinkText, { color: colors.primary }]}>{t(lang, 'detail_problem_link')}</Text>
+            <Icon name="forward" size={20} color={colors.textSubtle} />
           </AnimatedPressable>
 
           {/* Care info */}
@@ -143,31 +171,31 @@ export default function PlantDetailScreen() {
 
           <View style={[styles.infoGrid, { backgroundColor: colors.surface }, Shadow.cardSm]}>
             <InfoRow
-              icon="📍"
+              icon={LOCATION_ICONS[plant.location]}
               label={t(lang, 'detail_location')}
               value={LOCATION_LABELS[lang][plant.location]}
               colors={colors}
             />
             <InfoRow
-              icon="🌡️"
+              icon="temperature"
               label={t(lang, 'detail_temperature')}
               value={`${plant.careInfo.temperature.min}–${plant.careInfo.temperature.max} °C`}
               colors={colors}
             />
             <InfoRow
-              icon="💦"
+              icon="humidity"
               label={t(lang, 'detail_humidity')}
               value={HUMIDITY_LABELS[lang][plant.careInfo.humidity]}
               colors={colors}
             />
             <InfoRow
-              icon="💧"
+              icon="water"
               label={lang === 'de' ? 'Gießintervall' : 'Watering interval'}
               value={`${plant.careInfo.wateringFrequencyDays} ${t(lang, 'days')}`}
               colors={colors}
             />
             <InfoRow
-              icon="🌿"
+              icon="fertilize"
               label={lang === 'de' ? 'Düngintervall' : 'Fertilizing interval'}
               value={`${plant.careInfo.fertilizingFrequencyDays} ${t(lang, 'days')}`}
               colors={colors}
@@ -176,7 +204,7 @@ export default function PlantDetailScreen() {
 
           {plant.careInfo.locationTips ? (
             <InfoBlock
-              icon="📍"
+              icon="location"
               title={lang === 'de' ? 'Standorttipps' : 'Location tips'}
               text={plant.careInfo.locationTips}
               colors={colors}
@@ -184,7 +212,7 @@ export default function PlantDetailScreen() {
           ) : null}
           {plant.careInfo.wateringTips ? (
             <InfoBlock
-              icon="💧"
+              icon="water"
               title={lang === 'de' ? 'Gießtipps' : 'Watering tips'}
               text={plant.careInfo.wateringTips}
               colors={colors}
@@ -192,7 +220,7 @@ export default function PlantDetailScreen() {
           ) : null}
           {plant.careInfo.fertilizingTips ? (
             <InfoBlock
-              icon="🌿"
+              icon="fertilize"
               title={lang === 'de' ? 'Düngetipps' : 'Fertilizing tips'}
               text={plant.careInfo.fertilizingTips}
               colors={colors}
@@ -201,10 +229,10 @@ export default function PlantDetailScreen() {
 
           {/* Last care dates */}
           <View style={styles.lastDatesRow}>
-            <Text style={[styles.lastDate, { color: colors.accent }]}>
+            <Text style={[styles.lastDate, { color: colors.textMuted }]}>
               {t(lang, 'detail_last_watered')}: {formatLastDate(plant.lastWatered, lang)}
             </Text>
-            <Text style={[styles.lastDate, { color: colors.accent }]}>
+            <Text style={[styles.lastDate, { color: colors.textMuted }]}>
               {t(lang, 'detail_last_fertilized')}: {formatLastDate(plant.lastFertilized, lang)}
             </Text>
           </View>
@@ -243,24 +271,43 @@ export default function PlantDetailScreen() {
   )
 }
 
-type ThemeColors = ReturnType<typeof useThemeColors>
-
-function InfoRow({ icon, label, value, colors }: { icon: string; label: string; value: string; colors: ThemeColors }) {
+function InfoRow({
+  icon,
+  label,
+  value,
+  colors,
+}: {
+  icon: IconName
+  label: string
+  value: string
+  colors: ThemeColors
+}) {
   return (
-    <View style={[styles.infoRow, { borderBottomColor: colors.background }]}>
-      <Text style={styles.infoIcon}>{icon}</Text>
+    <View style={[styles.infoRow, { borderBottomColor: colors.border }]}>
+      <Icon name={icon} size={18} color={colors.primaryLight} style={styles.infoIcon} />
       <Text style={[styles.infoLabel, { color: colors.textMuted }]}>{label}</Text>
       <Text style={[styles.infoValue, { color: colors.primary }]}>{value}</Text>
     </View>
   )
 }
 
-function InfoBlock({ icon, title, text, colors }: { icon: string; title: string; text: string; colors: ThemeColors }) {
+function InfoBlock({
+  icon,
+  title,
+  text,
+  colors,
+}: {
+  icon: IconName
+  title: string
+  text: string
+  colors: ThemeColors
+}) {
   return (
     <View style={[styles.infoBlock, { backgroundColor: colors.surface }, Shadow.cardSm]}>
-      <Text style={[styles.infoBlockTitle, { color: colors.primaryLight }]}>
-        {icon} {title}
-      </Text>
+      <View style={styles.infoBlockHeader}>
+        <Icon name={icon} size={16} color={colors.primaryLight} />
+        <Text style={[styles.infoBlockTitle, { color: colors.primary }]}>{title}</Text>
+      </View>
       <Text style={[styles.infoBlockText, { color: colors.text }]}>{text}</Text>
     </View>
   )
@@ -269,40 +316,54 @@ function InfoBlock({ icon, title, text, colors }: { icon: string; title: string;
 const styles = StyleSheet.create({
   container: { flex: 1 },
   notFound: { padding: 24, fontSize: 16 },
-  heroPhoto: { width: '100%', height: 240 },
+  heroPhoto: { width: '100%', height: 300 },
   heroPlaceholder: {
     width: '100%',
-    height: 200,
+    height: 220,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  heroEmoji: { fontSize: 80 },
   photoBadge: {
     position: 'absolute',
     right: 12,
-    bottom: 12,
+    top: 16,
     backgroundColor: 'rgba(0,0,0,0.5)',
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 2,
   },
   photoBadgeText: { color: '#fff', fontSize: 12 },
+  creditBadge: {
+    position: 'absolute',
+    top: 248,
+    right: 12,
+    maxWidth: '75%',
+    backgroundColor: 'rgba(0,0,0,0.38)',
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  creditText: { color: 'rgba(255,255,255,0.9)', fontSize: 10 },
   backButton: {
     position: 'absolute',
     top: 16,
     left: 16,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.35)',
     borderRadius: 20,
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backButtonText: { color: '#fff', fontSize: 20, lineHeight: 22 },
-  content: { padding: 16 },
+  content: {
+    padding: 20,
+    marginTop: -24,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+  },
   nameRow: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 8 },
   nameBlock: { flex: 1, marginRight: 8 },
-  name: { fontSize: 26, fontWeight: '700' },
+  name: { ...Typography.headerTitle, fontSize: 30, lineHeight: 38 },
   scientificName: { fontSize: 14, fontStyle: 'italic', marginTop: 2 },
   description: { fontSize: 15, lineHeight: 22, marginBottom: 16 },
   nextCareRow: {
@@ -313,7 +374,7 @@ const styles = StyleSheet.create({
   },
   nextCareItem: {
     flex: 1,
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
@@ -325,20 +386,21 @@ const styles = StyleSheet.create({
   problemLink: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 12,
-    padding: 14,
-    marginTop: 12,
+    gap: 12,
+    borderRadius: 16,
+    padding: 12,
+    marginTop: 4,
+    marginBottom: 20,
   },
+  problemLinkIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
   problemLinkText: { flex: 1, fontSize: 15, fontWeight: '600' },
-  problemLinkChevron: { fontSize: 20 },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    ...Typography.sectionTitle,
     marginTop: 4,
     marginBottom: 10,
   },
   infoGrid: {
-    borderRadius: 12,
+    borderRadius: 16,
     overflow: 'hidden',
     marginBottom: 12,
   },
@@ -349,20 +411,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderBottomWidth: 1,
   },
-  infoIcon: { fontSize: 16, width: 24 },
+  infoIcon: { width: 28 },
   infoLabel: { flex: 1, fontSize: 14 },
   infoValue: { fontSize: 14, fontWeight: '600' },
   infoBlock: {
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 14,
     marginBottom: 10,
   },
+  infoBlockHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 },
   infoBlockTitle: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '700',
-    marginBottom: 4,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
   },
   infoBlockText: { fontSize: 14, lineHeight: 20 },
   lastDatesRow: { flexDirection: 'row', gap: 16, marginBottom: 20 },

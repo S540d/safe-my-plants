@@ -6,7 +6,10 @@ export type PlantTemplate = Omit<
 > & {
   /** Weitere gebräuchliche Namen/Synonyme für die Suche (z. B. "Friedenslilie" für das Einblatt). */
   aliases?: string[]
-  /** Lizenzfreies Wikimedia-Commons-Vorschaubild (CC-BY-SA / Public Domain). */
+  /**
+   * Vorschaubild von Wikimedia Commons (CC BY / CC BY-SA / Public Domain – Namensnennung nötig).
+   * Bildnachweis über `getPhotoCredit()` (src/utils/photoCredit.ts), Daten in `photoCredits.ts`.
+   */
   imageUrl?: string
 }
 

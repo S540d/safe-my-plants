@@ -1,10 +1,10 @@
-import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import React, { useMemo } from 'react'
 import { SafeAreaView, SectionList, StyleSheet, Text, View } from 'react-native'
 import { EmptyState } from '../src/components/EmptyState'
 import { HeaderMenu } from '../src/components/HeaderMenu'
 import { PlantCard } from '../src/components/PlantCard'
+import { ScreenHeader } from '../src/components/ScreenHeader'
 import { Radius, Spacing, Typography } from '../src/constants/theme'
 import { usePlants } from '../src/contexts/PlantContext'
 import { usePreferences } from '../src/hooks/usePreferences'
@@ -56,21 +56,16 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
-        <View style={styles.headerRow}>
-          <View>
-            <Text style={styles.headerTitle}>{t(language, 'home_title')}</Text>
-            <Text style={[styles.headerCount, { color: colors.gradientText }]}>
-              {plantCount} {countLabel}
-            </Text>
-          </View>
-          <HeaderMenu lang={language} />
-        </View>
-      </LinearGradient>
+      <ScreenHeader
+        large
+        title={t(language, 'home_title')}
+        subtitle={`${plantCount} ${countLabel}`}
+        right={<HeaderMenu lang={language} />}
+      />
 
       {plants.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <EmptyState icon="🪴" title={t(language, 'home_empty_tap')} />
+          <EmptyState icon="plants" title={t(language, 'home_empty_tap')} />
         </View>
       ) : (
         <SectionList
@@ -89,7 +84,7 @@ export default function HomeScreen() {
           )}
           renderSectionHeader={({ section }) => (
             <View style={styles.sectionHeader}>
-              <Text style={[styles.sectionTitle, { color: colors.primaryLight }]}>{section.title}</Text>
+              <Text style={[styles.sectionTitle, { color: colors.primary }]}>{section.title}</Text>
             </View>
           )}
           contentContainerStyle={styles.list}
@@ -105,34 +100,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.lg,
-    paddingBottom: Spacing.xl,
-  },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
-  },
-  headerTitle: {
-    ...Typography.headerTitle,
-    color: '#fff',
-  },
-  headerCount: {
-    fontSize: 14,
-    marginTop: 2,
-  },
   sectionHeader: {
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.lg,
-    paddingBottom: Spacing.xs + 2,
+    paddingTop: Spacing.xl,
+    paddingBottom: Spacing.sm,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    ...Typography.sectionTitle,
   },
   list: {
     paddingBottom: Spacing.xxl,

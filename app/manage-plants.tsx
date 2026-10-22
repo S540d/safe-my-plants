@@ -1,5 +1,4 @@
 import * as ImagePicker from 'expo-image-picker'
-import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import React, { useState } from 'react'
 import {
@@ -15,6 +14,9 @@ import {
   View,
 } from 'react-native'
 import { AnimatedPressable } from '../src/components/AnimatedPressable'
+import { Icon } from '../src/components/Icon'
+import { ScreenHeader } from '../src/components/ScreenHeader'
+import { LOCATION_ICONS } from '../src/constants/locationIcons'
 import { Radius, Shadow, Spacing, ThemeColors, Typography } from '../src/constants/theme'
 import { usePlants } from '../src/contexts/PlantContext'
 import { usePreferences } from '../src/hooks/usePreferences'
@@ -27,8 +29,8 @@ import { generateId } from '../src/utils/id'
 
 const LOCATIONS: PlantLocation[] = ['sun', 'partial-shade', 'shade', 'indoor']
 const LOCATION_LABELS: Record<string, Record<PlantLocation, string>> = {
-  de: { sun: '☀️ Sonne', 'partial-shade': '⛅ Halbschatten', shade: '🌥️ Schatten', indoor: '🏠 Innenraum' },
-  en: { sun: '☀️ Full sun', 'partial-shade': '⛅ Partial shade', shade: '🌥️ Shade', indoor: '🏠 Indoor' },
+  de: { sun: 'Sonne', 'partial-shade': 'Halbschatten', shade: 'Schatten', indoor: 'Innenraum' },
+  en: { sun: 'Full sun', 'partial-shade': 'Partial shade', shade: 'Shade', indoor: 'Indoor' },
 }
 
 function emptyPlant(): Plant {
@@ -192,11 +194,16 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
               ]}
               onPress={() => set({ location: loc })}
             >
+              <Icon
+                name={LOCATION_ICONS[loc]}
+                size={15}
+                color={plant.location === loc ? colors.textOnPrimary : colors.primaryMid}
+              />
               <Text
                 style={[
                   formStyles.chipText,
                   { color: colors.primaryMid },
-                  plant.location === loc && { color: '#fff', fontWeight: '600' },
+                  plant.location === loc && { color: colors.textOnPrimary, fontWeight: '600' },
                 ]}
               >
                 {LOCATION_LABELS[lang][loc]}
@@ -275,7 +282,7 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
                 style={[
                   formStyles.chipText,
                   { color: colors.primaryMid },
-                  plant.careInfo.humidity === h && { color: '#fff', fontWeight: '600' },
+                  plant.careInfo.humidity === h && { color: colors.textOnPrimary, fontWeight: '600' },
                 ]}
               >
                 {t(lang, h === 'low' ? 'humidity_low' : h === 'medium' ? 'humidity_medium' : 'humidity_high')}
@@ -289,8 +296,11 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
           {plant.photos.map((photo) => (
             <View key={photo.uri} style={formStyles.photoWrapper}>
               <Image source={{ uri: photo.uri }} style={formStyles.photo} />
-              <AnimatedPressable style={formStyles.removePhoto} onPress={() => removePhoto(photo.uri)}>
-                <Text style={formStyles.removePhotoText}>✕</Text>
+              <AnimatedPressable
+                style={[formStyles.removePhoto, { backgroundColor: colors.statusOverdue }]}
+                onPress={() => removePhoto(photo.uri)}
+              >
+                <Icon name="close" size={13} color="#FFFFFF" />
               </AnimatedPressable>
             </View>
           ))}
@@ -298,7 +308,7 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
             style={[formStyles.addPhotoBtn, { borderColor: colors.border, backgroundColor: colors.surfaceAlt }]}
             onPress={addPhoto}
           >
-            <Text style={[formStyles.addPhotoText, { color: colors.primaryLight }]}>+</Text>
+            <Icon name="camera" size={26} color={colors.primaryLight} />
           </AnimatedPressable>
         </View>
 
@@ -311,9 +321,12 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
               { backgroundColor: colors.statusSoonSurface, borderLeftColor: colors.statusSoon },
             ]}
           >
-            <Text style={[formStyles.diseaseChipText, { color: colors.primary }]}>🦠 {d.name}</Text>
-            <AnimatedPressable onPress={() => removeDisease(d.id)}>
-              <Text style={formStyles.removePhotoText}>✕</Text>
+            <View style={formStyles.diseaseChipLabel}>
+              <Icon name="disease" size={15} color={colors.statusSoon} />
+              <Text style={[formStyles.diseaseChipText, { color: colors.primary }]}>{d.name}</Text>
+            </View>
+            <AnimatedPressable onPress={() => removeDisease(d.id)} hitSlop={8}>
+              <Icon name="close" size={18} color={colors.textMuted} />
             </AnimatedPressable>
           </View>
         ))}
@@ -352,7 +365,7 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
                 style={[formStyles.btn, formStyles.btnPrimary, { backgroundColor: colors.primaryMid }]}
                 onPress={saveDisease}
               >
-                <Text style={formStyles.btnPrimaryText}>{t(lang, 'form_add')}</Text>
+                <Text style={[formStyles.btnPrimaryText, { color: colors.textOnPrimary }]}>{t(lang, 'form_add')}</Text>
               </AnimatedPressable>
             </View>
           </View>
@@ -378,7 +391,7 @@ function PlantForm({ lang, colors, initial, existingRooms, onSave, onCancel }: P
             style={[formStyles.btn, formStyles.btnPrimary, { backgroundColor: colors.primaryMid }]}
             onPress={handleSave}
           >
-            <Text style={formStyles.btnPrimaryText}>{t(lang, 'save')}</Text>
+            <Text style={[formStyles.btnPrimaryText, { color: colors.textOnPrimary }]}>{t(lang, 'save')}</Text>
           </AnimatedPressable>
         </View>
         <View style={{ height: 40 }} />
@@ -410,14 +423,11 @@ export default function ManagePlantsScreen() {
   if (editing) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
-          <View style={styles.headerRow}>
-            <AnimatedPressable onPress={() => setEditing(null)} style={styles.backBtn} scaleTo={0.9}>
-              <Text style={[styles.backBtnText, { color: colors.gradientText }]}>← {t(lang, 'back')}</Text>
-            </AnimatedPressable>
-            <Text style={styles.headerTitle}>{t(lang, 'manage_plants_edit_title')}</Text>
-          </View>
-        </LinearGradient>
+        <ScreenHeader
+          title={t(lang, 'manage_plants_edit_title')}
+          onBack={() => setEditing(null)}
+          backLabel={t(lang, 'back')}
+        />
         <PlantForm
           lang={lang}
           colors={colors}
@@ -435,24 +445,20 @@ export default function ManagePlantsScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
-        <View style={styles.headerRow}>
-          <AnimatedPressable onPress={() => router.back()} style={styles.backBtn} scaleTo={0.9}>
-            <Text style={[styles.backBtnText, { color: colors.gradientText }]}>← {t(lang, 'back')}</Text>
-          </AnimatedPressable>
-          <Text style={styles.headerTitle}>{t(lang, 'manage_plants_title')}</Text>
-        </View>
-      </LinearGradient>
+      <ScreenHeader title={t(lang, 'manage_plants_title')} onBack={() => router.back()} backLabel={t(lang, 'back')} />
       <ScrollView contentContainerStyle={styles.scroll}>
         <AnimatedPressable
-          style={[styles.addBtn, { backgroundColor: colors.primaryMid }]}
+          style={[styles.addBtn, { backgroundColor: colors.primary }]}
           onPress={() => router.push('/add-plant')}
         >
-          <Text style={styles.addBtnText}>+ {lang === 'de' ? 'Pflanze hinzufügen' : 'Add plant'}</Text>
+          <Icon name="add" size={20} color={colors.textOnPrimary} />
+          <Text style={[styles.addBtnText, { color: colors.textOnPrimary }]}>
+            {lang === 'de' ? 'Pflanze hinzufügen' : 'Add plant'}
+          </Text>
         </AnimatedPressable>
         {plants.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyEmoji}>🪴</Text>
+            <Icon name="plants" size={48} color={colors.primaryLight} style={styles.emptyIcon} />
             <Text style={[styles.emptyText, { color: colors.primaryLight }]}>{t(lang, 'manage_plants_empty')}</Text>
           </View>
         ) : (
@@ -460,6 +466,16 @@ export default function ManagePlantsScreen() {
             const status = getCareStatus(plant)
             return (
               <View key={plant.id} style={[styles.plantRow, { backgroundColor: colors.surface }, Shadow.cardSm]}>
+                {plant.photos[0] ? (
+                  <Image
+                    source={{ uri: plant.photos[0].uri }}
+                    style={[styles.thumb, { backgroundColor: colors.accentSurface }]}
+                  />
+                ) : (
+                  <View style={[styles.thumb, styles.thumbIcon, { backgroundColor: colors.accentSurface }]}>
+                    <Icon name="plants" size={22} color={colors.primaryLight} />
+                  </View>
+                )}
                 <View style={styles.plantInfo}>
                   <View style={styles.plantNameRow}>
                     <Text style={[styles.plantName, { color: colors.primary }]} numberOfLines={1}>
@@ -468,7 +484,10 @@ export default function ManagePlantsScreen() {
                     <TrafficLight status={status.overall} size={12} />
                   </View>
                   {plant.room ? (
-                    <Text style={[styles.plantRoom, { color: colors.accent }]}>📍 {plant.room}</Text>
+                    <View style={styles.plantRoomRow}>
+                      <Icon name="location" size={12} color={colors.textMuted} />
+                      <Text style={[styles.plantRoom, { color: colors.textMuted }]}>{plant.room}</Text>
+                    </View>
                   ) : null}
                 </View>
                 <View style={styles.plantActions}>
@@ -476,15 +495,19 @@ export default function ManagePlantsScreen() {
                     style={styles.editBtn}
                     onPress={() => setEditing(plant)}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    accessibilityRole="button"
+                    accessibilityLabel={t(lang, 'manage_plants_edit_title')}
                   >
-                    <Text style={styles.editBtnText}>✏️</Text>
+                    <Icon name="edit" size={20} color={colors.primaryMid} />
                   </AnimatedPressable>
                   <AnimatedPressable
                     style={styles.deleteBtn}
                     onPress={() => handleDelete(plant)}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    accessibilityRole="button"
+                    accessibilityLabel={lang === 'de' ? 'Löschen' : 'Delete'}
                   >
-                    <Text style={styles.deleteBtnText}>🗑️</Text>
+                    <Icon name="delete" size={20} color={colors.textSubtle} />
                   </AnimatedPressable>
                 </View>
               </View>
@@ -499,60 +522,61 @@ export default function ManagePlantsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { paddingHorizontal: Spacing.xl, paddingTop: Spacing.lg, paddingBottom: Spacing.xl },
-  headerRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md },
-  backBtn: { paddingVertical: Spacing.xs },
-  backBtnText: { fontSize: 15 },
-  headerTitle: { ...Typography.headerTitleSm, color: '#fff', flex: 1 },
-  scroll: { padding: Spacing.lg },
+  scroll: { padding: Spacing.lg, paddingTop: Spacing.xl },
   addBtn: {
-    borderRadius: Radius.lg,
-    padding: Spacing.md + 2,
-    alignItems: 'center',
-    marginBottom: Spacing.md,
-  },
-  addBtnText: { color: '#fff', fontSize: 15, fontWeight: '600' },
-  emptyContainer: { alignItems: 'center', paddingTop: 60 },
-  emptyEmoji: { fontSize: 48, marginBottom: Spacing.md },
-  emptyText: { fontSize: 16, textAlign: 'center' },
-  plantRow: {
-    borderRadius: Radius.lg,
+    borderRadius: Radius.full,
     padding: Spacing.md + 2,
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.lg,
+  },
+  addBtnText: { fontSize: 15, fontWeight: '600' },
+  emptyContainer: { alignItems: 'center', paddingTop: 60 },
+  emptyIcon: { marginBottom: Spacing.md },
+  emptyText: { fontSize: 16, textAlign: 'center' },
+  plantRow: {
+    borderRadius: Radius.xl,
+    padding: Spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.md,
     marginBottom: Spacing.sm,
   },
+  thumb: { width: 48, height: 48, borderRadius: Radius.lg },
+  thumbIcon: { alignItems: 'center', justifyContent: 'center' },
   plantInfo: { flex: 1 },
   plantNameRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm },
-  plantName: { fontSize: 16, fontWeight: '500', flex: 1 },
-  plantRoom: { fontSize: 12, marginTop: 2 },
-  plantActions: { flexDirection: 'row', gap: Spacing.sm },
+  plantName: { ...Typography.title, fontSize: 17, flex: 1 },
+  plantRoomRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 },
+  plantRoom: { fontSize: 12 },
+  plantActions: { flexDirection: 'row', gap: Spacing.xs },
   editBtn: { padding: Spacing.xs + 2 },
-  editBtnText: { fontSize: 18 },
   deleteBtn: { padding: Spacing.xs + 2 },
-  deleteBtnText: { fontSize: 18 },
 })
 
 const formStyles = StyleSheet.create({
   scroll: { padding: Spacing.lg },
   sectionLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    ...Typography.title,
+    fontSize: 17,
     marginTop: Spacing.xl,
     marginBottom: Spacing.sm,
   },
   label: { fontSize: 13, marginBottom: Spacing.xs, marginTop: Spacing.md - 2 },
   input: {
     borderWidth: 1.5,
-    borderRadius: Radius.sm,
+    borderRadius: Radius.lg,
     padding: Spacing.md - 2,
     fontSize: 15,
   },
   multiline: { minHeight: 70, textAlignVertical: 'top' },
   chipRow: { flexDirection: 'row', gap: Spacing.sm, flexWrap: 'wrap' },
   chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs + 3,
     borderRadius: Radius.full,
@@ -561,29 +585,26 @@ const formStyles = StyleSheet.create({
   chipText: { fontSize: 13 },
   photoGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
   photoWrapper: { position: 'relative' },
-  photo: { width: 80, height: 80, borderRadius: Radius.sm },
+  photo: { width: 80, height: 80, borderRadius: Radius.lg },
   removePhoto: {
     position: 'absolute',
     top: -6,
     right: -6,
-    backgroundColor: '#E63946',
     borderRadius: Radius.full,
-    width: 20,
-    height: 20,
+    width: 22,
+    height: 22,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  removePhotoText: { color: '#fff', fontSize: 11, fontWeight: '700' },
   addPhotoBtn: {
     width: 80,
     height: 80,
-    borderRadius: Radius.sm,
+    borderRadius: Radius.lg,
     borderWidth: 2,
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  addPhotoText: { fontSize: 28 },
   diseaseChip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -593,6 +614,7 @@ const formStyles = StyleSheet.create({
     marginBottom: Spacing.xs + 2,
     borderLeftWidth: 3,
   },
+  diseaseChipLabel: { flexDirection: 'row', alignItems: 'center', gap: Spacing.sm, flex: 1 },
   diseaseChipText: { fontSize: 14 },
   diseaseForm: {
     borderRadius: Radius.lg,
@@ -611,10 +633,10 @@ const formStyles = StyleSheet.create({
   addDiseaseBtnText: { fontSize: 14 },
   actions: { flexDirection: 'row', gap: Spacing.md - 2, marginTop: Spacing.xxl },
   row: { flexDirection: 'row', gap: Spacing.sm, marginTop: Spacing.sm },
-  btn: { flex: 1, padding: Spacing.md, borderRadius: Radius.md, alignItems: 'center' },
+  btn: { flex: 1, padding: Spacing.md, borderRadius: Radius.full, alignItems: 'center' },
   btnPrimary: {},
   btnSecondary: { backgroundColor: 'transparent', borderWidth: 1.5 },
-  btnPrimaryText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  btnPrimaryText: { fontSize: 15, fontWeight: '600' },
   btnSecondaryText: { fontSize: 15 },
   suggestions: {
     borderRadius: Radius.sm,
