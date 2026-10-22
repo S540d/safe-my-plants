@@ -336,3 +336,14 @@ Erster Durchlauf des wiederkehrenden Code-Health-Audit-Standards (project-templa
 - **Schwächer belegt (Blog-/Händlerquellen, allgemeines Gartenwissen):** Nährstoffmangel-Zeichen (Adern grün), Fluorid/Leitungswasser bei Grünlilie/Calathea, „Überschuss nach ~15 Min. wegkippen", Eingewöhnung nach Standortwechsel, Steckling-Rettung bei Stängelfäule, Weißschimmel als harmloser Saprophyt. Vor einem Release gegenlesen (Issue #184: Template-Pflegedaten und diese Aussagen in einem Durchgang gegen Quellen prüfen).
 - Nicht enthalten: Pflanzenspezifische Hinweise, Krankheiten einzelner Arten, chemische Mittel mit Produktnamen/Dosierung (nur Verweis auf Packungsangabe).
 
+
+## Redesign-Fundament (PR #196, gemerged 2026-10-22)
+
+- Gemeinsame Designsprache mit dem Pflanzkalender (dort PR #324). `src/constants/brandPalette.ts` ist **wertgleich** in beiden Repos zu halten (Formatierung folgt der jeweiligen Prettier-Config). `theme.ts` mappt die bestehenden Schlüssel darauf, Akzent hier Terrakotta; neue Schlüssel `headerTitle`, `terracottaSurface`. `gradientStart`/`gradientEnd` sind jetzt identisch (flächiger Header, kein Verlauf mehr) – `expo-linear-gradient` entfernt.
+- Schrift Fraunces (600/700) via `@expo-google-fonts/fraunces` + `expo-font`, geladen in `app/_layout.tsx` (Splash bleibt bis zum Laden; bei Fehler Systemschrift). Fließtext bleibt Systemschrift. `Typography.headerTitle/headerTitleSm/title/sectionTitle` tragen `fontFamily`.
+- `Icon` (`src/components/Icon.tsx`, Ionicons nur Outline, semantische Namen) ersetzt UI-Emojis; `ScreenHeader` ersetzt die inline-Header. **Bewusst geblieben:** Symptom-Emojis (`symptomGuide.ts`), Wassertropfen-Animation, Notification-Texte.
+- `PlantCard`: Status-Pills statt Ampelpunkte; Buttons „Gegossen/Gedüngt/Erde noch feucht" erscheinen **nur bei Bedarf** (Verhaltensänderung, früher immer sichtbar).
+- Entfernt (waren nirgends importiert): `DashboardSummary`, `FilterChips`, `HeroPlantCard`, `ReminderBanner`, `SearchBar`, `SortMenu`.
+- Bildnachweis für Wikimedia-Templatebilder: `src/utils/photoCredit.ts` (`getPhotoCredit`, Abgleich über Upload-URL → Dateiname), Daten in `src/constants/photoCredits.ts`, Anzeige als Bildzeile in `app/plant/[id].tsx` und Abschnitt „Bildnachweise" in `settings.tsx`.
+- **Offen:** `photoCredits.ts` ist noch leer – die Commons-API war aus der Session nicht erreichbar (EGRESS_BLOCKED). Lokal `node scripts/fetch-photo-credits.js` ausführen und committen; bis dahin zeigt die Bildzeile „Wikimedia Commons" + Link zur Dateiseite. Ob das für die CC-BY-SA-Namensnennung genügt, ist nicht geprüft.
+- **Folgearbeit (Roadmap):** „Wann zuletzt gegossen?" beim Anlegen (sonst startet jede Pflanze rot), Startseite „Heute", neue Template-Felder (Giftigkeit, Schwierigkeit, Anfängerfehler, Winterfaktor) zusammen mit #184.
