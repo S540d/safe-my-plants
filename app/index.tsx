@@ -1,45 +1,17 @@
-import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import React, { useMemo } from 'react'
 import { SafeAreaView, SectionList, StyleSheet, Text, View } from 'react-native'
 import { EmptyState } from '../src/components/EmptyState'
 import { HeaderMenu } from '../src/components/HeaderMenu'
+import { Icon } from '../src/components/Icon'
 import { PlantCard } from '../src/components/PlantCard'
+import { ScreenHeader } from '../src/components/ScreenHeader'
 import { Radius, Spacing, Typography } from '../src/constants/theme'
 import { usePlants } from '../src/contexts/PlantContext'
 import { usePreferences } from '../src/hooks/usePreferences'
 import { useThemeColors } from '../src/hooks/useThemeColors'
-import { t, Language } from '../src/i18n/translations'
-import { Plant } from '../src/types/plant'
-
-interface Section {
-  title: string
-  data: Plant[]
-}
-
-function groupByRoom(plants: Plant[], lang: Language): Section[] {
-  const groups: Record<string, Plant[]> = {}
-  const noRoom: Plant[] = []
-
-  for (const plant of plants) {
-    const room = plant.room?.trim()
-    if (room) {
-      groups[room] = [...(groups[room] ?? []), plant]
-    } else {
-      noRoom.push(plant)
-    }
-  }
-
-  const sections: Section[] = Object.entries(groups)
-    .sort(([a], [b]) => a.localeCompare(b, lang))
-    .map(([title, data]) => ({ title, data }))
-
-  if (noRoom.length > 0) {
-    sections.push({ title: t(lang, 'home_no_room'), data: noRoom })
-  }
-
-  return sections
-}
+import { t } from '../src/i18n/translations'
+import { buildHomeSections } from '../src/utils/homeSections'
 
 export default function HomeScreen() {
   const { plants, isLoaded, markWatered, markFertilized, snoozeWatering } = usePlants()
@@ -47,30 +19,40 @@ export default function HomeScreen() {
   const colors = useThemeColors()
   const router = useRouter()
 
-  const sections = useMemo(() => groupByRoom(plants, language), [plants, language])
+  const sections = useMemo(
+    () =>
+      buildHomeSections(plants, {
+        dueTitle: t(language, 'home_due_title'),
+        noRoomTitle: t(language, 'home_no_room'),
+        locale: language,
+      }),
+    [plants, language]
+  )
+  const dueCount = sections.find((section) => section.kind === 'due')?.data.length ?? 0
 
   const plantCount = plants.length
   const countLabel = plantCount === 1 ? t(language, 'home_plant_singular') : t(language, 'home_plant_plural')
+  const subtitle =
+    dueCount === 0
+      ? `${plantCount} ${countLabel}`
+      : dueCount === 1
+        ? t(language, 'home_due_one')
+        : t(language, 'home_due_other', { n: dueCount })
 
   if (!isLoaded) return null
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <LinearGradient colors={[colors.gradientStart, colors.gradientEnd]} style={styles.header}>
-        <View style={styles.headerRow}>
-          <View>
-            <Text style={styles.headerTitle}>{t(language, 'home_title')}</Text>
-            <Text style={[styles.headerCount, { color: colors.gradientText }]}>
-              {plantCount} {countLabel}
-            </Text>
-          </View>
-          <HeaderMenu lang={language} />
-        </View>
-      </LinearGradient>
+      <ScreenHeader
+        large
+        title={t(language, 'home_title')}
+        subtitle={subtitle}
+        right={<HeaderMenu lang={language} />}
+      />
 
       {plants.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <EmptyState icon="🪴" title={t(language, 'home_empty_tap')} />
+          <EmptyState icon="plants" title={t(language, 'home_empty_tap')} />
         </View>
       ) : (
         <SectionList
@@ -87,9 +69,26 @@ export default function HomeScreen() {
               onSnooze={() => snoozeWatering(item.id)}
             />
           )}
+          ListHeaderComponent={
+            dueCount === 0 ? (
+              <View style={[styles.allDone, { backgroundColor: colors.accentSurface }]}>
+                <Icon name="check" size={22} color={colors.primaryLight} />
+                <View style={styles.allDoneText}>
+                  <Text style={[styles.allDoneTitle, { color: colors.primary }]}>
+                    {t(language, 'home_all_done_title')}
+                  </Text>
+                  <Text style={[styles.allDoneBody, { color: colors.textMuted }]}>
+                    {t(language, 'home_all_done_body')}
+                  </Text>
+                </View>
+              </View>
+            ) : null
+          }
           renderSectionHeader={({ section }) => (
             <View style={styles.sectionHeader}>
-              <Text style={[styles.sectionTitle, { color: colors.primaryLight }]}>{section.title}</Text>
+              <Text style={[styles.sectionTitle, { color: section.kind === 'due' ? colors.accent : colors.primary }]}>
+                {section.title}
+              </Text>
             </View>
           )}
           contentContainerStyle={styles.list}
@@ -105,34 +104,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    paddingHorizontal: Spacing.xl,
-    paddingTop: Spacing.lg,
-    paddingBottom: Spacing.xl,
-  },
-  headerRow: {
+  allDone: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: Spacing.md,
+    marginHorizontal: Spacing.lg,
+    marginTop: Spacing.lg,
+    padding: Spacing.lg,
+    borderRadius: Radius.xl,
   },
-  headerTitle: {
-    ...Typography.headerTitle,
-    color: '#fff',
-  },
-  headerCount: {
-    fontSize: 14,
-    marginTop: 2,
-  },
+  allDoneText: { flex: 1 },
+  allDoneTitle: { ...Typography.title },
+  allDoneBody: { fontSize: 13, marginTop: 2 },
   sectionHeader: {
     paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.lg,
-    paddingBottom: Spacing.xs + 2,
+    paddingTop: Spacing.xl,
+    paddingBottom: Spacing.sm,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    ...Typography.sectionTitle,
   },
   list: {
     paddingBottom: Spacing.xxl,

@@ -184,6 +184,18 @@ const translations = {
     add_plant_water_every: 'Gießen alle',
     add_plant_fertilize_every: 'Düngen alle',
     add_plant_hint: 'Weitere Details (Fotos, Krankheiten, …) kannst du später über "Pflanzen verwalten" ergänzen.',
+    add_plant_last_watered: 'Wann hast du zuletzt gegossen?',
+    add_plant_last_watered_today: 'Heute',
+    add_plant_last_watered_few_days: 'Vor 2–3 Tagen',
+    add_plant_last_watered_week: 'Vor etwa einer Woche',
+    add_plant_last_watered_unknown: 'Weiß nicht',
+    add_plant_last_watered_hint:
+      'Bei „Weiß nicht" meldet sich die Pflanze sofort – prüfe dann mit dem Fingertest die Erde.',
+    add_plant_last_fertilized: 'Wann hast du zuletzt gedüngt?',
+    add_plant_last_fertilized_today: 'Heute',
+    add_plant_last_fertilized_two_weeks: 'Vor etwa 2 Wochen',
+    add_plant_last_fertilized_month: 'Vor über einem Monat',
+    add_plant_last_fertilized_unknown: 'Weiß nicht / noch nie',
     add_plant_save: 'Pflanze hinzufügen',
     add_plant_empty_hint: 'Tippe einen Pflanzennamen ein, um loszulegen.',
 
@@ -224,12 +236,21 @@ const translations = {
     home_plant_singular: 'Pflanze',
     home_plant_plural: 'Pflanzen',
     home_no_room: 'Ohne Raum',
+    home_due_title: 'Heute dran',
+    home_due_one: '1 Pflanze braucht Pflege',
+    home_due_other: '{{n}} Pflanzen brauchen Pflege',
+    home_all_done_title: 'Alles erledigt',
+    home_all_done_body: 'Deinen Pflanzen geht es gut. Schau später wieder vorbei.',
     home_empty_tap: 'Noch keine Pflanzen.\nTippe auf ⋮ → Pflanze hinzufügen.',
 
     // PlantCard
-    card_watered: '💧 Gegossen',
-    card_fertilized: '🌿 Gedüngt',
-    card_soil_moist: '✋ Erde noch feucht – später prüfen',
+    card_watered: 'Gegossen',
+    card_fertilized: 'Gedüngt',
+    card_soil_moist: 'Erde noch feucht – später prüfen',
+    settings_photo_credits: 'Bildnachweise',
+    settings_photo_credits_intro:
+      'Die Vorlagenbilder stammen von Wikimedia Commons. Tippe auf einen Eintrag für Urheber und Lizenz.',
+    photo_credit_prefix: 'Foto',
 
     // Common
     ok: 'OK',
@@ -429,6 +450,18 @@ const translations = {
     add_plant_water_every: 'Water every',
     add_plant_fertilize_every: 'Fertilize every',
     add_plant_hint: 'Additional details (photos, diseases, …) can be added later via "Manage plants".',
+    add_plant_last_watered: 'When did you last water it?',
+    add_plant_last_watered_today: 'Today',
+    add_plant_last_watered_few_days: '2–3 days ago',
+    add_plant_last_watered_week: 'About a week ago',
+    add_plant_last_watered_unknown: "Don't know",
+    add_plant_last_watered_hint:
+      'With "Don\'t know" the plant shows up as due right away – check the soil with the finger test.',
+    add_plant_last_fertilized: 'When did you last fertilize it?',
+    add_plant_last_fertilized_today: 'Today',
+    add_plant_last_fertilized_two_weeks: 'About 2 weeks ago',
+    add_plant_last_fertilized_month: 'Over a month ago',
+    add_plant_last_fertilized_unknown: "Don't know / never",
     add_plant_save: 'Add plant',
     add_plant_empty_hint: 'Type a plant name to get started.',
 
@@ -469,12 +502,20 @@ const translations = {
     home_plant_singular: 'plant',
     home_plant_plural: 'plants',
     home_no_room: 'No room',
+    home_due_title: 'Needs care today',
+    home_due_one: '1 plant needs care',
+    home_due_other: '{{n}} plants need care',
+    home_all_done_title: 'All done',
+    home_all_done_body: 'Your plants are doing fine. Check back later.',
     home_empty_tap: 'No plants yet.\nTap ⋮ → Add plant.',
 
     // PlantCard
-    card_watered: '💧 Watered',
-    card_fertilized: '🌿 Fertilized',
-    card_soil_moist: '✋ Soil still moist – check later',
+    card_watered: 'Watered',
+    card_fertilized: 'Fertilized',
+    card_soil_moist: 'Soil still moist – check later',
+    settings_photo_credits: 'Photo credits',
+    settings_photo_credits_intro: 'Template photos come from Wikimedia Commons. Tap an entry for author and license.',
+    photo_credit_prefix: 'Photo',
 
     // Common
     ok: 'OK',

@@ -1,5 +1,4 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import React, { useRef, useState } from 'react'
 import {
@@ -12,31 +11,41 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { Icon, IconName } from '../src/components/Icon'
+import { brandHeader, brandPalette } from '../src/constants/brandPalette'
+import { Typography } from '../src/constants/theme'
 import { usePreferences } from '../src/hooks/usePreferences'
 import { t } from '../src/i18n/translations'
+
+// Onboarding nutzt bewusst immer die dunkle Markenfläche (wie der Header).
+const BG = brandHeader.light.background
+const ON_BG = brandHeader.light.title
+const ON_BG_MUTED = brandHeader.light.subtitle
+const STATUS_DOTS = [brandPalette.dark.statusOk, brandPalette.dark.statusSoon, brandPalette.dark.statusOverdue]
 
 const ONBOARDED_KEY = 'smp-onboarded'
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
 interface Slide {
-  emoji: string
+  /** `traffic` = Ampel-Illustration aus den drei Statusfarben. */
+  icon: IconName | 'traffic'
   titleKey: 'onboarding_slide1_title' | 'onboarding_slide2_title' | 'onboarding_slide3_title'
   bodyKey: 'onboarding_slide1_body' | 'onboarding_slide2_body' | 'onboarding_slide3_body'
 }
 
 const SLIDES: Slide[] = [
   {
-    emoji: '🌿',
+    icon: 'plants',
     titleKey: 'onboarding_slide1_title',
     bodyKey: 'onboarding_slide1_body',
   },
   {
-    emoji: '🚦',
+    icon: 'traffic',
     titleKey: 'onboarding_slide2_title',
     bodyKey: 'onboarding_slide2_body',
   },
   {
-    emoji: '💧',
+    icon: 'water',
     titleKey: 'onboarding_slide3_title',
     bodyKey: 'onboarding_slide3_body',
   },
@@ -74,7 +83,7 @@ export default function OnboardingScreen() {
   const isLastSlide = currentIndex === SLIDES.length - 1
 
   return (
-    <LinearGradient colors={['#1B4332', '#2D6A4F', '#52B788']} style={styles.container}>
+    <View style={[styles.container, { backgroundColor: BG }]}>
       {/* Skip button */}
       <View style={styles.header}>
         <TouchableOpacity onPress={completeOnboarding} style={styles.skipButton}>
@@ -94,7 +103,17 @@ export default function OnboardingScreen() {
         scrollEventThrottle={16}
         renderItem={({ item }) => (
           <View style={styles.slide}>
-            <Text style={styles.emoji}>{item.emoji}</Text>
+            <View style={styles.illustration}>
+              {item.icon === 'traffic' ? (
+                <View style={styles.trafficRow}>
+                  {STATUS_DOTS.map((color) => (
+                    <View key={color} style={[styles.trafficDot, { backgroundColor: color }]} />
+                  ))}
+                </View>
+              ) : (
+                <Icon name={item.icon} size={64} color={ON_BG} />
+              )}
+            </View>
             <Text style={styles.title}>{t(language, item.titleKey)}</Text>
             <Text style={styles.body}>{t(language, item.bodyKey)}</Text>
           </View>
@@ -116,7 +135,7 @@ export default function OnboardingScreen() {
           </Text>
         </TouchableOpacity>
       </View>
-    </LinearGradient>
+    </View>
   )
 }
 
@@ -134,7 +153,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
   },
   skipText: {
-    color: 'rgba(255,255,255,0.75)',
+    color: ON_BG_MUTED,
     fontSize: 15,
     fontWeight: '500',
   },
@@ -145,21 +164,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 40,
   },
-  emoji: {
-    fontSize: 80,
-    marginBottom: 32,
+  illustration: {
+    width: 148,
+    height: 148,
+    borderRadius: 74,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 36,
   },
+  trafficRow: { flexDirection: 'row', gap: 12 },
+  trafficDot: { width: 28, height: 28, borderRadius: 14 },
   title: {
-    fontSize: 26,
-    fontWeight: '700',
-    color: '#fff',
+    ...Typography.headerTitle,
+    color: ON_BG,
     textAlign: 'center',
     marginBottom: 16,
     lineHeight: 34,
   },
   body: {
     fontSize: 17,
-    color: 'rgba(255,255,255,0.88)',
+    color: ON_BG_MUTED,
     textAlign: 'center',
     lineHeight: 26,
   },
@@ -176,7 +201,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   dotActive: {
-    backgroundColor: '#fff',
+    backgroundColor: ON_BG,
     width: 24,
   },
   dotInactive: {
@@ -187,8 +212,8 @@ const styles = StyleSheet.create({
     paddingBottom: 48,
   },
   nextButton: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
+    backgroundColor: ON_BG,
+    borderRadius: 999,
     paddingVertical: 16,
     alignItems: 'center',
     shadowColor: '#000',
@@ -198,7 +223,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   nextText: {
-    color: '#1B4332',
+    color: BG,
     fontSize: 17,
     fontWeight: '700',
   },

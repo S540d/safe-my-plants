@@ -1,6 +1,9 @@
+import { useRouter } from 'expo-router'
 import React, { useMemo } from 'react'
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from 'react-native'
-import { Shadow } from '../src/constants/theme'
+import { Icon, IconName } from '../src/components/Icon'
+import { ScreenHeader } from '../src/components/ScreenHeader'
+import { Fonts, Shadow, Typography } from '../src/constants/theme'
 import { useCareLog } from '../src/hooks/useCareLog'
 import { usePlants } from '../src/contexts/PlantContext'
 import { usePreferences } from '../src/hooks/usePreferences'
@@ -10,6 +13,7 @@ import { t } from '../src/i18n/translations'
 
 export default function StatsScreen() {
   const { language } = usePreferences()
+  const router = useRouter()
   const colors = useThemeColors()
   const { current, longest } = useStreak()
   const { getRecentActions } = useCareLog()
@@ -46,17 +50,14 @@ export default function StatsScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <ScreenHeader title={t(language, 'stats_title')} onBack={() => router.back()} backLabel={t(language, 'back')} />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={[styles.header, { color: colors.primary }]}>{t(language, 'stats_title')}</Text>
-
         {/* Streak */}
-        <View style={[styles.streakCard, { backgroundColor: colors.primary }, Shadow.menu]}>
-          <Text style={styles.streakEmoji}>🔥</Text>
-          <Text style={[styles.streakNumber, { color: colors.accent }]}>{current}</Text>
-          <Text style={[styles.streakLabel, { color: colors.accentSurface }]}>
-            {t(language, 'stats_streak_current')}
-          </Text>
-          <Text style={[styles.streakRecord, { color: colors.primaryLight }]}>
+        <View style={[styles.streakCard, { backgroundColor: colors.gradientStart }, Shadow.card]}>
+          <Icon name="streak" size={36} color={colors.accent} />
+          <Text style={[styles.streakNumber, { color: colors.headerTitle }]}>{current}</Text>
+          <Text style={[styles.streakLabel, { color: colors.headerTitle }]}>{t(language, 'stats_streak_current')}</Text>
+          <Text style={[styles.streakRecord, { color: colors.gradientText }]}>
             {t(language, 'stats_streak_longest')}: {longest} {t(language, 'stats_streak_days')}
           </Text>
         </View>
@@ -64,22 +65,27 @@ export default function StatsScreen() {
         {/* This month */}
         <Text style={[styles.sectionTitle, { color: colors.primary }]}>{t(language, 'stats_this_month')}</Text>
         <View style={styles.monthGrid}>
-          <StatTile icon="💧" count={waterCount} label={t(language, 'stats_actions_water')} colors={colors} />
-          <StatTile icon="🌿" count={fertilizeCount} label={t(language, 'stats_actions_fertilize')} colors={colors} />
-          <StatTile icon="✂️" count={otherCount} label={t(language, 'stats_actions_other')} colors={colors} />
+          <StatTile icon="water" count={waterCount} label={t(language, 'stats_actions_water')} colors={colors} />
+          <StatTile
+            icon="fertilize"
+            count={fertilizeCount}
+            label={t(language, 'stats_actions_fertilize')}
+            colors={colors}
+          />
+          <StatTile icon="prune" count={otherCount} label={t(language, 'stats_actions_other')} colors={colors} />
         </View>
 
         {/* Plant highlights */}
         <Text style={[styles.sectionTitle, { color: colors.primary }]}>{t(language, 'stats_highlights')}</Text>
         <View style={styles.highlightCards}>
           <HighlightCard
-            icon="💧"
+            icon="water"
             title={t(language, 'stats_thirstiest')}
             plantName={thirstiestPlant?.name}
             colors={colors}
           />
           <HighlightCard
-            icon="⭐"
+            icon="star"
             title={t(language, 'stats_most_active')}
             plantName={mostActivePlant?.name}
             colors={colors}
@@ -92,10 +98,22 @@ export default function StatsScreen() {
 
 type ThemeColors = ReturnType<typeof useThemeColors>
 
-function StatTile({ icon, count, label, colors }: { icon: string; count: number; label: string; colors: ThemeColors }) {
+function StatTile({
+  icon,
+  count,
+  label,
+  colors,
+}: {
+  icon: IconName
+  count: number
+  label: string
+  colors: ThemeColors
+}) {
   return (
     <View style={[styles.statTile, { backgroundColor: colors.surface }, Shadow.cardSm]}>
-      <Text style={styles.statTileIcon}>{icon}</Text>
+      <View style={[styles.iconCircle, { backgroundColor: colors.accentSurface }]}>
+        <Icon name={icon} size={22} color={colors.primaryLight} />
+      </View>
       <Text style={[styles.statTileCount, { color: colors.primary }]}>{count}</Text>
       <Text style={[styles.statTileLabel, { color: colors.textMuted }]}>{label}</Text>
     </View>
@@ -108,14 +126,16 @@ function HighlightCard({
   plantName,
   colors,
 }: {
-  icon: string
+  icon: IconName
   title: string
   plantName?: string
   colors: ThemeColors
 }) {
   return (
     <View style={[styles.highlightCard, { backgroundColor: colors.surface }, Shadow.cardSm]}>
-      <Text style={styles.highlightIcon}>{icon}</Text>
+      <View style={[styles.iconCircle, { backgroundColor: colors.accentSurface }]}>
+        <Icon name={icon} size={22} color={colors.primaryLight} />
+      </View>
       <View style={styles.highlightContent}>
         <Text style={[styles.highlightTitle, { color: colors.textMuted }]}>{title}</Text>
         <Text style={[styles.highlightName, { color: colors.primary }]}>{plantName ?? '–'}</Text>
@@ -126,29 +146,22 @@ function HighlightCard({
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scroll: { padding: 16, paddingBottom: 40 },
-  header: {
-    fontSize: 28,
-    fontWeight: '800',
-    marginBottom: 20,
-  },
+  scroll: { padding: 16, paddingTop: 20, paddingBottom: 40 },
   streakCard: {
     borderRadius: 20,
     padding: 28,
     alignItems: 'center',
     marginBottom: 24,
   },
-  streakEmoji: { fontSize: 48, marginBottom: 4 },
   streakNumber: {
     fontSize: 64,
-    fontWeight: '900',
-    lineHeight: 70,
+    fontFamily: Fonts.displayBold,
+    lineHeight: 74,
   },
   streakLabel: { fontSize: 16, fontWeight: '600', marginTop: 4 },
   streakRecord: { fontSize: 13, marginTop: 8 },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    ...Typography.sectionTitle,
     marginBottom: 12,
     marginTop: 4,
   },
@@ -163,8 +176,8 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
   },
-  statTileIcon: { fontSize: 28, marginBottom: 6 },
-  statTileCount: { fontSize: 28, fontWeight: '800' },
+  iconCircle: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  statTileCount: { fontSize: 28, fontFamily: Fonts.displayBold, marginTop: 6 },
   statTileLabel: { fontSize: 11, textAlign: 'center', marginTop: 2 },
   highlightCards: { gap: 10, marginBottom: 24 },
   highlightCard: {
@@ -174,7 +187,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 16,
   },
-  highlightIcon: { fontSize: 28 },
   highlightContent: { flex: 1 },
   highlightTitle: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.4 },
   highlightName: { fontSize: 16, fontWeight: '700', marginTop: 2 },

@@ -1,20 +1,23 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { useCareLog } from '../hooks/useCareLog'
+import { Shadow, Typography } from '../constants/theme'
 import { usePreferences } from '../hooks/usePreferences'
+import { useThemeColors } from '../hooks/useThemeColors'
 import { t } from '../i18n/translations'
 import { CareActionType } from '../types/careLog'
+import { Icon, IconName } from './Icon'
 
 interface Props {
   plantId: string
 }
 
-const ACTION_ICONS: Record<CareActionType, string> = {
-  water: '💧',
-  fertilize: '🌿',
-  repot: '🪴',
-  prune: '✂️',
-  note: '📝',
+const ACTION_ICONS: Record<CareActionType, IconName> = {
+  water: 'water',
+  fertilize: 'fertilize',
+  repot: 'repot',
+  prune: 'prune',
+  note: 'note',
 }
 
 const ACTION_LABEL_KEYS = {
@@ -46,29 +49,36 @@ function formatRelativeDate(iso: string, lang: string): string {
 export function CareHistoryList({ plantId }: Props) {
   const { getActionsForPlant } = useCareLog()
   const { language } = usePreferences()
+  const colors = useThemeColors()
   const actions = getActionsForPlant(plantId, 20)
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{t(language, 'history_title')}</Text>
+      <Text style={[styles.title, { color: colors.primary }]}>{t(language, 'history_title')}</Text>
       {actions.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>{t(language, 'history_empty')}</Text>
+        <View style={[styles.emptyContainer, { backgroundColor: colors.surface }, Shadow.cardSm]}>
+          <Text style={[styles.emptyText, { color: colors.textMuted }]}>{t(language, 'history_empty')}</Text>
         </View>
       ) : (
-        <View style={styles.list}>
+        <View style={[styles.list, { backgroundColor: colors.surface }, Shadow.cardSm]}>
           {actions.map((action) => (
-            <View key={action.id} style={styles.row}>
-              <Text style={styles.rowIcon}>{ACTION_ICONS[action.type]}</Text>
+            <View key={action.id} style={[styles.row, { borderBottomColor: colors.border }]}>
+              <View style={[styles.rowIcon, { backgroundColor: colors.accentSurface }]}>
+                <Icon name={ACTION_ICONS[action.type]} size={16} color={colors.primaryLight} />
+              </View>
               <View style={styles.rowContent}>
-                <Text style={styles.rowLabel}>{t(language, ACTION_LABEL_KEYS[action.type])}</Text>
+                <Text style={[styles.rowLabel, { color: colors.primary }]}>
+                  {t(language, ACTION_LABEL_KEYS[action.type])}
+                </Text>
                 {action.note ? (
-                  <Text style={styles.rowNote} numberOfLines={2}>
+                  <Text style={[styles.rowNote, { color: colors.textMuted }]} numberOfLines={2}>
                     {action.note}
                   </Text>
                 ) : null}
               </View>
-              <Text style={styles.rowDate}>{formatRelativeDate(action.timestamp, language)}</Text>
+              <Text style={[styles.rowDate, { color: colors.textSubtle }]}>
+                {formatRelativeDate(action.timestamp, language)}
+              </Text>
             </View>
           ))}
         </View>
@@ -82,49 +92,33 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1B4332',
+    ...Typography.sectionTitle,
     marginBottom: 10,
   },
   emptyContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 20,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
   },
   emptyText: {
     fontSize: 14,
-    color: '#6B7280',
     textAlign: 'center',
   },
   list: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 16,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 11,
     paddingHorizontal: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0FFF4',
+    borderBottomWidth: StyleSheet.hairlineWidth,
     gap: 10,
   },
-  rowIcon: { fontSize: 18, width: 24, textAlign: 'center' },
+  rowIcon: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
   rowContent: { flex: 1 },
-  rowLabel: { fontSize: 14, fontWeight: '600', color: '#1B4332' },
-  rowNote: { fontSize: 12, color: '#6B7280', marginTop: 2 },
-  rowDate: { fontSize: 12, color: '#74C69D', flexShrink: 0 },
+  rowLabel: { fontSize: 14, fontWeight: '600' },
+  rowNote: { fontSize: 12, marginTop: 2 },
+  rowDate: { fontSize: 12, flexShrink: 0 },
 })

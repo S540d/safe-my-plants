@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
 import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Shadow, Typography } from '../constants/theme'
 import { useCareLog } from '../hooks/useCareLog'
+import { useThemeColors } from '../hooks/useThemeColors'
 import { t, Language } from '../i18n/translations'
+import { Icon } from './Icon'
 
 interface Props {
   plantId: string
@@ -26,6 +29,7 @@ function formatNoteDate(iso: string, lang: Language): string {
 
 function NoteItem({ text, date, lang }: { text: string; date: string; lang: Language }) {
   const [expanded, setExpanded] = useState(false)
+  const colors = useThemeColors()
   const lines = text.split('\n')
   // isLong: either too many chars OR too many lines
   const isLong = text.length > 180 || lines.length > 3
@@ -38,12 +42,20 @@ function NoteItem({ text, date, lang }: { text: string; date: string; lang: Lang
         : text.slice(0, 180).trimEnd() + '…'
 
   return (
-    <View style={styles.noteItem}>
-      <Text style={styles.noteDate}>{formatNoteDate(date, lang)}</Text>
-      <Text style={styles.noteText}>{displayed}</Text>
+    <View
+      style={[
+        styles.noteItem,
+        { backgroundColor: colors.surface, borderLeftColor: colors.primaryLight },
+        Shadow.cardSm,
+      ]}
+    >
+      <Text style={[styles.noteDate, { color: colors.primaryLight }]}>{formatNoteDate(date, lang)}</Text>
+      <Text style={[styles.noteText, { color: colors.text }]}>{displayed}</Text>
       {isLong && (
         <TouchableOpacity onPress={() => setExpanded((v) => !v)}>
-          <Text style={styles.expandLink}>{expanded ? t(lang, 'notes_show_less') : t(lang, 'notes_show_more')}</Text>
+          <Text style={[styles.expandLink, { color: colors.primaryLight }]}>
+            {expanded ? t(lang, 'notes_show_less') : t(lang, 'notes_show_more')}
+          </Text>
         </TouchableOpacity>
       )}
     </View>
@@ -52,6 +64,7 @@ function NoteItem({ text, date, lang }: { text: string; date: string; lang: Lang
 
 export function NotesSection({ plantId, lang }: Props) {
   const { addAction, actions } = useCareLog()
+  const colors = useThemeColors()
   const [modalVisible, setModalVisible] = useState(false)
   const [draft, setDraft] = useState('')
 
@@ -77,30 +90,33 @@ export function NotesSection({ plantId, lang }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{t(lang, 'notes_title')}</Text>
+        <Text style={[styles.title, { color: colors.primary }]}>{t(lang, 'notes_title')}</Text>
         <TouchableOpacity
-          style={styles.addBtn}
+          style={[styles.addBtn, { backgroundColor: colors.primary }]}
           onPress={() => setModalVisible(true)}
           accessibilityLabel={t(lang, 'notes_add')}
         >
-          <Text style={styles.addBtnText}>+</Text>
+          <Icon name="add" size={20} color={colors.textOnPrimary} />
         </TouchableOpacity>
       </View>
 
       {notes.length === 0 ? (
-        <Text style={styles.empty}>{t(lang, 'notes_empty')}</Text>
+        <Text style={[styles.empty, { color: colors.textSubtle }]}>{t(lang, 'notes_empty')}</Text>
       ) : (
         notes.map((note) => <NoteItem key={note.id} text={note.note ?? ''} date={note.timestamp} lang={lang} />)
       )}
 
       <Modal visible={modalVisible} transparent animationType="slide" onRequestClose={handleClose}>
         <View style={styles.backdrop}>
-          <View style={styles.sheet}>
-            <Text style={styles.sheetTitle}>{t(lang, 'notes_add')}</Text>
+          <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.sheetTitle, { color: colors.primary }]}>{t(lang, 'notes_add')}</Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                { borderColor: colors.border, backgroundColor: colors.background, color: colors.text },
+              ]}
               placeholder={t(lang, 'notes_placeholder')}
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={colors.textSubtle}
               multiline
               numberOfLines={5}
               value={draft}
@@ -109,11 +125,14 @@ export function NotesSection({ plantId, lang }: Props) {
               textAlignVertical="top"
             />
             <View style={styles.row}>
-              <TouchableOpacity style={[styles.btn, styles.btnSecondary]} onPress={handleClose}>
-                <Text style={styles.btnSecondaryText}>{t(lang, 'cancel')}</Text>
+              <TouchableOpacity
+                style={[styles.btn, styles.btnSecondary, { borderColor: colors.border }]}
+                onPress={handleClose}
+              >
+                <Text style={[styles.btnSecondaryText, { color: colors.primaryMid }]}>{t(lang, 'cancel')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.btn, styles.btnPrimary]} onPress={handleSave}>
-                <Text style={styles.btnPrimaryText}>{t(lang, 'notes_save')}</Text>
+              <TouchableOpacity style={[styles.btn, { backgroundColor: colors.primary }]} onPress={handleSave}>
+                <Text style={[styles.btnPrimaryText, { color: colors.textOnPrimary }]}>{t(lang, 'notes_save')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -126,60 +145,46 @@ export function NotesSection({ plantId, lang }: Props) {
 const styles = StyleSheet.create({
   container: { marginTop: 8, marginBottom: 8 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
-  title: { fontSize: 18, fontWeight: '700', color: '#1B4332' },
+  title: { ...Typography.sectionTitle },
   addBtn: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#52B788',
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  addBtnText: { color: '#fff', fontSize: 20, lineHeight: 22, fontWeight: '600' },
-  empty: { fontSize: 14, color: '#9CA3AF', fontStyle: 'italic', paddingVertical: 8 },
+  empty: { fontSize: 14, fontStyle: 'italic', paddingVertical: 8 },
   noteItem: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 12,
     marginBottom: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#52B788',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
   },
-  noteDate: { fontSize: 11, color: '#74C69D', fontWeight: '600', marginBottom: 4 },
-  noteText: { fontSize: 14, color: '#333', lineHeight: 20 },
-  expandLink: { fontSize: 12, color: '#52B788', marginTop: 4, fontWeight: '600' },
+  noteDate: { fontSize: 11, fontWeight: '600', marginBottom: 4 },
+  noteText: { fontSize: 14, lineHeight: 20 },
+  expandLink: { fontSize: 12, marginTop: 4, fontWeight: '600' },
   backdrop: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.45)',
     justifyContent: 'flex-end',
   },
   sheet: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
     padding: 20,
     paddingBottom: 36,
   },
-  sheetTitle: { fontSize: 17, fontWeight: '700', color: '#1B4332', marginBottom: 12 },
+  sheetTitle: { ...Typography.title, marginBottom: 12 },
   input: {
     borderWidth: 1.5,
-    borderColor: '#B7E4C7',
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 12,
     fontSize: 15,
     minHeight: 110,
-    backgroundColor: '#F0FFF4',
-    color: '#1A1A1A',
   },
   row: { flexDirection: 'row', gap: 10, marginTop: 12 },
-  btn: { flex: 1, padding: 12, borderRadius: 10, alignItems: 'center' },
-  btnPrimary: { backgroundColor: '#2D6A4F' },
-  btnSecondary: { backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#B7E4C7' },
-  btnPrimaryText: { color: '#fff', fontSize: 15, fontWeight: '600' },
-  btnSecondaryText: { color: '#2D6A4F', fontSize: 15 },
+  btn: { flex: 1, padding: 12, borderRadius: 999, alignItems: 'center' },
+  btnSecondary: { borderWidth: 1.5 },
+  btnPrimaryText: { fontSize: 15, fontWeight: '600' },
+  btnSecondaryText: { fontSize: 15 },
 })
