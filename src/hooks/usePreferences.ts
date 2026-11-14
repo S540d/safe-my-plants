@@ -2,6 +2,7 @@ import { getLocales } from 'expo-localization'
 import { useCallback, useEffect, useState } from 'react'
 import { clearLegacyAdminPin, getLanguage, getTheme, saveLanguage, saveTheme } from '../services/storage'
 import { Language } from '../i18n/translations'
+import { languageFromLocaleCode } from '../i18n/deviceLanguage'
 
 type ThemeMode = 'light' | 'dark' | 'system'
 
@@ -14,8 +15,7 @@ interface Preferences {
 }
 
 function getDeviceLanguage(): Language {
-  const locale = getLocales()[0]?.languageCode ?? 'de'
-  return locale === 'en' ? 'en' : 'de'
+  return languageFromLocaleCode(getLocales()[0]?.languageCode)
 }
 
 // Module-level subscribers so every usePreferences instance stays in sync
