@@ -17,4 +17,4 @@ Dein Begleiter für Zimmerpflanzen: Pflegetipps, Gieß- und Düngeerinnerung per
 
 ## Lizenz
 
-Siehe [LICENSE](LICENSE).
+PolyForm Noncommercial 1.0.0 (nicht-kommerzielle Nutzung) — siehe [LICENSE](LICENSE).
